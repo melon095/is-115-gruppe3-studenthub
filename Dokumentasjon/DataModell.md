@@ -121,4 +121,30 @@ erDiagram
             
         TIMESTAMP opprettet_på
     }
+    
+    STUDENT ||--o{ GRUPPE_MEDLEM : "er medlem av"
+    STUDENT ||--o{ INNLEGG : "skriver"
+    STUDENT ||--o{ REAKSJON : "lager"
+    STUDENT ||--o{ OPPGAVE : "opprettet av"
+    STUDENT ||--o{ DISKUSJONSTRAAD : "opprettet av"
+    STUDENT ||--o{ FIL : "opprettet av"
+    STUDENT ||--o{ FIL_VERSJON : "opprettet av"
+    STUDENT ||--o{ INVITASJON_KODE : "opprettet av"
+    
+    GRUPPE ||--o{ GRUPPE_MEDLEM : "har"
+    GRUPPE ||--o{ OPPGAVE : "inneholder"
+    GRUPPE ||--o{ INVITASJON_KODE : "har"
+    
+    OPPGAVE ||--o{ DISKUSJONSTRAAD : "inneholder"
+    OPPGAVE ||--o{ FIL : "kan ha"
+    
+    DISKUSJONSTRAAD ||--o{ INNLEGG : "inneholder"
+    
+    INNLEGG ||--o{ INNLEGG : "kan svare på"
+    INNLEGG ||--o{ REAKSJON : "får"
+    
+    REAKSJON ||--o{ REAKSJON_TYPE : "av type"
+    
+    FIL ||--o{ FIL_VERSJON : "har"
+    FIL ||--o{ INNLEGG : "kommentert på"
 ```
