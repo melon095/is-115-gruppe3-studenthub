@@ -22,10 +22,14 @@
     <link rel="stylesheet" href="/assets/css/colors.css">
     <link rel="stylesheet" href="/assets/css/base.css">
     <link rel="stylesheet" href="/assets/css/layout.css">
+    <?php foreach ($page_styles ?? [] as $stylesheet): ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheet); ?>">
+    <?php endforeach; ?>
 </head>
 
 <body>
     <?php include __DIR__."/../components/header.tpl.php"; ?>
+    <?php include __DIR__."/../components/breadcrumb.tpl.php"; ?>
 
     <main class="main">
         <button id="toggle-sidebar" class="toggle-btn" aria-label="Åpne meny">= </button>

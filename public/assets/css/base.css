@@ -34,6 +34,64 @@ button {
     cursor: pointer;
 }
 
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.button-primary {
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+}
+
+.button-primary:hover {
+    background-color: var(--primary-700);
+    color: var(--text-on-dark);
+}
+
+.button-secondary {
+    background-color: transparent;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.button-secondary:hover {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.button-success {
+    background-color: var(--secondary-600);
+    color: var(--text-on-dark);
+}
+
+.button-success:hover {
+    background-color: var(--secondary-700);
+    color: var(--text-on-dark);
+}
+
+.button-warning {
+    background-color: var(--tertiary-600);
+    color: var(--text-on-dark);
+}
+
+.button-warning:hover {
+    background-color: var(--tertiary-700);
+    color: var(--text-on-dark);
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
     font-weight: 600;
@@ -64,6 +122,44 @@ h1, h2, h3, h4, h5, h6 {
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+.breadcrumb ul {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: "/";
+    color: var(--border);
+}
+
+.breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    color: var(--link);
+    text-decoration: underline;
+}
+
+.breadcrumb span[aria-current="page"] {
+    color: var(--text);
+    font-weight: 500;
 }
 
 footer {
