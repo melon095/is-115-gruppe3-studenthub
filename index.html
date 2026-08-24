@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudentHub</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f5f5f5;
+}
+
+header{
+    background:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid #ccc;
+}
+
+.groups{
+    display:flex;
+    gap:10px;
+}
+
+.group{
+    background:#e8e8e8;
+    padding:10px 15px;
+    border-radius:8px;
+}
+
+.profile{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#ccc;
+}
+
+main{
+    padding:20px;
+}
+
+.top-section{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.box{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+.card{
+    background:#f7f7f7;
+    padding:15px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-content{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    width:400px;
+}
+
+.modal-content input,
+.modal-content textarea{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+}
+
+.modal-content textarea{
+    height:100px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="groups">
+        <div class="group">Gruppe 1</div>
+        <div class="group">Gruppe 2</div>
+        <div class="group">Gruppe 3</div>
+    </div>
+
+    <div class="profile"></div>
+
+</header>
+
+<main>
+
+    <div class="top-section">
+        <h1>Valgt gruppe</h1>
+
+        <p>
+            Dette er samarbeidsområdet til gruppen.
+            Her skal medlemmer kunne diskutere oppgaver,
+            dele filer og samarbeide om prosjekter.
+        </p>
+
+        <br>
+
+        <button id="openModal">Nytt innlegg</button>
+    </div>
+
+    <div class="layout">
+
+        <div class="box">
+
+            <h2>Oppgaver og diskusjoner</h2>
+
+            <div class="card">
+                Her vil oppgaver og diskusjonstråder vises.
+                Gruppemedlemmer skal kunne opprette innlegg,
+                svare på innlegg og reagere på innlegg.
+            </div>
+
+            <div class="card">
+                En oppgave kan inneholde flere
+                diskusjonstråder knyttet til arbeidet.
+            </div>
+
+        </div>
+
+        <div class="box">
+
+            <h2>Ressurser</h2>
+
+            <div class="card">
+                Her vil filer som ikke er knyttet til en
+                spesifikk oppgave vises.
+            </div>
+
+            <div class="card">
+                Filer skal kunne ha revisjonshistorikk
+                med tidligere versjoner tilgjengelig.
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<div class="modal" id="modal">
+
+    <div class="modal-content">
+
+        <h2>Nytt innlegg</h2>
+
+        <input type="text" placeholder="Tittel">
+
+        <textarea placeholder="Skriv innlegg her..."></textarea>
+
+        <br><br>
+
+        <button id="closeModal">Lukk</button>
+
+    </div>
+
+</div>
+
+<script>
+
+const modal = document.getElementById("modal");
+
+document.getElementById("openModal").onclick = () => {
+    modal.style.display = "flex";
+};
+
