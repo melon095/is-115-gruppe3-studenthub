@@ -5,13 +5,13 @@ session_start();
 $gruppe_id = $_GET["gruppe_id"] ?? null;
 $section = $_GET["section"] ?? null;
 
-if ($gruppe_id == null) {
-    header("Location: index.php");
+if ($gruppe_id === null) {
+    header("Location: /index.php");
     exit();
 }
 
-if ($section == null) {
-    header("Location: gruppe.tpl.php?gruppe_id=" . $gruppe_id . "&section=oppgaver");
+if ($section === null) {
+    header("Location: /gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver");
     exit();
 }
 
@@ -89,8 +89,8 @@ foreach ($mock_filer as $i => $fil) {
 }
 
 $page_title = "Gruppe";
-$page_content = "../pages/gruppe.tpl.php";
-$page_styles = ["/assets/css/gruppe.css"];
+$page_content = __DIR__."/../pages/gruppe.tpl.php";
+$page_styles = ["/assets/css/gruppe.css", "/assets/css/ressurs-tabell.css"];
 
 $breadcrumbs = [
     ["label" => "Grupper", "href" => "/index.php"],

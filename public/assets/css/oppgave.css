@@ -1,0 +1,22 @@
+.oppgave-title-row {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+
+    h1 {
+        margin: 0 0 0.35rem;
+    }
+}
+
+.oppgave-meta {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.oppgave-beskrivelse {
+    margin: 0 0 1.5rem;
+}

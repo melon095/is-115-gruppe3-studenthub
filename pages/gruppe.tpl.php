@@ -11,12 +11,24 @@ function section_btn(array $state, string $section, string $str) {
 <li>
     <a 
         class="button button-{$btnClass}" 
-        href="/gruppe.tpl.php?gruppe_id={$gruppeId}&section={$section}"
+        href="/gruppe.php?gruppe_id={$gruppeId}&section={$section}"
     >
         $str
     </a>
 </li>
 EOF;
+}
+
+// https://stackoverflow.com/a/28047922
+function bytes_til_menneske(int $bytes): string
+{
+    if ($bytes == 0)
+        return "0.00 B";
+
+    $s = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+    $e = floor(log($bytes, 1024));
+
+    return round($bytes/pow(1024, $e), 2).$s[$e];
 }
 
 ?>
@@ -81,33 +93,41 @@ EOF;
         </section>
     <?php elseif ($state["section"] == "ressurser"): ?>
         <section>
-            <h3>Ressurser</h3>
+            <h2>Ressurser</h2>
 
-            <ul>
-            <?php foreach($state["ressurser"] as $ressurs): ?>
-                <li>
-                    <p>
-                        <?php echo $ressurs["fil_navn"] ;?>
-                    </p>
-                    <p>
-                        <?php echo $ressurs["fil_størrelse"] ;?>
-                    </p>
-                    <section>
-                        <h4>Revisjoner</h4>
-                        <ol>
-                        <?php foreach($ressurs["versjoner"] as $versjon): ?>
-                            <li>
-                                <article>
-                                    <h5><?php echo $versjon["versjon_id"]; ?></h5>
-                                    <p><?php echo $versjon["fil_lokasjon_hdd"]; ?></p>
-                                </article>
-                            </li>
-                        <?php endforeach; ?>
-                        </ol>
-                    </section>
-                </li>
-            <?php endforeach; ?>
-            </ul>
+            <div class="ressurs-tabell-wrapper">
+                <table class="ressurs-tabell">
+                    <caption>Ressurser som er designert global i gruppen.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Filnavn</th>
+                            <th scope="col">Filtype</th>
+                            <th scope="col">Filstørrelse</th>
+                            <th scope="col">Revisjoner</th>
+                            <th scope="col">Handlinger</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach($state["ressurser"] as $ressurs): ?>
+                        <tr>
+                            <th scope="row"><?php echo $ressurs["fil_navn"] ;?></th>
+                            <td><?php echo $ressurs["fil_type"]; ?></td>
+                            <td><?php echo bytes_til_menneske($ressurs["fil_størrelse"]); ?></td>
+                            <td><?php echo $ressurs["siste_versjon"]["versjon_nummer"] ; ?></td>
+                            <td>
+                                <a 
+                                    role="button" 
+                                    class="button button-primary"
+                                    href="/ressurs.php?ressurs_id=<?php echo $ressurs["fil_id"] ;?>"
+                                >
+                                    Åpne
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </section>
     <?php endif; ?>
     </div>

@@ -62,13 +62,14 @@ button {
 }
 
 .button-secondary {
-    background-color: transparent;
+    background-color: var(--border);
     border-color: var(--border);
     color: var(--text);
 }
 
 .button-secondary:hover {
-    background-color: var(--surface);
+    background-color: var(--neutral-400);
+    border-color: var(--neutral-400);
     color: var(--text);
 }
 
@@ -90,6 +91,23 @@ button {
 .button-warning:hover {
     background-color: var(--tertiary-700);
     color: var(--text-on-dark);
+}
+
+.button-lg {
+    padding: 0.75rem 1.75rem;
+    font-size: 1.0625rem;
+}
+
+.card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 1.125rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
