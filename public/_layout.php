@@ -32,7 +32,6 @@
     <?php include __DIR__."/../components/breadcrumb.tpl.php"; ?>
 
     <main class="main">
-        <button id="toggle-sidebar" class="toggle-btn" aria-label="Åpne meny">= </button>
         <?php include __DIR__."/../components/sidebar.tpl.php"; ?>
         
         <article class="page-content">

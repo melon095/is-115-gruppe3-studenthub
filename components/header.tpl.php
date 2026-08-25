@@ -20,18 +20,22 @@ $student = hent_student($student_id);
 ?>
 
 <nav class="navbar">
+    <button id="toggle-sidebar" class="toggle-btn" aria-label="Åpne meny" aria-controls="sidebar">☰</button>
+
     <ul>
-       <li><a href="/index.php"><strong>Studenthub</strong></a></li> 
+       <li><a href="/index.php"><strong>Studenthub</strong></a></li>
     </ul>
-    
+
     <ul>
         <li>
-            <img src="<?php echo htmlspecialchars($student["avatar_link"]);?>" alt="Bruker Profile Bilde" /> 
+            <a href="/profil.php" class="navbar-avatar-link">
+                <img src="<?php echo htmlspecialchars($student["avatar_link"]);?>" alt="Bruker Profile Bilde" />
+            </a>
         </li>
-        <li>
+        <li class="navbar-hilsen">
             <span>Hei! <?php echo $student["fornavn"]; ?> <?php echo $student["etternavn"]; ?></span>
         </li>
-        <li>
+        <li class="navbar-profil-link">
             <a href="/profil.php">Profil</a>
         </li>
         <li>

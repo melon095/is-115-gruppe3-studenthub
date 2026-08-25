@@ -142,6 +142,31 @@ h1, h2, h3, h4, h5, h6 {
     object-fit: cover;
 }
 
+.navbar-avatar-link {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.625rem 1rem;
+        gap: 0.5rem;
+    }
+
+    .navbar ul {
+        gap: 0.625rem;
+    }
+
+    .navbar img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .navbar-hilsen,
+    .navbar-profil-link {
+        display: none;
+    }
+}
+
 .breadcrumb ul {
     display: flex;
     align-items: center;
