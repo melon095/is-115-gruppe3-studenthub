@@ -11,7 +11,7 @@
     }
 }
 
-.gruppe-oppgaver-medlemmer {
+.gruppe-sections {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
@@ -45,7 +45,7 @@
         gap: 0.5rem;
     }
 
-    li article {
+    li article, .gruppe-medlem {
         padding: 0.75rem;
         background-color: var(--bg);
         border: 1px solid var(--border);
@@ -76,8 +76,21 @@
     font-weight: 500;
 }
 
+.gruppe-oppgaver-oppgave {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.gruppe-section-list {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    list-style-type: none;
+}
+
 @media (max-width: 768px) {
-    .gruppe-oppgaver-medlemmer {
+    .gruppe-sections {
         flex-direction: column;
     }
 }

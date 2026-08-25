@@ -3,7 +3,7 @@
 function hent_student_grupper(string $student_id): array {
     $arr = [];
 
-    for ($i = 1; $i < 51; $i++) {
+    for ($i = 1; $i <= 50; $i++) {
         $arr[] = [
             "gruppe_id"=> $i,
             "navn" => "Gruppe " . $i
