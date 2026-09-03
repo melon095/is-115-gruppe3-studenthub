@@ -1,0 +1,53 @@
+.ressurs-tabell-wrapper {
+    overflow: auto hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.ressurs-tabell {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+
+    caption {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    th, td {
+        padding: 0.625rem 1rem;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    thead th {
+        background-color: var(--surface);
+        color: var(--text-muted);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background-color 0.15s ease;
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background-color: var(--surface);
+    }
+
+    tbody th {
+        color: var(--text);
+        font-weight: 500;
+    }
+}

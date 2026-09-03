@@ -1,0 +1,55 @@
+.ressurs-title-row {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    h1 {
+        margin: 0 0 0.35rem;
+    }
+}
+
+.ressurs-meta {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.ressurs-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    > section {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.125rem;
+        }
+    }
+}
+
+.ressurs-opplasting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+    }
+
+    input[type="file"] {
+        font: inherit;
+        color: var(--text);
+    }
+}

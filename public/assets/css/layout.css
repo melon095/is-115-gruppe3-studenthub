@@ -1,0 +1,132 @@
+:root {
+    --sidebar-width: 250px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+main.main {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+    position: relative;
+}
+
+aside.sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1rem;
+    position: sticky;
+    top: 60px;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.grupper-nav {
+    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    h2 {
+        margin-top: 0;
+        font-size: 1rem;
+    }
+}
+
+.grupper-liste {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    
+    li {
+        margin: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    a {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius);
+        text-decoration: none;
+        color: var(--text);
+        transition: all 0.2s;
+
+        &:hover {
+            background-color: var(--surface);
+            padding-left: 1.25rem;
+        }
+
+        &[aria-current="page"] {
+            background-color: var(--primary-600);
+            color: var(--text-on-dark);
+            font-weight: bold;
+            padding-left: 1rem;
+        }
+    }
+}
+
+.toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+}
+
+article.page-content {
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 100%;
+    }
+
+    main.main {
+        grid-template-columns: 1fr;
+    }
+
+    aside.sidebar {
+        background-color: var(--surface);
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: calc(100vh - 60px);
+        width: 100%;
+        z-index: 999;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    aside.sidebar.open {
+        transform: translateX(0);
+    }
+
+    .toggle-btn {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    article.page-content {
+        padding: 1rem;
+    }
+}
