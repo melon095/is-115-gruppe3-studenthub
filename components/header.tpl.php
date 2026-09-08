@@ -1,21 +1,20 @@
 <?php
 
-function hent_student(string $student_id): array  {
-    return [
-        "student_id" => $student_id,
-        "fornavn" => "Kai",
-        "etternavn"=> "Eide",
-        "epost" => "kai@eide.no",
-        "avatar_link" => "http://dummyimage.com/172x100.png/dddddd/000000"
-        
-    ];
-}
+//function hent_student(string $student_id): array  {
+//    return [
+//        "student_id" => $student_id,
+//        "fornavn" => "Kai",
+//        "etternavn"=> "Eide",
+//        "epost" => "kai@eide.no",
+//        "avatar_link" => "http://dummyimage.com/172x100.png/dddddd/000000"
+//        
+//    ];
+//}
 
 
 //$student_id = $_SESSION["student_id"];
-$student_id = "1";
-
-$student = hent_student($student_id);
+//$student_id = "1";
+//$student = hent_student($student_id);
 
 ?>
 
@@ -27,7 +26,8 @@ $student = hent_student($student_id);
     </ul>
 
     <ul>
-        <li>
+        <?php
+/*        <li>
             <a href="/profil.php" class="navbar-avatar-link">
                 <img src="<?php echo htmlspecialchars($student["avatar_link"]);?>" alt="Bruker Profile Bilde" />
             </a>
@@ -40,6 +40,10 @@ $student = hent_student($student_id);
         </li>
         <li>
             <a href="/logout.php">Logg ut</a>
-        </li>
+        </li>*/
+        ?>
+        
+        <li></li>
+        <li></li>
     </ul>
 </nav>
