@@ -1,12 +1,12 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $gruppe_id = $_GET["gruppe_id"] ?? null;
 $oppgave_id = $_GET["oppgave_id"] ?? null;
 
 if ($gruppe_id == null) {
-    header("Location: /index.php");
+    header("Location: " . url("/index.php"));
     exit();
 }
 
@@ -76,17 +76,17 @@ foreach ($mock_tekster as $i => $tekst) {
 
 $page_title = "Diskusjon";
 $page_content = __DIR__."/../pages/diskusjon.tpl.php";
-$page_styles = ["/assets/css/diskusjon.css"];
+$page_styles = [url("/assets/css/diskusjon.css")];
 
 $breadcrumbs = [
-    ["label" => "Grupper", "href" => "/index.php"],
-    ["label" => $gruppe["navn"], "href" => "/gruppe.php?gruppe_id=" . $gruppe_id],
+    ["label" => "Grupper", "href" => url("/index.php")],
+    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)],
 ];
 
 if ($oppgave !== null) {
     $breadcrumbs[] = [
         "label" => $oppgave["tittel"],
-        "href" => "/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"],
+        "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
     ];
 }
 

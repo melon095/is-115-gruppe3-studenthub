@@ -6,12 +6,13 @@ function section_btn(array $state, string $section, string $str) {
             : 'secondary';
     
     $gruppeId = $state["gruppe"]["id"];
-    
+    $href = url("/gruppe.php?gruppe_id={$gruppeId}&section={$section}");
+
     return <<<EOF
 <li>
-    <a 
-        class="button button-{$btnClass}" 
-        href="/gruppe.php?gruppe_id={$gruppeId}&section={$section}"
+    <a
+        class="button button-{$btnClass}"
+        href="{$href}"
     >
         $str
     </a>
@@ -67,7 +68,7 @@ function bytes_til_menneske(int $bytes): string
                             <div>
                                 <a
                                     class="button button-primary"
-                                    href="/oppgave.php?gruppe_id=<?php echo $state["gruppe"]["id"] ;?>&oppgave_id=<?php echo $oppgave["oppgave_id"] ;?>"
+                                    href="<?php echo url("/oppgave.php?gruppe_id=" . $state["gruppe"]["id"] . "&oppgave_id=" . $oppgave["oppgave_id"]); ?>"
                                 >
                                     Åpne
                                 </a>
@@ -118,7 +119,7 @@ function bytes_til_menneske(int $bytes): string
                                 <a 
                                     role="button" 
                                     class="button button-primary"
-                                    href="/ressurs.php?ressurs_id=<?php echo $ressurs["fil_id"] ;?>"
+                                    href="<?php echo url("/ressurs.php?ressurs_id=" . $ressurs["fil_id"]); ?>"
                                 >
                                     Åpne
                                 </a>

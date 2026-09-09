@@ -23,7 +23,7 @@ function bytes_til_menneske(int $bytes): string
         <div>
             <a
                 class="button button-secondary"
-                href="/diskusjon.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>&oppgave_id=<?php echo $state["oppgave"]["oppgave_id"]; ?>"
+                href="<?php echo url("/diskusjon.php?gruppe_id=" . $state["gruppe"]["id"] . "&oppgave_id=" . $state["oppgave"]["oppgave_id"]); ?>"
             >
                 Se diskusjonstråden
             </a>
@@ -58,7 +58,7 @@ function bytes_til_menneske(int $bytes): string
                             <a
                                 role="button"
                                 class="button button-primary"
-                                href="/ressurs.php?ressurs_id=<?php echo $ressurs["fil_id"]; ?>"
+                                href="<?php echo url("/ressurs.php?ressurs_id=" . $ressurs["fil_id"]); ?>"
                             >
                                 Åpne
                             </a>

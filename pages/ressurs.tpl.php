@@ -33,7 +33,7 @@ function bytes_til_menneske(int $bytes): string
         <div>
             <a
                 class="button button-secondary"
-                href="/diskusjon.php?gruppe_id=<?php echo $state["ressurs"]["gruppe_id"]; ?><?php echo $state["oppgave"] !== null ? "&oppgave_id=" . $state["oppgave"]["oppgave_id"] : ""; ?>"
+                href="<?php echo url("/diskusjon.php?gruppe_id=" . $state["ressurs"]["gruppe_id"] . ($state["oppgave"] !== null ? "&oppgave_id=" . $state["oppgave"]["oppgave_id"] : "")); ?>"
             >
                 Se diskusjonstråden
             </a>

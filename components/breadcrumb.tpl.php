@@ -6,7 +6,7 @@ $breadcrumbs = $breadcrumbs ?? [];
 
 <nav aria-label="brødsmulesti" class="breadcrumb">
     <ul>
-        <li><a href="/index.php">Studenthub</a></li>
+        <li><a href="<?php echo url("/index.php"); ?>">Studenthub</a></li>
         <?php foreach ($breadcrumbs as $i => $crumb): ?>
             <?php $er_siste = $i === array_key_last($breadcrumbs); ?>
             <li>
