@@ -1,12 +1,12 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $ressurs_id = $_GET["ressurs_id"] ?? null;
 $gruppe_id = "1"; // TODO: Gruppe ID ifra database.
 
 if ($ressurs_id === null) {
-    header("Location: /index.php");
+    header("Location: " . url("/index.php"));
     exit();
 }
 
@@ -54,17 +54,17 @@ $ressurs = [
 
 $page_title = "Ressurs";
 $page_content = __DIR__."/../pages/ressurs.tpl.php";
-$page_styles = ["/assets/css/ressurs-tabell.css", "/assets/css/ressurs.css"];
+$page_styles = [url("/assets/css/ressurs-tabell.css"), url("/assets/css/ressurs.css")];
 
 $breadcrumbs = [
-    ["label" => "Grupper", "href" => "/index.php"],
-    ["label" => $gruppe["navn"], "href" => "/gruppe.php?gruppe_id=" . $gruppe_id],
+    ["label" => "Grupper", "href" => url("/index.php")],
+    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)],
 ];
 
 if ($oppgave !== null) {
     $breadcrumbs[] = [
         "label" => $oppgave["tittel"],
-        "href" => "/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"],
+        "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
     ];
 }
 
