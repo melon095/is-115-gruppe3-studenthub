@@ -9,10 +9,14 @@ body {
 
 main.main {
     display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-columns: 1fr;
     gap: 0;
     min-height: calc(100vh - 60px);
     position: relative;
+}
+
+main.main:has(> aside.sidebar) {
+    grid-template-columns: var(--sidebar-width) 1fr;
 }
 
 aside.sidebar {
@@ -31,13 +35,13 @@ aside.sidebar {
     flex: 1;
     display: flex;
     flex-direction: column;
-    
+
     section {
         flex: 1;
         display: flex;
         flex-direction: column;
     }
-    
+
     h2 {
         margin-top: 0;
         font-size: 1rem;

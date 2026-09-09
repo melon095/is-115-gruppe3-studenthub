@@ -1,8 +1,13 @@
 (function() {
     const toggleBtn = document.getElementById("toggle-sidebar");
     const sidebar = document.getElementById("sidebar");
+
+    if (!toggleBtn || !sidebar) {
+        return;
+    }
+
     const sidebarLinks = sidebar.querySelectorAll("a");
-    
+
     toggleBtn.addEventListener("click", () => {
         sidebar.classList.toggle("open");
     });

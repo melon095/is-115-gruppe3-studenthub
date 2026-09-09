@@ -19,9 +19,7 @@ function bytes_til_menneske(int $bytes): string
             <h1><?php echo htmlspecialchars($state["ressurs"]["fil_navn"]); ?></h1>
             <p class="ressurs-meta">
                 <?php echo htmlspecialchars(strtoupper($state["ressurs"]["fil_type"])); ?>
-                &middot;
                 <?php echo bytes_til_menneske($state["ressurs"]["siste_versjon"]["fil_størrelse"]); ?>
-                &middot;
                 <?php if ($state["oppgave"] !== null): ?>
                     Tilhører oppgaven <?php echo htmlspecialchars($state["oppgave"]["tittel"]); ?>
                 <?php else: ?>
@@ -33,9 +31,9 @@ function bytes_til_menneske(int $bytes): string
         <div>
             <a
                 class="button button-secondary"
-                href="<?php echo url("/diskusjon.php?gruppe_id=" . $state["ressurs"]["gruppe_id"] . ($state["oppgave"] !== null ? "&oppgave_id=" . $state["oppgave"]["oppgave_id"] : "")); ?>"
+                href="<?php echo url("/gruppe.php?gruppe_id=" . $state["ressurs"]["gruppe_id"] . "&section=diskusjoner&fil_id=" . $state["ressurs"]["fil_id"] . ($state["oppgave"] !== null ? "&oppgave_id=" . $state["oppgave"]["oppgave_id"] : "")); ?>"
             >
-                Se diskusjonstråden
+                Se diskusjoner om denne filen
             </a>
         </div>
     </div>

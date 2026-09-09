@@ -33,15 +33,14 @@ Direktemeldinger mellom studenter kan være en relevant funksjon for plattformen
 
 ## Data Modell Hierarki
 
-- Studenthub har mange grupper.   
-- En gruppe har mange oppgaver.   
-- En oppgave har mange diskusjonstråder.   
-- Et diskusjonstråd har mange innlegg.   
-- Et innlegg kan peke til et annet innlegg, det vil si innlegget er et svar.   
+- Studenthub har mange grupper.
+- En gruppe har mange oppgaver.
+- En gruppe har mange diskusjonstråder.
+- En diskusjonstråd kan valgfritt merkes med én oppgave og/eller én fil, for å gjøre det raskere å finne fram.
+- Et diskusjonstråd har mange innlegg.
+- Et innlegg kan peke til et annet innlegg, det vil si innlegget er et svar.
 - Et innlegg kan ha reaksjoner (emojis) 😀…
 
 - En gruppe kan ha mange filer  
 - En oppgave kan ha mange filer  
-- En fil kan ha mange kommentarer.  
-- En fil kan ha revisjoner.  
-- Kommentar peker til spesifikk revisjon.
+- En fil kan ha revisjoner.

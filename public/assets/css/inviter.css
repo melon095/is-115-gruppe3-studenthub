@@ -1,0 +1,67 @@
+.inviter-feil {
+    margin: 0 0 1.5rem;
+    padding: 0.75rem 1rem;
+    list-style: none;
+    background-color: var(--tertiary-100);
+    border: 1px solid var(--tertiary-400);
+    border-radius: var(--radius);
+    color: var(--tertiary-800);
+    font-size: 0.9375rem;
+}
+
+.inviter-resultat {
+    margin-bottom: 1.5rem;
+}
+
+.inviter-resultat p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.inviter-resultat label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.inviter-lenke-rad {
+    display: flex;
+    gap: 0.5rem;
+
+    input {
+        flex: 1;
+        font: inherit;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background-color: var(--bg);
+        color: var(--text);
+    }
+}
+
+.inviter-metoder {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    h2 {
+        margin-top: 0;
+        font-size: 1.125rem;
+    }
+
+    p {
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .inviter-metoder {
+        grid-template-columns: 1fr;
+    }
+
+    .inviter-lenke-rad {
+        flex-direction: column;
+    }
+}

@@ -4,6 +4,8 @@ require __DIR__."/_bootstrap.php";
 
 $gruppe_id = $_GET["gruppe_id"] ?? null;
 $oppgave_id = $_GET["oppgave_id"] ?? null;
+$fil_id = $_GET["fil_id"] ?? null;
+$diskusjon_id = $_GET["diskusjon_id"] ?? "1";
 
 if ($gruppe_id == null) {
     header("Location: " . url("/index.php"));
@@ -23,6 +25,20 @@ if ($oppgave_id !== null) {
         "tittel" => "Oppgave " . $oppgave_id,
     ];
 }
+
+$fil = null;
+if ($fil_id !== null) {
+    $fil = [
+        "fil_id" => $fil_id,
+        "gruppe_id" => $gruppe_id,
+        "fil_navn" => "Fil " . $fil_id,
+    ];
+}
+
+$diskusjon = [
+    "id" => $diskusjon_id,
+    "tittel" => "Diskusjonstråd " . $diskusjon_id,
+];
 
 $mock_forfattere = [
     ["navn" => "Kai Eide", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
@@ -88,13 +104,20 @@ if ($oppgave !== null) {
         "label" => $oppgave["tittel"],
         "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
     ];
+} elseif ($fil !== null) {
+    $breadcrumbs[] = [
+        "label" => $fil["fil_navn"],
+        "href" => url("/ressurs.php?ressurs_id=" . $fil["fil_id"]),
+    ];
 }
 
-$breadcrumbs[] = ["label" => "Diskusjon"];
+$breadcrumbs[] = ["label" => $diskusjon["tittel"]];
 
 $state = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
+    "fil" => $fil,
+    "diskusjon" => $diskusjon,
     "innlegg" => $innlegg,
 ];
 

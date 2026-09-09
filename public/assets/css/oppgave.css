@@ -20,3 +20,17 @@
 .oppgave-beskrivelse {
     margin: 0 0 1.5rem;
 }
+
+.oppgave-last-opp {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+
+    .form-felt {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}

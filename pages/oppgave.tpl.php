@@ -23,9 +23,9 @@ function bytes_til_menneske(int $bytes): string
         <div>
             <a
                 class="button button-secondary"
-                href="<?php echo url("/diskusjon.php?gruppe_id=" . $state["gruppe"]["id"] . "&oppgave_id=" . $state["oppgave"]["oppgave_id"]); ?>"
+                href="<?php echo url("/gruppe.php?gruppe_id=" . $state["gruppe"]["id"] . '&section=diskusjoner' . "&oppgave_id=" . $state["oppgave"]["oppgave_id"]); ?>"
             >
-                Se diskusjonstråden
+                <?php echo (int) $state["antall_diskusjoner"]; ?> diskusjoner om denne oppgaven
             </a>
         </div>
     </div>
@@ -68,5 +68,14 @@ function bytes_til_menneske(int $bytes): string
                 </tbody>
             </table>
         </div>
+
+        <form method="post" action="" enctype="multipart/form-data" class="oppgave-last-opp">
+            <div class="form-felt">
+                <label for="ny_fil">Last opp fil til oppgaven</label>
+                <input type="file" id="ny_fil" name="ny_fil" required>
+            </div>
+
+            <button type="submit" class="button button-primary">Last opp</button>
+        </form>
     </section>
 </section>

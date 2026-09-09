@@ -13,21 +13,21 @@ function hent_student_grupper(string $student_id): array {
     return $arr;
 }
 
-$student_id = "1";
-
-$grupper = hent_student_grupper($student_id);
-$current_gruppe_id = $_GET["gruppe_id"] ?? null;
-
 ?>
 
+<?php if(isset($_SESSION['student_id'])): ?>
+<?php
+    $grupper = hent_student_grupper($_SESSION['student_id']);
+    $current_gruppe_id = $_GET['gruppe_id'] ?? null;
+?>
 <aside class="sidebar" id="sidebar">
     <nav class="grupper-nav">
         <section>
-            <h2>Grupper du er i</h2>
+            <h2>Grupper du er medlem av</h2>
             <ul class="grupper-liste">
             <?php foreach($grupper as $gruppe ):?>
                 <li>
-                    <a 
+                    <a
                         href="<?php echo url("/gruppe.php?gruppe_id=" . $gruppe["gruppe_id"]); ?>"
                         <?php echo ($current_gruppe_id == $gruppe["gruppe_id"]) ? 'aria-current="page"' : ''; ?>
                     >
@@ -39,3 +39,4 @@ $current_gruppe_id = $_GET["gruppe_id"] ?? null;
         </section>
     </nav>
 </aside>
+<?php endif; ?>

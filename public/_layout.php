@@ -1,14 +1,11 @@
 <?php
 
-// TODO: Autentikasjon
-//if (!isset($_SESSION["student_id"])) {
-//    header("Location: /login.php");
-//    exit();
-//}
-    
+if (!($public_page ?? false) && !isset($_SESSION['student_id'])) {
+    header("Location: " . url("/login.php"));
+    exit();
+}
+
 ?>
-
-
 <!DOCTYPE html>
 <html lang="nb">
 
@@ -33,17 +30,20 @@
 
     <main class="main">
         <?php include __DIR__."/../components/sidebar.tpl.php"; ?>
-        
+
         <article class="page-content">
             <?php include $page_content; ?>
         </article>
     </main>
-    
+
     <footer>
         <p>&copy; 2026 Studenthub - Gruppe 3</p>
     </footer>
 
     <script src="<?php echo url("/assets/js/sidebar.js"); ?>" type="module"></script>
+    <?php foreach ($page_scripts ?? [] as $script): ?>
+    <script src="<?php echo htmlspecialchars($script); ?>" type="module"></script>
+    <?php endforeach; ?>
 </body>
 
 </html>

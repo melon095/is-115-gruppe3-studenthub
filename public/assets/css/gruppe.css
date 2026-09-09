@@ -11,6 +11,38 @@
     }
 }
 
+.gruppe-title-knapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gruppe-endre-navn {
+    position: relative;
+
+    summary {
+        list-style: none;
+        cursor: pointer;
+    }
+
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .form {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        z-index: 10;
+        width: 260px;
+        padding: 1rem;
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+    }
+}
+
 .gruppe-section-list {
     display: flex;
     flex-wrap: wrap;
@@ -19,6 +51,39 @@
     margin: 0 0 1.5rem;
     padding: 0 0 0.5rem;
     border-bottom: 1px solid var(--border);
+}
+
+.gruppe-ny-oppgave {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.gruppe-last-opp {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+
+    .form-felt {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+.gruppe-medlemmer-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    h2 {
+        margin: 0;
+    }
 }
 
 .gruppe-sections > section {
@@ -75,6 +140,55 @@
 
 .gruppe-medlem-navn {
     font-weight: 500;
+}
+
+.gruppe-diskusjon-filter {
+    margin: 0 0 1rem;
+    padding: 0.625rem 0.75rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+}
+
+.gruppe-diskusjon-kort {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s ease;
+}
+
+.gruppe-diskusjon-kort:hover {
+    border-color: var(--primary-400);
+}
+
+.gruppe-diskusjon-tittel {
+    font-weight: 500;
+}
+
+.gruppe-diskusjon-meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.gruppe-diskusjon-tag {
+    display: inline-block;
+    padding: 0.0625rem 0.4rem;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+}
+
+.gruppe-ny-diskusjon {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
 }
 
 .gruppe-oppgaver-oppgave {
