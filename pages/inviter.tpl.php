@@ -21,6 +21,7 @@ function send_invitasjon_epost(string $til, string $gruppe_navn, string $lenke):
 function bygg_invitasjonslenke(string $gruppe_id): string {
     $skjema = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $kode = bin2hex(random_bytes(16));
+    // TODO: Skriv kode til database.
 
     return $skjema . '://' . $_SERVER['HTTP_HOST'] . '/inviter-til-gruppe.php?gruppe_id=' . $gruppe_id . '&kode=' . $kode;
 }

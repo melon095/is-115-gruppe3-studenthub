@@ -1,5 +1,7 @@
 <?php
 
+// https://stackoverflow.com/a/3512570
+
 session_start();
 unset($_SESSION);
 if (ini_get('session.use_cookies')) {

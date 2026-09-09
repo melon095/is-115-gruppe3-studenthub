@@ -20,7 +20,6 @@ function hent_student_grupper(string $student_id): array {
     $grupper = hent_student_grupper($_SESSION['student_id']);
     $current_gruppe_id = $_GET['gruppe_id'] ?? null;
 ?>
-
 <aside class="sidebar" id="sidebar">
     <nav class="grupper-nav">
         <section>
@@ -40,7 +39,4 @@ function hent_student_grupper(string $student_id): array {
         </section>
     </nav>
 </aside>
-
-<?php else: ?>
-
 <?php endif; ?>
