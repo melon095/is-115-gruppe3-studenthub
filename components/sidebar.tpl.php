@@ -28,7 +28,7 @@ function hent_student_grupper(string $student_id): array {
             <?php foreach($grupper as $gruppe ):?>
                 <li>
                     <a
-                        href="/gruppe.php?gruppe_id=<?php echo $gruppe["gruppe_id"]; ?>"
+                        href="<?php echo url("/gruppe.php?gruppe_id=" . $gruppe["gruppe_id"]); ?>"
                         <?php echo ($current_gruppe_id == $gruppe["gruppe_id"]) ? 'aria-current="page"' : ''; ?>
                     >
                         <?php echo htmlspecialchars($gruppe["navn"]); ?>

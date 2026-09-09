@@ -31,7 +31,7 @@ function bytes_til_menneske(int $bytes): string
         <div>
             <a
                 class="button button-secondary"
-                href="/gruppe.php?gruppe_id=<?php echo $state["ressurs"]["gruppe_id"]; ?>&section=diskusjoner&fil_id=<?php echo $state["ressurs"]["fil_id"]; ?>"
+                href="<?php echo url("/gruppe.php?gruppe_id=" . $state["ressurs"]["gruppe_id"] . "&section=diskusjoner" . ($state["oppgave"] !== null ? "&oppgave_id=" . $state["oppgave"]["oppgave_id"] : "")); ?>"
             >
                 Se diskusjoner om denne filen
             </a>

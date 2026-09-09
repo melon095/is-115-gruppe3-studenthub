@@ -16,7 +16,7 @@ function hent_student(string $student_id): array  {
     <button id="toggle-sidebar" class="toggle-btn" aria-label="Åpne meny" aria-controls="sidebar">☰</button>
 
     <ul>
-       <li><a href="/index.php"><strong>Studenthub</strong></a></li>
+       <li><a href="<?php echo url("/index.php"); ?>"><strong>Studenthub</strong></a></li>
     </ul>
 
     <ul>
@@ -26,7 +26,7 @@ function hent_student(string $student_id): array  {
         $student = hent_student($student_id);
     ?>
         <li>
-            <a href="/profil.php" class="navbar-avatar-link">
+            <a href="<?php echo url("/profil.php"); ?>" class="navbar-avatar-link">
                 <img src="<?php echo htmlspecialchars($student["avatar_link"]);?>" alt="Bruker Profile Bilde" />
             </a>
         </li>
@@ -34,7 +34,7 @@ function hent_student(string $student_id): array  {
             <span>Hei! <?php echo $student["fornavn"]; ?> <?php echo $student["etternavn"]; ?></span>
         </li>
         <li>
-            <a href="/logout.php">Logg ut</a>
+            <a href="<?php echo url("/logout.php"); ?>">Logg ut</a>
         </li>
     <?php else: ?>
         <li>

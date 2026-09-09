@@ -1,11 +1,14 @@
 <?php
 
-if (!($public_page ?? false) && !isset($_SESSION['student_id'])) {
-    header("Location: /login.php");
-    exit();
-}
+// TODO: Autentikasjon
+//if (!isset($_SESSION["student_id"])) {
+//    header("Location: /login.php");
+//    exit();
+//}
 
 ?>
+
+
 <!DOCTYPE html>
 <html lang="nb">
 
@@ -41,9 +44,6 @@ if (!($public_page ?? false) && !isset($_SESSION['student_id'])) {
     </footer>
 
     <script src="/assets/js/sidebar.js" type="module"></script>
-    <?php foreach ($page_scripts ?? [] as $script): ?>
-    <script src="<?php echo htmlspecialchars($script); ?>" type="module"></script>
-    <?php endforeach; ?>
 </body>
 
 </html>

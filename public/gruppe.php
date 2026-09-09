@@ -1,17 +1,17 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $gruppe_id = $_GET["gruppe_id"] ?? null;
 $section = $_GET["section"] ?? null;
 
 if ($gruppe_id === null) {
-    header("Location: /index.php");
+    header("Location: " . url("/index.php"));
     exit();
 }
 
 if ($section === null) {
-    header("Location: /gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver");
+    header("Location: " . url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
     exit();
 }
 
@@ -203,10 +203,10 @@ if ($filter_oppgave_id !== null) {
 
 $page_title = "Gruppe";
 $page_content = __DIR__."/../pages/gruppe.tpl.php";
-$page_styles = ["/assets/css/gruppe.css", "/assets/css/ressurs-tabell.css"];
+$page_styles = [url("/assets/css/gruppe.css"), url("/assets/css/ressurs-tabell.css")];
 
 $breadcrumbs = [
-    ["label" => "Grupper", "href" => "/index.php"],
+    ["label" => "Grupper", "href" => url("/index.php")],
     ["label" => $gruppe["navn"]],
 ];
 

@@ -1,12 +1,12 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $gruppe_id = $_GET["gruppe_id"] ?? null;
 $oppgave_id = $_GET["oppgave_id"] ?? null;
 
 if ($gruppe_id == null || $oppgave_id == null) {
-    header("Location: /index.php");
+    header("Location: " . url("/index.php"));
     exit();
 }
 
@@ -60,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES
 
 $page_title = "Oppgave";
 $page_content = __DIR__."/../pages/oppgave.tpl.php";
-$page_styles = ["/assets/css/oppgave.css", "/assets/css/ressurs-tabell.css"];
+$page_styles = [url("/assets/css/oppgave.css"), url("/assets/css/ressurs-tabell.css")];
 
 $breadcrumbs = [
-    ["label" => "Grupper", "href" => "/index.php"],
-    ["label" => $gruppe["navn"], "href" => "/gruppe.php?gruppe_id=" . $gruppe["id"]],
+    ["label" => "Grupper", "href" => url("/index.php")],
+    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe["id"])],
     ["label" => $oppgave["tittel"]],
 ];
 
