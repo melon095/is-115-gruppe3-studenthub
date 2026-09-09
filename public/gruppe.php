@@ -21,6 +21,16 @@ $gruppe = [
     "beskrivelse" => "Dette er beskrivelsen til gruppe '" . $gruppe_id . "'",
 ];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gruppe_navn'])) {
+    // TODO: Database integrasjon
+    // TODO: Rense brukerinput
+    $nytt_navn = trim($_POST['gruppe_navn']);
+
+    if ($nytt_navn !== '') {
+        $gruppe['navn'] = $nytt_navn;
+    }
+}
+
 $oppgaver = [];
 for ($i = 1; $i <= 12; $i++) {
     $oppgaver[] = [
@@ -30,6 +40,23 @@ for ($i = 1; $i <= 12; $i++) {
         "beskrivelse" => "Beskrivelse for oppgave " . $i . " i gruppe " . $gruppe_id,
         "opprettet_på" => date("Y-m-d", strtotime("-" . $i . " days")),
     ];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // TODO: Database integrasjon.
+    // TODO: Rense brukerinput.
+    $ny_tittel = trim($_POST['oppgave_tittel'] ?? '');
+    $ny_beskrivelse = trim($_POST['oppgave_beskrivelse'] ?? '');
+
+    if ($ny_tittel !== '') {
+        $oppgaver[] = [
+            "oppgave_id" => count($oppgaver) + 1,
+            "gruppe_id" => $gruppe_id,
+            "tittel" => $ny_tittel,
+            "beskrivelse" => $ny_beskrivelse !== '' ? $ny_beskrivelse : "Ingen beskrivelse.",
+            "opprettet_på" => date("Y-m-d"),
+        ];
+    }
 }
 
 $mock_studenter = [
@@ -88,6 +115,92 @@ foreach ($mock_filer as $i => $fil) {
     ];
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES['ny_fil']['error'] === UPLOAD_ERR_OK) {
+    // TODO: Database integrasjon og faktisk fillagring.
+    $ny_fil_navn = basename($_FILES['ny_fil']['name']);
+
+    $ressurser[] = [
+        "fil_id" => count($ressurser) + 1,
+        "oppgave_id" => null,
+        "opprettet_av" => $_SESSION['student_id'],
+        "opprettet_av_navn" => "Deg",
+        "fil_navn" => $ny_fil_navn,
+        "fil_størrelse" => (int) $_FILES['ny_fil']['size'],
+        "fil_type" => strtolower(pathinfo($ny_fil_navn, PATHINFO_EXTENSION)),
+        "opprettet_på" => date("Y-m-d H:i"),
+        "siste_versjon" => ["versjon_nummer" => 1],
+        "versjoner" => [],
+    ];
+}
+
+$mock_diskusjoner = [
+    ["tittel" => "Spørsmål om innlevering", "oppgave_id" => 1, "fil_id" => null],
+    ["tittel" => "Forslag til presentasjon", "oppgave_id" => null, "fil_id" => 2],
+    ["tittel" => "Generell fremdrift i gruppa", "oppgave_id" => null, "fil_id" => null],
+    ["tittel" => "Feil i kildekoden?", "oppgave_id" => null, "fil_id" => 3],
+];
+
+$diskusjoner = [];
+foreach ($mock_diskusjoner as $i => $trad) {
+    $diskusjoner[] = [
+        "id" => $i + 1,
+        "tittel" => $trad["tittel"],
+        "oppgave_id" => $trad["oppgave_id"],
+        "fil_id" => $trad["fil_id"],
+        "antall_innlegg" => ($i * 2) + 1,
+        "siste_aktivitet" => date("Y-m-d H:i", strtotime("-" . (($i + 1) * 4) . " hours")),
+    ];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['diskusjon_tittel'])) {
+    // TODO: Database integrasjon.
+    // TODO: Rense brukerinput.
+    $ny_tittel = trim($_POST['diskusjon_tittel'] ?? '');
+    $merket_oppgave_id = trim($_POST['diskusjon_oppgave_id'] ?? '');
+    $merket_fil_id = trim($_POST['diskusjon_fil_id'] ?? '');
+
+    if ($ny_tittel !== '') {
+        $diskusjoner[] = [
+            "id" => count($diskusjoner) + 1,
+            "tittel" => $ny_tittel,
+            "oppgave_id" => $merket_oppgave_id !== '' ? $merket_oppgave_id : null,
+            "fil_id" => $merket_fil_id !== '' ? $merket_fil_id : null,
+            "antall_innlegg" => 0,
+            "siste_aktivitet" => date("Y-m-d H:i"),
+        ];
+    }
+}
+
+$filter_oppgave_id = $_GET['oppgave_id'] ?? null;
+$filter_fil_id = $_GET['fil_id'] ?? null;
+
+$filter_oppgave = null;
+if ($filter_oppgave_id !== null) {
+    foreach ($oppgaver as $oppgave) {
+        if ($oppgave['oppgave_id'] == $filter_oppgave_id) {
+            $filter_oppgave = $oppgave;
+            break;
+        }
+    }
+}
+
+$filter_fil = null;
+if ($filter_fil_id !== null) {
+    foreach ($ressurser as $ressurs) {
+        if ($ressurs['fil_id'] == $filter_fil_id) {
+            $filter_fil = $ressurs;
+            break;
+        }
+    }
+}
+
+$diskusjoner_visning = $diskusjoner;
+if ($filter_oppgave_id !== null) {
+    $diskusjoner_visning = array_filter($diskusjoner, fn($trad) => $trad['oppgave_id'] == $filter_oppgave_id);
+} elseif ($filter_fil_id !== null) {
+    $diskusjoner_visning = array_filter($diskusjoner, fn($trad) => $trad['fil_id'] == $filter_fil_id);
+}
+
 $page_title = "Gruppe";
 $page_content = __DIR__."/../pages/gruppe.tpl.php";
 $page_styles = ["/assets/css/gruppe.css", "/assets/css/ressurs-tabell.css"];
@@ -99,9 +212,12 @@ $breadcrumbs = [
 
 $state = [
   "gruppe" => $gruppe,
-  "oppgaver" => $oppgaver,  
+  "oppgaver" => $oppgaver,
   "medlemmer" => $medlemmer,
   "ressurser" => $ressurser,
+  "diskusjoner_visning" => $diskusjoner_visning,
+  "filter_oppgave" => $filter_oppgave,
+  "filter_fil" => $filter_fil,
   "section" => $section,
 ];
 

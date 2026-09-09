@@ -59,7 +59,9 @@ erDiagram
     DISKUSJONSTRAAD {
         BIGINT diskusjons_id PK
         
-        BIGINT oppgave_id FK
+        BIGINT gruppe_id FK
+        BIGINT oppgave_id FK "Valgfri - merker tråden med en oppgave"
+        BIGINT fil_id FK "Valgfri - merker tråden med en fil"
         BIGINT opprettet_av FK
         
         TEXT traad_tittel
@@ -68,14 +70,12 @@ erDiagram
         TIMESTAMP oppdatert_på
     }
     
-    %% TODO: Innlegg - CHECK (diskusjons_id IS NOT NULL XOR fil_id IS NOT NULL)
     INNLEGG {
         BIGINT innlegg_id PK
         
         BIGINT student_id FK
+        BIGINT diskusjons_id FK
         BIGINT parent_innlegg_id FK "Hvis innlegg svarer annet innlegg"
-        BIGINT diskusjons_id FK "Hvis det er i en tråd"
-        BIGINT fil_id FK "Hvis det er kommentar på fil"        
 
         TEXT innhold
             
@@ -134,9 +134,11 @@ erDiagram
     GRUPPE ||--o{ GRUPPE_MEDLEM : "har"
     GRUPPE ||--o{ OPPGAVE : "inneholder"
     GRUPPE ||--o{ INVITASJON_KODE : "har"
+    GRUPPE ||--o{ DISKUSJONSTRAAD : "har"
     
-    OPPGAVE ||--o{ DISKUSJONSTRAAD : "inneholder"
     OPPGAVE ||--o{ FIL : "kan ha"
+    OPPGAVE o|--o{ DISKUSJONSTRAAD : "kan merkes med"
+    FIL o|--o{ DISKUSJONSTRAAD : "kan merkes med"
     
     DISKUSJONSTRAAD ||--o{ INNLEGG : "inneholder"
     
@@ -146,5 +148,4 @@ erDiagram
     REAKSJON ||--o{ REAKSJON_TYPE : "av type"
     
     FIL ||--o{ FIL_VERSJON : "har"
-    FIL ||--o{ INNLEGG : "kommentert på"
 ```

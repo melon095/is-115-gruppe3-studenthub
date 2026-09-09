@@ -3,7 +3,7 @@
 session_start();
 
 $ressurs_id = $_GET["ressurs_id"] ?? null;
-$gruppe_id = "1"; // TODO: Gruppe ID ifra database.
+$gruppe_id = "1"; // TODO: Gruppe ID fra database.
 
 if ($ressurs_id === null) {
     header("Location: /index.php");
@@ -37,6 +37,17 @@ for ($v = 1; $v <= $antall_versjoner; $v++) {
         "opprettet_av_navn" => "Kai Eide",
         "opprettet_på" => date("Y-m-d H:i", strtotime("-" . (($antall_versjoner - $v) * 3) . " days")),
         "fil_størrelse" => 245_000 + ($v * 15_000),
+    ];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES['ny_fil']['error'] === UPLOAD_ERR_OK) {
+    // TODO: Database integrasjon og faktisk fillagring.
+    $versjoner[] = [
+        "versjon_id" => count($versjoner) + 1,
+        "versjon_nummer" => count($versjoner) + 1,
+        "opprettet_av_navn" => "Deg",
+        "opprettet_på" => date("Y-m-d H:i"),
+        "fil_størrelse" => (int) $_FILES['ny_fil']['size'],
     ];
 }
 

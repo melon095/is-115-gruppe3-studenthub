@@ -41,6 +41,23 @@ foreach ($mock_filer as $i => $fil) {
     ];
 }
 
+// TODO: Hent fra database.
+$antall_diskusjoner = (((int) $oppgave_id) % 4) + 1;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES['ny_fil']['error'] === UPLOAD_ERR_OK) {
+    // TODO: Database integrasjon og faktisk fillagring.
+    $ny_fil_navn = basename($_FILES['ny_fil']['name']);
+
+    $ressurser[] = [
+        "fil_id" => count($ressurser) + 1,
+        "oppgave_id" => $oppgave_id,
+        "fil_navn" => $ny_fil_navn,
+        "fil_type" => strtolower(pathinfo($ny_fil_navn, PATHINFO_EXTENSION)),
+        "fil_størrelse" => (int) $_FILES['ny_fil']['size'],
+        "siste_versjon" => ["versjon_nummer" => 1],
+    ];
+}
+
 $page_title = "Oppgave";
 $page_content = __DIR__."/../pages/oppgave.tpl.php";
 $page_styles = ["/assets/css/oppgave.css", "/assets/css/ressurs-tabell.css"];
@@ -55,6 +72,7 @@ $state = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
     "ressurser" => $ressurser,
+    "antall_diskusjoner" => $antall_diskusjoner,
 ];
 
 include __DIR__."/_layout.php";

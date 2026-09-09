@@ -4,12 +4,13 @@
 
 <section>
     <div class="diskusjon-title-row">
-        <h1>Diskusjon</h1>
+        <h1><?php echo htmlspecialchars($state["diskusjon"]["tittel"]); ?></h1>
         <p class="diskusjon-meta">
+            Tilhører <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>
             <?php if ($state["oppgave"] !== null): ?>
-                Tilhører oppgaven <?php echo htmlspecialchars($state["oppgave"]["tittel"]); ?>
-            <?php else: ?>
-                Tilhører <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>
+                merket med oppgaven: <?php echo htmlspecialchars($state["oppgave"]["tittel"]); ?>
+            <?php elseif ($state["fil"] !== null): ?>
+                merket med filen: <?php echo htmlspecialchars($state["fil"]["fil_navn"]); ?>
             <?php endif; ?>
         </p>
     </div>
