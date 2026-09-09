@@ -52,7 +52,7 @@ function bytes_til_menneske(int $bytes): string
                 </form>
             </details>
 
-            <a href="/forlat-gruppe.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>" class="button button-warning">Forlat Gruppe</a>
+            <a href="<?php echo url("/forlat-gruppe.php?gruppe_id=" . $state["gruppe"]["id"]); ?>" class="button button-warning">Forlat Gruppe</a>
         </div>
     </div>
     
@@ -110,7 +110,7 @@ function bytes_til_menneske(int $bytes): string
         <section>
             <div class="gruppe-medlemmer-title-row">
                 <h2>Medlemmer</h2>
-                <a href="/inviter.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>" class="button button-primary">Inviter medlem</a>
+                <a href="<?php echo url("/inviter.php?gruppe_id=" . $state["gruppe"]["id"]); ?>" class="button button-primary">Inviter medlem</a>
             </div>
 
             <ul>
@@ -181,7 +181,7 @@ function bytes_til_menneske(int $bytes): string
                     <?php else: ?>
                         filen "<?php echo htmlspecialchars($state["filter_fil"]["fil_navn"]); ?>"
                     <?php endif; ?>
-                    <a href="/gruppe.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>&section=diskusjoner">Vis alle</a>
+                    <a href="<?php echo url("/gruppe.php?gruppe_id=" . $state["gruppe"]["id"] . "&section=diskusjoner"); ?>">Vis alle</a>
                 </p>
             <?php endif; ?>
 
@@ -190,7 +190,7 @@ function bytes_til_menneske(int $bytes): string
                     <li>
                         <a
                             class="gruppe-diskusjon-kort"
-                            href="/diskusjon.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>&diskusjon_id=<?php echo $trad["id"]; ?><?php echo $trad["oppgave_id"] !== null ? "&oppgave_id=" . $trad["oppgave_id"] : ""; ?><?php echo $trad["fil_id"] !== null ? "&fil_id=" . $trad["fil_id"] : ""; ?>"
+                            href="<?php echo url("/diskusjon.php?gruppe_id=" . $state["gruppe"]["id"] . "&diskusjon_id=" . $trad["id"] . ($trad["oppgave_id"] !== null ? "&oppgave_id=" . $trad["oppgave_id"] : "") . ($trad["fil_id"] !== null ? "&fil_id=" . $trad["fil_id"] : "")); ?>"
                         >
                             <span class="gruppe-diskusjon-tittel"><?php echo htmlspecialchars($trad["tittel"]); ?></span>
                             <span class="gruppe-diskusjon-meta">

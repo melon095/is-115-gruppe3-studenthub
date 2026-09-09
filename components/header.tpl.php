@@ -38,10 +38,10 @@ function hent_student(string $student_id): array  {
         </li>
     <?php else: ?>
         <li>
-            <a href="/login.php">Logg inn</a>
+            <a href="<?php echo url("/login.php"); ?>">Logg inn</a>
         </li>
         <li>
-            <a href="/registrer.php">Registrer</a>
+            <a href="<?php echo url("/registrer.php"); ?>">Registrer</a>
         </li>
     <?php endif; ?>
     </ul>

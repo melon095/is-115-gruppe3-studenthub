@@ -4,7 +4,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     // TODO: Database integrasjon.
     // TODO: Validere bruker input.
     $_SESSION['student_id'] = 1;
-    header('Location: index.php');
+    header('Location: ' . url('/index.php'));
     exit();
 }
 
@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <p class="auth-lenke">
-            Har du allerede en konto? <a href="/login.php">Logg inn</a>
+            Har du allerede en konto? <a href="<?php echo url("/login.php"); ?>">Logg inn</a>
         </p>
     </section>
 </div>

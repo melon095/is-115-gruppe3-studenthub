@@ -107,7 +107,7 @@ if ($oppgave !== null) {
 } elseif ($fil !== null) {
     $breadcrumbs[] = [
         "label" => $fil["fil_navn"],
-        "href" => "/ressurs.php?ressurs_id=" . $fil["fil_id"],
+        "href" => url("/ressurs.php?ressurs_id=" . $fil["fil_id"]),
     ];
 }
 

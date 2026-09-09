@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </dl>
 
             <div class="opprett-gruppe-resultat-knapper">
-                <a class="button button-primary" href="/gruppe.php?gruppe_id=<?php echo $opprettet_gruppe["id"]; ?>&section=oppgaver">Gå til gruppen</a>
-                <a class="button button-secondary" href="/index.php">Til alle grupper</a>
+                <a class="button button-primary" href="<?php echo url("/gruppe.php?gruppe_id=" . $opprettet_gruppe["id"] . "&section=oppgaver"); ?>">Gå til gruppen</a>
+                <a class="button button-secondary" href="<?php echo url("/index.php"); ?>">Til alle grupper</a>
             </div>
         </section>
     <?php else: ?>

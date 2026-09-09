@@ -1,13 +1,13 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $page_title = "Opprett gruppe";
 $page_content = __DIR__."/../pages/opprett-gruppe.tpl.php";
-$page_styles = ["/assets/css/opprett-gruppe.css"];
+$page_styles = [url("/assets/css/opprett-gruppe.css")];
 
 $breadcrumbs = [
-    ["label" => "Grupper", "href" => "/index.php"],
+    ["label" => "Grupper", "href" => url("/index.php")],
     ["label" => "Opprett gruppe"],
 ];
 

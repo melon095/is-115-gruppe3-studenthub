@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1 id="godkjent-heading">Du er nå medlem</h1>
             <p>Du er lagt til i <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>.</p>
 
-            <a class="button button-primary" href="/gruppe.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>&section=medlemmer">Gå til gruppen</a>
+            <a class="button button-primary" href="<?php echo url("/gruppe.php?gruppe_id=" . $state["gruppe"]["id"] . "&section=medlemmer"); ?>">Gå til gruppen</a>
         </section>
     <?php else: ?>
         <section class="card" aria-labelledby="invitasjon-heading">

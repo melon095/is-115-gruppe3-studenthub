@@ -1,13 +1,13 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 require __DIR__."/../components/csrf.php";
 
 $gruppe_id = $_GET["gruppe_id"] ?? $_POST["gruppe_id"] ?? null;
 
 if ($gruppe_id === null) {
-    header("Location: /index.php");
+    header("Location: " . url("/index.php"));
     exit();
 }
 
@@ -18,7 +18,7 @@ $gruppe = [
 
 $page_title = "Bli med i gruppe";
 $page_content = __DIR__."/../pages/inviter-til-gruppe.tpl.php";
-$page_styles = ["/assets/css/inviter-til-gruppe.css"];
+$page_styles = [url("/assets/css/inviter-til-gruppe.css")];
 
 $state = [
     "gruppe" => $gruppe,

@@ -14,7 +14,7 @@ if ($har_forlatt) {
             <h1 id="forlat-gruppe-resultat-heading">Du har forlatt gruppen</h1>
             <p>Du er ikke lenger medlem av <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>.</p>
 
-            <a class="button button-primary" href="/index.php">Til forsiden</a>
+            <a class="button button-primary" href="<?php echo url("/index.php"); ?>">Til forsiden</a>
         </section>
     <?php else: ?>
         <section class="card" aria-labelledby="forlat-gruppe-heading">
@@ -29,7 +29,7 @@ if ($har_forlatt) {
 
                 <a
                     class="button button-secondary"
-                    href="/gruppe.php?gruppe_id=<?php echo $state["gruppe"]["id"]; ?>"
+                    href="<?php echo url("/gruppe.php?gruppe_id=" . $state["gruppe"]["id"]); ?>"
                 >
                     Avbryt
                 </a>

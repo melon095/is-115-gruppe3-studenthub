@@ -1,11 +1,11 @@
 <?php
 
-session_start();
+require __DIR__."/_bootstrap.php";
 
 $public_page = true;
 
 $page_title = "Registrer";
 $page_content = __DIR__."/../pages/registrer.tpl.php";
-$page_styles = ["/assets/css/auth.css"];
+$page_styles = [url("/assets/css/auth.css")];
 
 include __DIR__."/_layout.php";
