@@ -2,7 +2,9 @@
 
 $grupper = [];
 
-if (isset($_SESSION["student_id"])) {
+$vis_sidebar = !($public_page ?? false) && isset($_SESSION["student_id"]);
+
+if ($vis_sidebar) {
     $stmt = $pdo->prepare("
         SELECT
             g.id AS gruppe_id,
@@ -29,49 +31,67 @@ $current_gruppe_id = filter_input(
 
 ?>
 
-<?php if (isset($_SESSION["student_id"])): ?>
+<?php if ($vis_sidebar): ?>
 
-<aside class="sidebar" id="sidebar">
-    <nav class="grupper-nav">
-        <section>
+    <aside class="sidebar" id="sidebar">
 
-            <h2>Grupper du er medlem av</h2>
+        <nav class="grupper-nav">
 
-            <?php if (empty($grupper)): ?>
+            <section>
 
-                <p>Du er ikke medlem av noen grupper ennå.</p>
+                <h2>Grupper du er medlem av</h2>
 
-            <?php else: ?>
+                <?php if (empty($grupper)): ?>
 
-                <ul class="grupper-liste">
+                    <p>
+                        Du er ikke medlem av noen grupper ennå.
+                    </p>
 
-                    <?php foreach ($grupper as $gruppe): ?>
+                <?php else: ?>
 
-                        <li>
-                            <a href="<?php echo url(
-                                "gruppe.php?gruppe_id=" . (int) $gruppe["gruppe_id"]
-                            ); ?>"
+                    <ul class="grupper-liste">
+
+                        <?php foreach ($grupper as $gruppe): ?>
+
+                            <li>
+
                                 <?php
-                                if (
+
+                                $gruppe_url = url(
+                                    "/gruppe.php?gruppe_id=" .
+                                    $gruppe["gruppe_id"] .
+                                    "&section=oppgaver"
+                                );
+
+                                $current = (
                                     (int) $current_gruppe_id ===
                                     (int) $gruppe["gruppe_id"]
-                                ) {
-                                    echo 'aria-current="page"';
-                                }
+                                );
+
+                                echo '<a href="' .
+                                    htmlspecialchars($gruppe_url) .
+                                    '"' .
+                                    ($current ? ' aria-current="page"' : '') .
+                                    '>';
+
+                                echo htmlspecialchars($gruppe["navn"]);
+
+                                echo '</a>';
+
                                 ?>
-                            >
-                                <?php echo htmlspecialchars($gruppe["navn"]); ?>
-                            </a>
-                        </li>
 
-                    <?php endforeach; ?>
+                            </li>
 
-                </ul>
+                        <?php endforeach; ?>
 
-            <?php endif; ?>
+                    </ul>
 
-        </section>
-    </nav>
-</aside>
+                <?php endif; ?>
+
+            </section>
+
+        </nav>
+
+    </aside>
 
 <?php endif; ?>
