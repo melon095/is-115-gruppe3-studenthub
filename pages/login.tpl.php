@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <p class="auth-lenke">
             Ikke registrert?
-                <a href="<?php echo url('/register.php'); ?>">Registrer deg</a>
+                <a href="<?php echo url('/registrer.php'); ?>">Registrer deg</a>
         </p>
     </section>
 </div>
