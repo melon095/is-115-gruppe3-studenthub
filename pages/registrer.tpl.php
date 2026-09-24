@@ -11,12 +11,55 @@
             </ul>
         <?php endif; ?>
 
-        
+        <form method="post" action="" class="form">
 
-        <p class="auth-lenke">
-            Har du allerede en konto?
-            <?php echo url("/login.php"); ?>Logg inn</a>
-        </p>
+            <div class="form-felt">
+                <label for="fornavn">Fornavn</label>
+                <input
+                    type="text"
+                    id="fornavn"
+                    name="fornavn"
+                    value="<?php echo htmlspecialchars($fornavn); ?>"
+                    autocomplete="given-name"
+                    required
+                >
+            </div>
 
-    </section>
-</div>
+            <div class="form-felt">
+                <label for="etternavn">Etternavn</label>
+                <input
+                    type="text"
+                    id="etternavn"
+                    name="etternavn"
+                    value="<?php echo htmlspecialchars($etternavn); ?>"
+                    autocomplete="family-name"
+                    required
+                >
+            </div>
+
+            <div class="form-felt">
+                <label for="epost">E-post</label>
+                <input
+                    type="email"
+                    id="epost"
+                    name="epost"
+                    value="<?php echo htmlspecialchars($epost ?: ""); ?>"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-felt">
+                <label for="passord">Passord</label>
+                <input
+                    type="password"
+                    id="passord"
+                    name="passord"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <div class="form-felt">
+                <label for="bekreft_passord">Bekreft passord</label>
+ 
