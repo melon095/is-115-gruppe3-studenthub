@@ -1,46 +1,71 @@
 <?php
 
-function section_btn(array $state, string $section, string $tekst): string
-{
-    $aktiv = $state["section"] === $section;
+function section_btn(
+    array $state,
+    string $section,
+    string $tekst
+): string {
+    $aktiv =
+        $state["section"] === $section;
 
-    $klasse = $aktiv
+    $klasse =
+        $aktiv
         ? "button button-primary"
         : "button button-secondary";
 
-    $gruppe_id = (int) $state["gruppe"]["id"];
-
     $href = url(
         "/gruppe.php?gruppe_id=" .
-        $gruppe_id .
+        (int) $state["gruppe"]["id"] .
         "&section=" .
         urlencode($section)
     );
 
-    $html = '<li>';
-    $html .= '<a href="' . htmlspecialchars($href) . '" class="' . $klasse . '">';
+    $html = "<li>";
+        $html .= '<a href="' .
+            htmlspecialchars($href) .
+            '">';
     $html .= htmlspecialchars($tekst);
-    $html .= '</a>';
-    $html .= '</li>';
+    $html .= "</a>";
+    $html .= "</li>";
 
     return $html;
 }
 
-function bytes_til_menneske(int $bytes): string
-{
+
+function bytes_til_menneske(
+    int $bytes
+): string {
     if ($bytes <= 0) {
         return "0.00 B";
     }
 
-    $enheter = ["B", "KB", "MB", "GB", "TB", "PB"];
+    $enheter = [
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB",
+        "PB"
+    ];
 
-    $eksponent = (int) floor(log($bytes, 1024));
-    $eksponent = min($eksponent, count($enheter) - 1);
+    $eksponent =
+        (int) floor(
+            log($bytes, 1024)
+        );
+
+    $eksponent =
+        min(
+            $eksponent,
+            count($enheter) - 1
+        );
 
     return round(
-        $bytes / pow(1024, $eksponent),
+        $bytes /
+        pow(1024, $eksponent),
         2
-    ) . " " . $enheter[$eksponent];
+    ) .
+    " " .
+    $enheter[$eksponent];
 }
 
 ?>
@@ -50,72 +75,104 @@ function bytes_til_menneske(int $bytes): string
     <div class="gruppe-title-row">
 
         <div>
+
             <h1>
-                <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>
+                <?php echo htmlspecialchars(
+                    $state["gruppe"]["navn"]
+                ); ?>
             </h1>
 
-            <?php if (!empty($state["gruppe"]["beskrivelse"])): ?>
+            <?php if (
+                !empty(
+                    $state["gruppe"]["beskrivelse"]
+                )
+            ): ?>
+
                 <p class="gruppe-beskrivelse">
-                    <?php echo htmlspecialchars($state["gruppe"]["beskrivelse"]); ?>
+
+                    <?php echo htmlspecialchars(
+                        $state["gruppe"]["beskrivelse"]
+                    ); ?>
+
                 </p>
+
             <?php endif; ?>
+
         </div>
+
 
         <div class="gruppe-title-knapper">
 
-            <details class="gruppe-endre-navn">
+            <?php if ($state["er_eier"]): ?>
 
-                <summary class="button button-secondary">
-                    Endre navn
-                </summary>
+                <details class="gruppe-endre-navn">
+
+                    <summary
+                        class="button button-secondary"
+                    >
+                        Endre navn
+                    </summary>
+
+                    <?php
+                    echo '<form method="post" action="" class="form">';
+                    ?>
+
+                        <div class="form-felt">
+
+                            <label for="gruppe_navn">
+                                Nytt navn
+                            </label>
+
+                            <input
+                                type="text"
+                                id="gruppe_navn"
+                                name="gruppe_navn"
+                                value="<?php echo htmlspecialchars(
+                                    $state["gruppe"]["navn"]
+                                ); ?>"
+                                required
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="button button-primary"
+                        >
+                            Lagre
+                        </button>
+
+                    </form>
+
+                </details>
+
+            <?php else: ?>
 
                 <?php
-                echo '<form method="post" action="" class="form">';
+
+                $forlat_url =
+                    url(
+                        "/forlat-gruppe.php?gruppe_id=" .
+                        $state["gruppe"]["id"]
+                    );
+
+                echo '<a class="button button-warning" href="' .
+                    htmlspecialchars($forlat_url) .
+                    '">Forlat gruppe</a>';
+
                 ?>
 
-                    <div class="form-felt">
-                        <label for="gruppe_navn">
-                            Nytt navn
-                        </label>
-
-                        <input
-                            type="text"
-                            id="gruppe_navn"
-                            name="gruppe_navn"
-                            value="<?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>"
-                            required
-                        >
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="button button-primary"
-                    >
-                        Lagre
-                    </button>
-
-                </form>
-
-            </details>
-
-            <?php
-
-            $forlat_url = url(
-                "/forlat-gruppe.php?gruppe_id=" .
-                $state["gruppe"]["id"]
-            );
-
-            echo '<a class="button button-warning" href="' .
-                htmlspecialchars($forlat_url) .
-                '">Forlat gruppe</a>';
-
-            ?>
+            <?php endif; ?>
 
         </div>
 
     </div>
 
-    <nav class="gruppe-section-nav" aria-label="Gruppemeny">
+
+    <nav
+        class="gruppe-section-nav"
+        aria-label="Gruppemeny"
+    >
 
         <ul class="gruppe-section-list">
 
@@ -147,9 +204,13 @@ function bytes_til_menneske(int $bytes): string
 
     </nav>
 
+
     <div class="gruppe-sections">
 
-        <?php if ($state["section"] === "oppgaver"): ?>
+
+        <?php if (
+            $state["section"] === "oppgaver"
+        ): ?>
 
             <section>
 
@@ -157,19 +218,27 @@ function bytes_til_menneske(int $bytes): string
 
                     <div>
                         <h2>Oppgaver</h2>
-                        <p>Oppgaver som tilhører denne gruppen.</p>
+
+                        <p>
+                            Oppgaver som tilhører denne gruppen.
+                        </p>
                     </div>
 
                 </div>
 
-                <?php if (empty($state["oppgaver"])): ?>
+
+                <?php if (
+                    empty($state["oppgaver"])
+                ): ?>
 
                     <div class="gruppe-empty">
 
-                        <h3>Ingen oppgaver ennå</h3>
+                        <h3>
+                            Ingen oppgaver ennå
+                        </h3>
 
                         <p>
-                            Opprett den første oppgaven for gruppen nedenfor.
+                            Opprett den første oppgaven nedenfor.
                         </p>
 
                     </div>
@@ -178,11 +247,16 @@ function bytes_til_menneske(int $bytes): string
 
                     <ul class="gruppe-oppgaver-liste">
 
-                        <?php foreach ($state["oppgaver"] as $oppgave): ?>
+                        <?php foreach (
+                            $state["oppgaver"]
+                            as $oppgave
+                        ): ?>
 
                             <li>
 
-                                <article class="gruppe-oppgaver-oppgave">
+                                <article
+                                    class="gruppe-oppgaver-oppgave"
+                                >
 
                                     <div>
 
@@ -192,7 +266,11 @@ function bytes_til_menneske(int $bytes): string
                                             ); ?>
                                         </h3>
 
-                                        <?php if (!empty($oppgave["beskrivelse"])): ?>
+                                        <?php if (
+                                            !empty(
+                                                $oppgave["beskrivelse"]
+                                            )
+                                        ): ?>
 
                                             <p>
                                                 <?php echo htmlspecialchars(
@@ -204,20 +282,62 @@ function bytes_til_menneske(int $bytes): string
 
                                     </div>
 
-                                    <?php
 
-                                    $oppgave_url = url(
-                                        "/oppgave.php?gruppe_id=" .
-                                        $state["gruppe"]["id"] .
-                                        "&oppgave_id=" .
-                                        $oppgave["oppgave_id"]
-                                    );
+                                    <div
+                                        class="gruppe-handlinger"
+                                    >
 
-                                    echo '<a class="button button-primary" href="' .
-                                        htmlspecialchars($oppgave_url) .
-                                        '">Åpne</a>';
+                                        <?php
 
-                                    ?>
+                                        $oppgave_url =
+                                            url(
+                                                "/oppgave.php?gruppe_id=" .
+                                                $state["gruppe"]["id"] .
+                                                "&oppgave_id=" .
+                                                $oppgave["oppgave_id"]
+                                            );
+
+                                        echo '<a class="button button-primary" href="' .
+                                            htmlspecialchars($oppgave_url) .
+                                            '">Åpne</a>';
+
+                                        ?>
+
+
+                                        <?php if (
+                                            $state["er_eier"]
+                                        ): ?>
+
+                                            <?php
+                                            echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne oppgaven?\');">';
+                                            ?>
+
+                                                <?php echo csrf_felt(); ?>
+
+                                                <input
+                                                    type="hidden"
+                                                    name="admin_handling"
+                                                    value="slett_oppgave"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="oppgave_id"
+                                                    value="<?php echo (int) $oppgave["oppgave_id"]; ?>"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="button button-warning"
+                                                >
+                                                    Slett
+                                                </button>
+
+                                            </form>
+
+                                        <?php endif; ?>
+
+                                    </div>
 
                                 </article>
 
@@ -228,6 +348,7 @@ function bytes_til_menneske(int $bytes): string
                     </ul>
 
                 <?php endif; ?>
+
 
                 <div class="gruppe-opprett-omrade">
 
@@ -279,115 +400,192 @@ function bytes_til_menneske(int $bytes): string
 
             </section>
 
-        <?php elseif ($state["section"] === "medlemmer"): ?>
+
+        <?php elseif (
+            $state["section"] === "medlemmer"
+        ): ?>
 
             <section>
 
                 <div class="gruppe-medlemmer-title-row">
 
                     <div>
+
                         <h2>Medlemmer</h2>
-                        <p>Studenter som er medlem av gruppen.</p>
+
+                        <p>
+                            Studenter som er medlem av gruppen.
+                        </p>
+
                     </div>
 
-                    <?php
 
-                    $inviter_url = url(
-                        "/inviter.php?gruppe_id=" .
-                        $state["gruppe"]["id"]
-                    );
+                    <?php if (
+                        $state["er_eier"]
+                    ): ?>
 
-                    echo '<a class="button button-primary" href="' .
-                        htmlspecialchars($inviter_url) .
-                        '">Inviter medlem</a>';
+                        <?php
 
-                    ?>
+                        $inviter_url =
+                            url(
+                                "/inviter.php?gruppe_id=" .
+                                $state["gruppe"]["id"]
+                            );
+
+                        echo '<a class="button button-primary" href="' .
+                            htmlspecialchars($inviter_url) .
+                            '">Inviter medlem</a>';
+
+                        ?>
+
+                    <?php endif; ?>
 
                 </div>
 
-                <?php if (empty($state["medlemmer"])): ?>
 
-                    <div class="gruppe-empty">
-                        <p>Gruppen har ingen medlemmer.</p>
-                    </div>
+                <ul class="gruppe-medlemmer-liste">
 
-                <?php else: ?>
+                    <?php foreach (
+                        $state["medlemmer"]
+                        as $medlem
+                    ): ?>
 
-                    <ul class="gruppe-medlemmer-liste">
+                        <?php
+                        $medlem_er_eier =
+                            (int) $medlem["student_id"] ===
+                            (int) $state["gruppe"]["opprettet_av"];
+                        ?>
 
-                        <?php foreach ($state["medlemmer"] as $medlem): ?>
+                        <li class="gruppe-medlem">
 
-                            <li class="gruppe-medlem">
+                            <?php if (
+                                !empty(
+                                    $medlem["avatar_link"]
+                                )
+                            ): ?>
 
-                                <?php if (!empty($medlem["avatar_link"])): ?>
+                                <?php
+                                echo '<img class="gruppe-medlem-img" src="' .
+                                    htmlspecialchars($medlem["avatar_link"]) .
+                                    '" alt="Brukerprofilbilde">';
+                                ?>
 
-                                    <?php
-                                    echo '<img class="gruppe-medlem-img" src="' .
-                                        htmlspecialchars($medlem["avatar_link"]) .
-                                        '" alt="Brukerprofilbilde">';
-                                    ?>
+                            <?php else: ?>
 
-                                <?php else: ?>
-
-                                    <div
-                                        class="gruppe-medlem-img gruppe-medlem-placeholder"
-                                        aria-hidden="true"
-                                    >
-                                        <?php
-                                        echo htmlspecialchars(
-                                            mb_strtoupper(
-                                                mb_substr(
-                                                    $medlem["fornavn"],
-                                                    0,
-                                                    1
-                                                )
+                                <div
+                                    class="gruppe-medlem-img gruppe-medlem-placeholder"
+                                    aria-hidden="true"
+                                >
+                                    <?php echo htmlspecialchars(
+                                        mb_strtoupper(
+                                            mb_substr(
+                                                $medlem["fornavn"],
+                                                0,
+                                                1
                                             )
-                                        );
-                                        ?>
-                                    </div>
+                                        )
+                                    ); ?>
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <span class="gruppe-medlem-navn">
+
+                                <?php echo htmlspecialchars(
+                                    $medlem["fornavn"]
+                                ); ?>
+
+                                <?php echo htmlspecialchars(
+                                    $medlem["etternavn"]
+                                ); ?>
+
+                                <?php if (
+                                    $medlem_er_eier
+                                ): ?>
+
+                                    <strong>
+                                        (Eier)
+                                    </strong>
 
                                 <?php endif; ?>
 
-                                <span class="gruppe-medlem-navn">
+                            </span>
 
-                                    <?php echo htmlspecialchars(
-                                        $medlem["fornavn"]
-                                    ); ?>
 
-                                    <?php echo htmlspecialchars(
-                                        $medlem["etternavn"]
-                                    ); ?>
+                            <?php if (
+                                $state["er_eier"] &&
+                                !$medlem_er_eier
+                            ): ?>
 
-                                </span>
+                                <?php
+                                echo '<form method="post" action="" onsubmit="return confirm(\'Vil du fjerne dette medlemmet fra gruppen?\');">';
+                                ?>
 
-                            </li>
+                                    <?php echo csrf_felt(); ?>
 
-                        <?php endforeach; ?>
+                                    <input
+                                        type="hidden"
+                                        name="admin_handling"
+                                        value="fjern_medlem"
+                                    >
 
-                    </ul>
+                                    <input
+                                        type="hidden"
+                                        name="student_id"
+                                        value="<?php echo (int) $medlem["student_id"]; ?>"
+                                    >
 
-                <?php endif; ?>
+                                    <button
+                                        type="submit"
+                                        class="button button-warning"
+                                    >
+                                        Fjern medlem
+                                    </button>
+
+                                </form>
+
+                            <?php endif; ?>
+
+                        </li>
+
+                    <?php endforeach; ?>
+
+                </ul>
 
             </section>
 
-        <?php elseif ($state["section"] === "ressurser"): ?>
+
+        <?php elseif (
+            $state["section"] === "ressurser"
+        ): ?>
 
             <section>
 
                 <div class="gruppe-section-heading">
 
                     <div>
+
                         <h2>Ressurser</h2>
-                        <p>Filer og ressurser som deles med gruppen.</p>
+
+                        <p>
+                            Filer og ressurser som deles med gruppen.
+                        </p>
+
                     </div>
 
                 </div>
 
-                <?php if (empty($state["ressurser"])): ?>
+
+                <?php if (
+                    empty($state["ressurser"])
+                ): ?>
 
                     <div class="gruppe-empty">
 
-                        <h3>Ingen ressurser ennå</h3>
+                        <h3>
+                            Ingen ressurser ennå
+                        </h3>
 
                         <p>
                             Last opp den første filen nedenfor.
@@ -401,33 +599,31 @@ function bytes_til_menneske(int $bytes): string
 
                         <table class="ressurs-tabell">
 
-                            <caption>
-                                Ressurser i gruppen
-                            </caption>
-
                             <thead>
 
                                 <tr>
-                                    <th scope="col">Filnavn</th>
-                                    <th scope="col">Filtype</th>
-                                    <th scope="col">Filstørrelse</th>
-                                    <th scope="col">Revisjoner</th>
-                                    <th scope="col">Handling</th>
+                                    <th>Filnavn</th>
+                                    <th>Filtype</th>
+                                    <th>Filstørrelse</th>
+                                    <th>Handling</th>
                                 </tr>
 
                             </thead>
 
                             <tbody>
 
-                                <?php foreach ($state["ressurser"] as $ressurs): ?>
+                                <?php foreach (
+                                    $state["ressurser"]
+                                    as $ressurs
+                                ): ?>
 
                                     <tr>
 
-                                        <th scope="row">
+                                        <td>
                                             <?php echo htmlspecialchars(
                                                 $ressurs["fil_navn"]
                                             ); ?>
-                                        </th>
+                                        </td>
 
                                         <td>
                                             <?php echo htmlspecialchars(
@@ -442,26 +638,58 @@ function bytes_til_menneske(int $bytes): string
                                         </td>
 
                                         <td>
-                                            <?php echo (int) (
-                                                $ressurs["siste_versjon"]["versjon_nummer"]
-                                                ?? 1
-                                            ); ?>
-                                        </td>
 
-                                        <td>
+                                            <div class="gruppe-handlinger">
 
-                                            <?php
+                                                <?php
 
-                                            $ressurs_url = url(
-                                                "/ressurs.php?ressurs_id=" .
-                                                $ressurs["fil_id"]
-                                            );
+                                                $ressurs_url =
+                                                    url(
+                                                        "/ressurs.php?ressurs_id=" .
+                                                        $ressurs["fil_id"]
+                                                    );
 
-                                            echo '<a class="button button-primary" href="' .
-                                                htmlspecialchars($ressurs_url) .
-                                                '">Åpne</a>';
+                                                echo '<a class="button button-primary" href="' .
+                                                    htmlspecialchars($ressurs_url) .
+                                                    '">Åpne</a>';
 
-                                            ?>
+                                                ?>
+
+
+                                                <?php if (
+                                                    $state["er_eier"]
+                                                ): ?>
+
+                                                    <?php
+                                                    echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne ressursen?\');">';
+                                                    ?>
+
+                                                        <?php echo csrf_felt(); ?>
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="admin_handling"
+                                                            value="slett_ressurs"
+                                                        >
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="fil_id"
+                                                            value="<?php echo (int) $ressurs["fil_id"]; ?>"
+                                                        >
+
+                                                        <button
+                                                            type="submit"
+                                                            class="button button-warning"
+                                                        >
+                                                            Slett
+                                                        </button>
+
+                                                    </form>
+
+                                                <?php endif; ?>
+
+                                            </div>
 
                                         </td>
 
@@ -477,9 +705,12 @@ function bytes_til_menneske(int $bytes): string
 
                 <?php endif; ?>
 
+
                 <div class="gruppe-opprett-omrade">
 
-                    <h3>Last opp ressurs</h3>
+                    <h3>
+                        Last opp ressurs
+                    </h3>
 
                     <?php
                     echo '<form method="post" action="" enctype="multipart/form-data" class="gruppe-last-opp">';
@@ -513,77 +744,39 @@ function bytes_til_menneske(int $bytes): string
 
             </section>
 
-        <?php elseif ($state["section"] === "diskusjoner"): ?>
+
+        <?php elseif (
+            $state["section"] === "diskusjoner"
+        ): ?>
 
             <section>
 
                 <div class="gruppe-section-heading">
 
                     <div>
+
                         <h2>Diskusjoner</h2>
-                        <p>Diskusjonstråder for gruppen.</p>
+
+                        <p>
+                            Diskusjonstråder for gruppen.
+                        </p>
+
                     </div>
 
                 </div>
 
+
                 <?php if (
-                    $state["filter_oppgave"] !== null ||
-                    $state["filter_fil"] !== null
+                    empty(
+                        $state["diskusjoner_visning"]
+                    )
                 ): ?>
-
-                    <div class="gruppe-diskusjon-filter">
-
-                        Viser diskusjoner merket med
-
-                        <?php if ($state["filter_oppgave"] !== null): ?>
-
-                            oppgaven
-
-                            <strong>
-                                <?php echo htmlspecialchars(
-                                    $state["filter_oppgave"]["tittel"]
-                                ); ?>
-                            </strong>
-
-                        <?php else: ?>
-
-                            filen
-
-                            <strong>
-                                <?php echo htmlspecialchars(
-                                    $state["filter_fil"]["fil_navn"]
-                                ); ?>
-                            </strong>
-
-                        <?php endif; ?>
-
-                        <?php
-
-                        $vis_alle_url = url(
-                            "/gruppe.php?gruppe_id=" .
-                            $state["gruppe"]["id"] .
-                            "&section=diskusjoner"
-                        );
-
-                        echo '<a href="' .
-                            htmlspecialchars($vis_alle_url) .
-                            '">Vis alle</a>';
-
-                        ?>
-
-                    </div>
-
-                <?php endif; ?>
-
-                <?php if (empty($state["diskusjoner_visning"])): ?>
 
                     <div class="gruppe-empty">
 
-                        <h3>Ingen diskusjoner ennå</h3>
-
-                        <p>
-                            Opprett den første diskusjonstråden nedenfor.
-                        </p>
+                        <h3>
+                            Ingen diskusjoner ennå
+                        </h3>
 
                     </div>
 
@@ -591,68 +784,84 @@ function bytes_til_menneske(int $bytes): string
 
                     <ul class="gruppe-diskusjon-liste">
 
-                        <?php foreach ($state["diskusjoner_visning"] as $trad): ?>
+                        <?php foreach (
+                            $state["diskusjoner_visning"]
+                            as $trad
+                        ): ?>
 
                             <li>
 
-                                <?php
+                                <div class="gruppe-diskusjon-admin">
 
-                                $diskusjon_url = url(
-                                    "/diskusjon.php?gruppe_id=" .
-                                    $state["gruppe"]["id"] .
-                                    "&diskusjon_id=" .
-                                    $trad["id"]
-                                );
+                                    <?php
 
-                                echo '<a class="gruppe-diskusjon-kort" href="' .
-                                    htmlspecialchars($diskusjon_url) .
-                                    '">';
+                                    $diskusjon_url =
+                                        url(
+                                            "/diskusjon.php?gruppe_id=" .
+                                            $state["gruppe"]["id"] .
+                                            "&diskusjon_id=" .
+                                            $trad["id"]
+                                        );
 
-                                ?>
+                                    echo '<a class="gruppe-diskusjon-kort" href="' .
+                                        htmlspecialchars($diskusjon_url) .
+                                        '">';
 
-                                    <span class="gruppe-diskusjon-tittel">
+                                    ?>
 
-                                        <?php echo htmlspecialchars(
-                                            $trad["tittel"]
-                                        ); ?>
+                                        <span class="gruppe-diskusjon-tittel">
 
-                                    </span>
+                                            <?php echo htmlspecialchars(
+                                                $trad["tittel"]
+                                            ); ?>
 
-                                    <span class="gruppe-diskusjon-meta">
-
-                                        <?php echo (int) $trad["antall_innlegg"]; ?>
-
-                                        innlegg
-
-                                        <span aria-hidden="true">
-                                            •
                                         </span>
 
-                                        Sist aktiv
+                                        <span class="gruppe-diskusjon-meta">
 
-                                        <?php echo htmlspecialchars(
-                                            $trad["siste_aktivitet"]
-                                        ); ?>
+                                            <?php echo (int) $trad["antall_innlegg"]; ?>
 
-                                        <?php if ($trad["oppgave_id"] !== null): ?>
+                                            innlegg
 
-                                            <span class="gruppe-diskusjon-tag">
-                                                Oppgave
-                                                <?php echo (int) $trad["oppgave_id"]; ?>
-                                            </span>
+                                        </span>
 
-                                        <?php elseif ($trad["fil_id"] !== null): ?>
+                                    </a>
 
-                                            <span class="gruppe-diskusjon-tag">
-                                                Fil
-                                                <?php echo (int) $trad["fil_id"]; ?>
-                                            </span>
 
-                                        <?php endif; ?>
+                                    <?php if (
+                                        $state["er_eier"]
+                                    ): ?>
 
-                                    </span>
+                                        <?php
+                                        echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne diskusjonen og alle innleggene?\');">';
+                                        ?>
 
-                                </a>
+                                            <?php echo csrf_felt(); ?>
+
+                                            <input
+                                                type="hidden"
+                                                name="admin_handling"
+                                                value="slett_diskusjon"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="diskusjon_id"
+                                                value="<?php echo (int) $trad["id"]; ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="button button-warning"
+                                            >
+                                                Slett
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
+
+                                </div>
 
                             </li>
 
@@ -662,9 +871,12 @@ function bytes_til_menneske(int $bytes): string
 
                 <?php endif; ?>
 
+
                 <div class="gruppe-opprett-omrade">
 
-                    <h3>Ny diskusjonstråd</h3>
+                    <h3>
+                        Ny diskusjonstråd
+                    </h3>
 
                     <?php
                     echo '<form method="post" action="" class="form gruppe-ny-diskusjon">';
@@ -680,16 +892,16 @@ function bytes_til_menneske(int $bytes): string
                                 type="text"
                                 id="diskusjon_tittel"
                                 name="diskusjon_tittel"
-                                placeholder="F.eks. Spørsmål om innlevering"
                                 required
                             >
 
                         </div>
 
+
                         <div class="form-felt">
 
                             <label for="diskusjon_oppgave_id">
-                                Knytt til oppgave (valgfritt)
+                                Knytt til oppgave
                             </label>
 
                             <select
@@ -701,7 +913,10 @@ function bytes_til_menneske(int $bytes): string
                                     Ingen
                                 </option>
 
-                                <?php foreach ($state["oppgaver"] as $oppgave): ?>
+                                <?php foreach (
+                                    $state["oppgaver"]
+                                    as $oppgave
+                                ): ?>
 
                                     <option
                                         value="<?php echo (int) $oppgave["oppgave_id"]; ?>"
@@ -717,10 +932,11 @@ function bytes_til_menneske(int $bytes): string
 
                         </div>
 
+
                         <div class="form-felt">
 
                             <label for="diskusjon_fil_id">
-                                Knytt til fil (valgfritt)
+                                Knytt til fil
                             </label>
 
                             <select
@@ -732,7 +948,10 @@ function bytes_til_menneske(int $bytes): string
                                     Ingen
                                 </option>
 
-                                <?php foreach ($state["ressurser"] as $ressurs): ?>
+                                <?php foreach (
+                                    $state["ressurser"]
+                                    as $ressurs
+                                ): ?>
 
                                     <option
                                         value="<?php echo (int) $ressurs["fil_id"]; ?>"
@@ -756,22 +975,6 @@ function bytes_til_menneske(int $bytes): string
                         </button>
 
                     </form>
-
-                </div>
-
-            </section>
-
-        <?php else: ?>
-
-            <section>
-
-                <div class="gruppe-empty">
-
-                    <h2>Ugyldig seksjon</h2>
-
-                    <p>
-                        Denne delen av gruppen finnes ikke.
-                    </p>
 
                 </div>
 

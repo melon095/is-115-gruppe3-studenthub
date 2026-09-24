@@ -1,18 +1,13 @@
 <?php
 
 require __DIR__ . "/_bootstrap.php";
-
-/*
-|--------------------------------------------------------------------------
-| Hent og valider GET-parametere
-|--------------------------------------------------------------------------
-*/
+require_once __DIR__ . "/../components/csrf.php";
 
 $get = filter_input_array(INPUT_GET, [
     "gruppe_id" => FILTER_VALIDATE_INT,
     "section" => FILTER_DEFAULT,
     "oppgave_id" => FILTER_VALIDATE_INT,
-    "fil_id" => FILTER_VALIDATE_INT,
+    "fil_id" => FILTER_VALIDATE_INT
 ]);
 
 $gruppe_id = $get["gruppe_id"] ?? null;
@@ -23,10 +18,18 @@ if (!$gruppe_id) {
     exit();
 }
 
-if ($section === null || $section === "") {
-    header("Location: " . url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
+if (!$section) {
+    header(
+        "Location: " .
+        url(
+            "/gruppe.php?gruppe_id=" .
+            $gruppe_id .
+            "&section=oppgaver"
+        )
+    );
     exit();
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +38,11 @@ if ($section === null || $section === "") {
 */
 
 $stmt = $pdo->prepare("
-    SELECT id, navn, beskrivelse
+    SELECT
+        id,
+        navn,
+        beskrivelse,
+        opprettet_av
     FROM grupper
     WHERE id = :gruppe_id
 ");
@@ -51,18 +58,226 @@ if (!$gruppe) {
     exit();
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Kontroller medlemskap
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT 1
+    FROM gruppe_medlemmer
+    WHERE gruppe_id = :gruppe_id
+    AND bruker_id = :bruker_id
+");
+
+$stmt->execute([
+    "gruppe_id" => $gruppe_id,
+    "bruker_id" => $_SESSION["student_id"]
+]);
+
+if (!$stmt->fetchColumn()) {
+    header("Location: " . url("/index.php"));
+    exit();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Eier
+|--------------------------------------------------------------------------
+*/
+
+$er_eier =
+    (int) $gruppe["opprettet_av"] ===
+    (int) $_SESSION["student_id"];
+
+
+/*
+|--------------------------------------------------------------------------
+| Admin-handlinger
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["admin_handling"])
+) {
+    $input = filter_input_array(INPUT_POST, [
+        "admin_handling" => FILTER_DEFAULT,
+        "student_id" => FILTER_VALIDATE_INT,
+        "oppgave_id" => FILTER_VALIDATE_INT,
+        "fil_id" => FILTER_VALIDATE_INT,
+        "diskusjon_id" => FILTER_VALIDATE_INT
+    ]);
+
+    if (
+        $er_eier &&
+        csrf_gyldig($_POST["csrf_token"] ?? null)
+    ) {
+        $handling = $input["admin_handling"] ?? "";
+
+        /*
+        |--------------------------------------------------------------
+        | Fjern medlem
+        |--------------------------------------------------------------
+        */
+
+        if ($handling === "fjern_medlem") {
+            $student_id = $input["student_id"] ?? null;
+
+            if (
+                $student_id &&
+                (int) $student_id !== (int) $gruppe["opprettet_av"]
+            ) {
+                $stmt = $pdo->prepare("
+                    DELETE FROM gruppe_medlemmer
+                    WHERE gruppe_id = :gruppe_id
+                    AND bruker_id = :student_id
+                ");
+
+                $stmt->execute([
+                    "gruppe_id" => $gruppe_id,
+                    "student_id" => $student_id
+                ]);
+            }
+
+            header(
+                "Location: " .
+                url(
+                    "/gruppe.php?gruppe_id=" .
+                    $gruppe_id .
+                    "&section=medlemmer"
+                )
+            );
+            exit();
+        }
+
+
+        /*
+        |--------------------------------------------------------------
+        | Slett oppgave
+        |--------------------------------------------------------------
+        */
+
+        if ($handling === "slett_oppgave") {
+            $oppgave_id = $input["oppgave_id"] ?? null;
+
+            if ($oppgave_id) {
+                $stmt = $pdo->prepare("
+                    DELETE FROM oppgaver
+                    WHERE id = :oppgave_id
+                    AND gruppe_id = :gruppe_id
+                ");
+
+                $stmt->execute([
+                    "oppgave_id" => $oppgave_id,
+                    "gruppe_id" => $gruppe_id
+                ]);
+            }
+
+            header(
+                "Location: " .
+                url(
+                    "/gruppe.php?gruppe_id=" .
+                    $gruppe_id .
+                    "&section=oppgaver"
+                )
+            );
+            exit();
+        }
+
+
+        /*
+        |--------------------------------------------------------------
+        | Slett diskusjon
+        |--------------------------------------------------------------
+        */
+
+        if ($handling === "slett_diskusjon") {
+            $diskusjon_id =
+                $input["diskusjon_id"] ?? null;
+
+            if ($diskusjon_id) {
+                $stmt = $pdo->prepare("
+                    DELETE FROM diskusjoner
+                    WHERE id = :diskusjon_id
+                    AND gruppe_id = :gruppe_id
+                ");
+
+                $stmt->execute([
+                    "diskusjon_id" => $diskusjon_id,
+                    "gruppe_id" => $gruppe_id
+                ]);
+            }
+
+            header(
+                "Location: " .
+                url(
+                    "/gruppe.php?gruppe_id=" .
+                    $gruppe_id .
+                    "&section=diskusjoner"
+                )
+            );
+            exit();
+        }
+
+
+        /*
+        |--------------------------------------------------------------
+        | Slett ressurs
+        |--------------------------------------------------------------
+        */
+
+        if ($handling === "slett_ressurs") {
+            $fil_id = $input["fil_id"] ?? null;
+
+            if ($fil_id) {
+                $stmt = $pdo->prepare("
+                    DELETE FROM filer
+                    WHERE id = :fil_id
+                    AND gruppe_id = :gruppe_id
+                ");
+
+                $stmt->execute([
+                    "fil_id" => $fil_id,
+                    "gruppe_id" => $gruppe_id
+                ]);
+            }
+
+            header(
+                "Location: " .
+                url(
+                    "/gruppe.php?gruppe_id=" .
+                    $gruppe_id .
+                    "&section=ressurser"
+                )
+            );
+            exit();
+        }
+    }
+}
+
+
 /*
 |--------------------------------------------------------------------------
 | Endre gruppenavn
 |--------------------------------------------------------------------------
 */
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["gruppe_navn"])) {
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["gruppe_navn"]) &&
+    $er_eier
+) {
     $input = filter_input_array(INPUT_POST, [
         "gruppe_navn" => FILTER_DEFAULT
     ]);
 
-    $nytt_navn = trim($input["gruppe_navn"] ?? "");
+    $nytt_navn = trim(
+        $input["gruppe_navn"] ?? ""
+    );
 
     if ($nytt_navn !== "") {
         $stmt = $pdo->prepare("
@@ -80,25 +295,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["gruppe_navn"])) {
     }
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | Opprett oppgave
 |--------------------------------------------------------------------------
 */
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["oppgave_tittel"])) {
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["oppgave_tittel"])
+) {
     $input = filter_input_array(INPUT_POST, [
         "oppgave_tittel" => FILTER_DEFAULT,
         "oppgave_beskrivelse" => FILTER_DEFAULT
     ]);
 
-    $ny_tittel = trim($input["oppgave_tittel"] ?? "");
-    $ny_beskrivelse = trim($input["oppgave_beskrivelse"] ?? "");
+    $ny_tittel = trim(
+        $input["oppgave_tittel"] ?? ""
+    );
+
+    $ny_beskrivelse = trim(
+        $input["oppgave_beskrivelse"] ?? ""
+    );
 
     if ($ny_tittel !== "") {
         $stmt = $pdo->prepare("
-            INSERT INTO oppgaver (gruppe_id, tittel, beskrivelse)
-            VALUES (:gruppe_id, :tittel, :beskrivelse)
+            INSERT INTO oppgaver (
+                gruppe_id,
+                tittel,
+                beskrivelse
+            )
+            VALUES (
+                :gruppe_id,
+                :tittel,
+                :beskrivelse
+            )
         ");
 
         $stmt->execute([
@@ -106,12 +338,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["oppgave_tittel"])) {
             "tittel" => $ny_tittel,
             "beskrivelse" => $ny_beskrivelse
         ]);
+
+        header(
+            "Location: " .
+            url(
+                "/gruppe.php?gruppe_id=" .
+                $gruppe_id .
+                "&section=oppgaver"
+            )
+        );
+        exit();
     }
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Hent oppgaver
+| Oppgaver
 |--------------------------------------------------------------------------
 */
 
@@ -133,9 +376,10 @@ $stmt->execute([
 
 $oppgaver = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
 /*
 |--------------------------------------------------------------------------
-| Hent medlemmer
+| Medlemmer
 |--------------------------------------------------------------------------
 */
 
@@ -158,6 +402,7 @@ $stmt->execute([
 
 $medlemmer = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
 /*
 |--------------------------------------------------------------------------
 | Last opp fil
@@ -169,20 +414,46 @@ if (
     isset($_FILES["ny_fil"]) &&
     $_FILES["ny_fil"]["error"] === UPLOAD_ERR_OK
 ) {
-    $ny_fil_navn = basename($_FILES["ny_fil"]["name"]);
-    $fil_type = strtolower(pathinfo($ny_fil_navn, PATHINFO_EXTENSION));
-    $fil_storrelse = (int) $_FILES["ny_fil"]["size"];
+    $ny_fil_navn =
+        basename($_FILES["ny_fil"]["name"]);
 
-    $opplastingsmappe = __DIR__ . "/../uploads/";
+    $fil_type =
+        strtolower(
+            pathinfo(
+                $ny_fil_navn,
+                PATHINFO_EXTENSION
+            )
+        );
+
+    $fil_storrelse =
+        (int) $_FILES["ny_fil"]["size"];
+
+    $opplastingsmappe =
+        __DIR__ . "/../uploads/";
 
     if (!is_dir($opplastingsmappe)) {
-        mkdir($opplastingsmappe, 0755, true);
+        mkdir(
+            $opplastingsmappe,
+            0755,
+            true
+        );
     }
 
-    $lagret_navn = uniqid("", true) . "_" . $ny_fil_navn;
-    $fil_lokasjon = $opplastingsmappe . $lagret_navn;
+    $lagret_navn =
+        uniqid("", true) .
+        "_" .
+        $ny_fil_navn;
 
-    if (move_uploaded_file($_FILES["ny_fil"]["tmp_name"], $fil_lokasjon)) {
+    $fil_lokasjon =
+        $opplastingsmappe .
+        $lagret_navn;
+
+    if (
+        move_uploaded_file(
+            $_FILES["ny_fil"]["tmp_name"],
+            $fil_lokasjon
+        )
+    ) {
         $stmt = $pdo->prepare("
             INSERT INTO filer (
                 gruppe_id,
@@ -210,12 +481,23 @@ if (
             "fil_type" => $fil_type,
             "fil_lokasjon" => $fil_lokasjon
         ]);
+
+        header(
+            "Location: " .
+            url(
+                "/gruppe.php?gruppe_id=" .
+                $gruppe_id .
+                "&section=ressurser"
+            )
+        );
+        exit();
     }
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Hent ressurser/filer
+| Ressurser
 |--------------------------------------------------------------------------
 */
 
@@ -224,7 +506,11 @@ $stmt = $pdo->prepare("
         f.id AS fil_id,
         f.oppgave_id,
         f.opprettet_av,
-        CONCAT(s.fornavn, ' ', s.etternavn) AS opprettet_av_navn,
+        CONCAT(
+            s.fornavn,
+            ' ',
+            s.etternavn
+        ) AS opprettet_av_navn,
         f.fil_navn,
         f.fil_størrelse,
         f.fil_type,
@@ -240,46 +526,36 @@ $stmt->execute([
     "gruppe_id" => $gruppe_id
 ]);
 
-$ressurser = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$ressurser =
+    $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/*
-|--------------------------------------------------------------------------
-| Hent filversjoner
-|--------------------------------------------------------------------------
-*/
 
 foreach ($ressurser as &$ressurs) {
     $stmt = $pdo->prepare("
         SELECT
             id AS versjon_id,
-            fil_id,
-            opprettet_av,
-            versjon_nummer,
-            fil_lokasjon_hdd,
-            opprettet_på
+            versjon_nummer
         FROM filversjoner
         WHERE fil_id = :fil_id
-        ORDER BY versjon_nummer ASC
+        ORDER BY versjon_nummer DESC
+        LIMIT 1
     ");
 
     $stmt->execute([
         "fil_id" => $ressurs["fil_id"]
     ]);
 
-    $versjoner = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $siste_versjon =
+        $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $ressurs["versjoner"] = $versjoner;
-
-    if (!empty($versjoner)) {
-        $ressurs["siste_versjon"] = end($versjoner);
-    } else {
-        $ressurs["siste_versjon"] = [
+    $ressurs["siste_versjon"] =
+        $siste_versjon ?: [
             "versjon_nummer" => 1
         ];
-    }
 }
 
 unset($ressurs);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -287,16 +563,26 @@ unset($ressurs);
 |--------------------------------------------------------------------------
 */
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["diskusjon_tittel"])) {
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["diskusjon_tittel"])
+) {
     $input = filter_input_array(INPUT_POST, [
         "diskusjon_tittel" => FILTER_DEFAULT,
         "diskusjon_oppgave_id" => FILTER_VALIDATE_INT,
         "diskusjon_fil_id" => FILTER_VALIDATE_INT
     ]);
 
-    $ny_tittel = trim($input["diskusjon_tittel"] ?? "");
-    $merket_oppgave_id = $input["diskusjon_oppgave_id"] ?? null;
-    $merket_fil_id = $input["diskusjon_fil_id"] ?? null;
+    $ny_tittel =
+        trim(
+            $input["diskusjon_tittel"] ?? ""
+        );
+
+    $merket_oppgave_id =
+        $input["diskusjon_oppgave_id"] ?? null;
+
+    $merket_fil_id =
+        $input["diskusjon_fil_id"] ?? null;
 
     if ($ny_tittel !== "") {
         $stmt = $pdo->prepare("
@@ -319,16 +605,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["diskusjon_tittel"])) 
         $stmt->execute([
             "gruppe_id" => $gruppe_id,
             "tittel" => $ny_tittel,
-            "oppgave_id" => $merket_oppgave_id ?: null,
-            "fil_id" => $merket_fil_id ?: null,
-            "opprettet_av" => $_SESSION["student_id"]
+            "oppgave_id" =>
+                $merket_oppgave_id ?: null,
+            "fil_id" =>
+                $merket_fil_id ?: null,
+            "opprettet_av" =>
+                $_SESSION["student_id"]
         ]);
+
+        header(
+            "Location: " .
+            url(
+                "/gruppe.php?gruppe_id=" .
+                $gruppe_id .
+                "&section=diskusjoner"
+            )
+        );
+        exit();
     }
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Hent diskusjoner
+| Diskusjoner
 |--------------------------------------------------------------------------
 */
 
@@ -357,22 +657,30 @@ $stmt->execute([
     "gruppe_id" => $gruppe_id
 ]);
 
-$diskusjoner = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$diskusjoner =
+    $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 /*
 |--------------------------------------------------------------------------
-| Filtrering av diskusjoner
+| Filter
 |--------------------------------------------------------------------------
 */
 
-$filter_oppgave_id = $get["oppgave_id"] ?? null;
-$filter_fil_id = $get["fil_id"] ?? null;
+$filter_oppgave_id =
+    $get["oppgave_id"] ?? null;
+
+$filter_fil_id =
+    $get["fil_id"] ?? null;
 
 $filter_oppgave = null;
 
 if ($filter_oppgave_id) {
     foreach ($oppgaver as $oppgave) {
-        if ((int) $oppgave["oppgave_id"] === (int) $filter_oppgave_id) {
+        if (
+            (int) $oppgave["oppgave_id"] ===
+            (int) $filter_oppgave_id
+        ) {
             $filter_oppgave = $oppgave;
             break;
         }
@@ -383,36 +691,49 @@ $filter_fil = null;
 
 if ($filter_fil_id) {
     foreach ($ressurser as $ressurs) {
-        if ((int) $ressurs["fil_id"] === (int) $filter_fil_id) {
+        if (
+            (int) $ressurs["fil_id"] ===
+            (int) $filter_fil_id
+        ) {
             $filter_fil = $ressurs;
             break;
         }
     }
 }
 
-$diskusjoner_visning = $diskusjoner;
+$diskusjoner_visning =
+    $diskusjoner;
 
 if ($filter_oppgave_id) {
-    $diskusjoner_visning = array_filter(
-        $diskusjoner,
-        fn($trad) => (int) $trad["oppgave_id"] === (int) $filter_oppgave_id
-    );
+    $diskusjoner_visning =
+        array_filter(
+            $diskusjoner,
+            fn($trad) =>
+                (int) $trad["oppgave_id"] ===
+                (int) $filter_oppgave_id
+        );
 } elseif ($filter_fil_id) {
-    $diskusjoner_visning = array_filter(
-        $diskusjoner,
-        fn($trad) => (int) $trad["fil_id"] === (int) $filter_fil_id
-    );
+    $diskusjoner_visning =
+        array_filter(
+            $diskusjoner,
+            fn($trad) =>
+                (int) $trad["fil_id"] ===
+                (int) $filter_fil_id
+        );
 }
+
 
 /*
 |--------------------------------------------------------------------------
-| Sideoppsett
+| Side
 |--------------------------------------------------------------------------
 */
 
 $page_title = "Gruppe";
 
-$page_content = __DIR__ . "/../pages/gruppe.tpl.php";
+$page_content =
+    __DIR__ .
+    "/../pages/gruppe.tpl.php";
 
 $page_styles = [
     url("/assets/css/gruppe.css"),
@@ -437,7 +758,8 @@ $state = [
     "diskusjoner_visning" => $diskusjoner_visning,
     "filter_oppgave" => $filter_oppgave,
     "filter_fil" => $filter_fil,
-    "section" => $section
+    "section" => $section,
+    "er_eier" => $er_eier
 ];
 
 include __DIR__ . "/_layout.php";
