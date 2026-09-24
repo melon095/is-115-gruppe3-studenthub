@@ -1,4 +1,4 @@
-<section>
+<section class="diskusjon-side">
 
     <div class="diskusjon-title-row">
 
@@ -7,26 +7,20 @@
         </h1>
 
         <p class="diskusjon-meta">
-
             Tilhører
             <?php echo htmlspecialchars($state["gruppe"]["navn"]); ?>
 
             <?php if ($state["oppgave"] !== null): ?>
-
                 , knyttet til oppgaven
                 <strong>
                     <?php echo htmlspecialchars($state["oppgave"]["tittel"]); ?>
                 </strong>
-
             <?php elseif ($state["fil"] !== null): ?>
-
                 , knyttet til filen
                 <strong>
                     <?php echo htmlspecialchars($state["fil"]["fil_navn"]); ?>
                 </strong>
-
             <?php endif; ?>
-
         </p>
 
     </div>
@@ -51,7 +45,7 @@
 
     <?php if (empty($state["innlegg"])): ?>
 
-        <div class="card">
+        <div class="card diskusjon-empty">
 
             <h2>Ingen innlegg ennå</h2>
 
@@ -73,10 +67,11 @@
 
                         <?php if (!empty($post["forfatter_avatar"])): ?>
 
-                            <img
-                                src="<?php echo htmlspecialchars($post["forfatter_avatar"]); ?>"
-                                alt="Profilbilde"
-                            >
+                            <?php
+                            echo '<img class="diskusjon-innlegg-avatar" src="' .
+                                htmlspecialchars($post["forfatter_avatar"]) .
+                                '" alt="Profilbilde">';
+                            ?>
 
                         <?php endif; ?>
 
@@ -86,19 +81,15 @@
                             <header class="diskusjon-innlegg-header">
 
                                 <span class="diskusjon-innlegg-forfatter">
-
                                     <?php echo htmlspecialchars(
                                         $post["forfatter_navn"]
                                     ); ?>
-
                                 </span>
 
                                 <time class="diskusjon-innlegg-tid">
-
                                     <?php echo htmlspecialchars(
                                         $post["opprettet_på"]
                                     ); ?>
-
                                 </time>
 
                             </header>
@@ -123,26 +114,39 @@
     <?php endif; ?>
 
 
-    
+    <div class="diskusjon-skriv">
 
-        <label for="nytt_innlegg">
-            Skriv et innlegg
-        </label>
+        <h2>Skriv et innlegg</h2>
 
-        <textarea
-            id="nytt_innlegg"
-            name="tekst"
-            rows="4"
-            required
-        ></textarea>
+        <?php
+        echo '<form method="post" action="" class="diskusjon-nytt-innlegg form">';
+        ?>
 
-        <button
-            type="submit"
-            class="button button-primary button-lg"
-        >
-            Send
-        </button>
+            <div class="form-felt">
 
-    </form>
+                <label for="nytt_innlegg">
+                    Innlegg
+                </label>
+
+                <textarea
+                    id="nytt_innlegg"
+                    name="tekst"
+                    rows="5"
+                    placeholder="Skriv innlegget ditt her..."
+                    required
+                ></textarea>
+
+            </div>
+
+            <button
+                type="submit"
+                class="button button-primary button-lg"
+            >
+                Send
+            </button>
+
+        </form>
+
+    </div>
 
 </section>
