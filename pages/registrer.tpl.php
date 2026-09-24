@@ -62,9 +62,7 @@
 
             <div class="form-felt">
                 <label for="bekreft_passord">Bekreft passord</label>
- <div class="form-felt">
-    <label for="bekreft_passord">Bekreft passord</label>
-
+ 
     <input
         type="password"
         id="bekreft_passord"

@@ -1,42 +1,110 @@
 <?php
 
-function hent_student_grupper(string $student_id): array {
-    $arr = [];
+$feil = [];
+$opprettet_gruppe = null;
+$innsendt_navn = "";
+$innsendt_beskrivelse = "";
 
-    for ($i = 1; $i <= 50; $i++) {
-        $arr[] = [
-            "gruppe_id"=> $i,
-            "navn" => "Gruppe " . $i
-        ];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = filter_input_array(INPUT_POST, [
+        'navn' => FILTER_DEFAULT,
+        'beskrivelse' => FILTER_DEFAULT
+    ]);
+
+    $innsendt_navn = trim($input['navn'] ?? '');
+    $innsendt_beskrivelse = trim($input['beskrivelse'] ?? '');
+
+    if ($innsendt_navn === '') {
+        $feil[] = "Gruppen må ha et navn.";
     }
 
-    return $arr;
+    if (empty($feil)) {
+        $stmt = $pdo->prepare("
+            INSERT INTO grupper (navn, beskrivelse)
+            VALUES (:navn, :beskrivelse)
+        ");
+
+        $stmt->execute([
+            'navn' => $innsendt_navn,
+            'beskrivelse' => $innsendt_beskrivelse
+        ]);
+
+        $gruppe_id = $pdo->lastInsertId();
+
+        $opprettet_gruppe = [
+            "id" => $gruppe_id,
+            "navn" => $innsendt_navn,
+            "beskrivelse" => $innsendt_beskrivelse,
+        ];
+    }
 }
 
 ?>
 
-<?php if(isset($_SESSION['student_id'])): ?>
-<?php
-    $grupper = hent_student_grupper($_SESSION['student_id']);
-    $current_gruppe_id = $_GET['gruppe_id'] ?? null;
-?>
-<aside class="sidebar" id="sidebar">
-    <nav class="grupper-nav">
-        <section>
-            <h2>Grupper du er medlem av</h2>
-            <ul class="grupper-liste">
-            <?php foreach($grupper as $gruppe ):?>
-                <li>
-                    <a
-                        href="<?php echo url("/gruppe.php?gruppe_id=" . $gruppe["gruppe_id"]); ?>"
-                        <?php echo ($current_gruppe_id == $gruppe["gruppe_id"]) ? 'aria-current="page"' : ''; ?>
-                    >
-                        <?php echo htmlspecialchars($gruppe["navn"]); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-            </ul>
+<div class="opprett-gruppe-wrapper">
+    <?php if ($opprettet_gruppe !== null): ?>
+        <section class="card opprett-gruppe-resultat" aria-labelledby="opprett-gruppe-resultat-heading">
+            <h1 id="opprett-gruppe-resultat-heading">Gruppen ble opprettet</h1>
+
+            <dl>
+                <dt>Navn</dt>
+                <dd><?php echo htmlspecialchars($opprettet_gruppe["navn"]); ?></dd>
+
+                <?php if ($opprettet_gruppe["beskrivelse"] !== ''): ?>
+                    <dt>Beskrivelse</dt>
+                    <dd><?php echo htmlspecialchars($opprettet_gruppe["beskrivelse"]); ?></dd>
+                <?php endif; ?>
+            </dl>
+
+            <div class="opprett-gruppe-resultat-knapper">
+                <a href="<?php echo url('gruppe?id=' . urlencode($opprettet_gruppe['id'])); ?>"
+                >
+                    Gå til gruppen
+                </a>
+
+                <a href="<?php echo url('grupper'); ?>"
+                >
+                    Til alle grupper
+                </a>
+            </div>
         </section>
-    </nav>
-</aside>
-<?php endif; ?>
+    <?php else: ?>
+        <section class="card" aria-labelledby="opprett-gruppe-heading">
+            <h1 id="opprett-gruppe-heading">Opprett gruppe</h1>
+
+            <?php if (!empty($feil)): ?>
+                <ul class="opprett-gruppe-feil" role="alert">
+                    <?php foreach ($feil as $melding): ?>
+                        <li><?php echo htmlspecialchars($melding); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            
+                <div class="form-felt">
+                    <label for="navn">Navn på gruppe</label>
+                    <input
+                        type="text"
+                        id="navn"
+                        name="navn"
+                        value="<?php echo htmlspecialchars($innsendt_navn); ?>"
+                        required
+                    >
+                </div>
+
+                <div class="form-felt">
+                    <label for="beskrivelse">Beskrivelse (valgfritt)</label>
+                    <textarea
+                        id="beskrivelse"
+                        name="beskrivelse"
+                        rows="4"
+                    ><?php echo htmlspecialchars($innsendt_beskrivelse); ?></textarea>
+                </div>
+
+                <button type="submit" class="button button-primary button-lg">
+                    Opprett gruppe
+                </button>
+            </form>
+        </section>
+    <?php endif; ?>
+</div>
