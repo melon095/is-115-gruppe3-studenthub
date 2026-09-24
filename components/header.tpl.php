@@ -19,6 +19,7 @@ if (isset($_SESSION["student_id"])) {
 ?>
 
 <nav class="navbar">
+
     <button
         id="toggle-sidebar"
         class="toggle-btn"
@@ -30,26 +31,16 @@ if (isset($_SESSION["student_id"])) {
 
     <ul>
         <li>
-            <?php echo url("/"); ?>">
-                <strong>Studenthub</strong>
-            </a>
+            <?php
+            echo '<a href="' . htmlspecialchars(url("/index.php")) . '">';
+            ?>
+            <strong>Studenthub</strong>
+            <?php echo '</a>'; ?>
         </li>
     </ul>
 
     <ul>
-        <?php if ($student !== null): ?>
-
-            <?php if (!empty($student["avatar_link"])): ?>
-                <li>
-                    <?php echo url("profil.php"); ?>"
-                        class="navbar-avatar-link"
-                    >
-                        <?php echo htmlspecialchars($student["avatar_link"]); ?>"
-                            alt="Brukerprofilbilde"
-                        >
-                    </a>
-                </li>
-            <?php endif; ?>
+        <?php if ($student): ?>
 
             <li class="navbar-hilsen">
                 <span>
@@ -60,25 +51,32 @@ if (isset($_SESSION["student_id"])) {
             </li>
 
             <li>
-                <?php echo url("logg-ut.php"); ?>">
-                    Logg ut
-                </a>
+                <?php
+                echo '<a href="' . htmlspecialchars(url("/logout.php")) . '">';
+                echo 'Logg ut';
+                echo '</a>';
+                ?>
             </li>
 
         <?php else: ?>
 
             <li>
-                <?php echo url("logg-inn.php"); ?>">
-                    Logg inn
-                </a>
+                <?php
+                echo '<a href="' . htmlspecialchars(url("/login.php")) . '">';
+                echo 'Logg inn';
+                echo '</a>';
+                ?>
             </li>
 
             <li>
-                <?php echo url("registrer.php"); ?>">
-                    Registrer
-                </a>
+                <?php
+                echo '<a href="' . htmlspecialchars(url("/registrer.php")) . '">';
+                echo 'Registrer';
+                echo '</a>';
+                ?>
             </li>
 
         <?php endif; ?>
     </ul>
+
 </nav>
