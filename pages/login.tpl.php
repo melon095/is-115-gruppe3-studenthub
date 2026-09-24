@@ -15,6 +15,7 @@
 
             <div class="form-felt">
                 <label for="epost">E-post</label>
+
                 <input
                     type="email"
                     id="epost"
@@ -27,6 +28,7 @@
 
             <div class="form-felt">
                 <label for="passord">Passord</label>
+
                 <input
                     type="password"
                     id="passord"
@@ -36,11 +38,4 @@
                 >
             </div>
 
-            <button type="submit" class="button button-primary button-lg">
-                Logg inn
-            </button>
-
-        </form>
-
-        <p class="auth-lenke">
-        
+            <button type="submit" class
