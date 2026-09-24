@@ -1,110 +1,84 @@
 <?php
 
-$feil = [];
-$opprettet_gruppe = null;
-$innsendt_navn = "";
-$innsendt_beskrivelse = "";
+$student = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = filter_input_array(INPUT_POST, [
-        'navn' => FILTER_DEFAULT,
-        'beskrivelse' => FILTER_DEFAULT
+if (isset($_SESSION["student_id"])) {
+    $stmt = $pdo->prepare("
+        SELECT id, fornavn, etternavn, epost, avatar_link
+        FROM studenter
+        WHERE id = :student_id
+    ");
+
+    $stmt->execute([
+        "student_id" => $_SESSION["student_id"]
     ]);
 
-    $innsendt_navn = trim($input['navn'] ?? '');
-    $innsendt_beskrivelse = trim($input['beskrivelse'] ?? '');
-
-    if ($innsendt_navn === '') {
-        $feil[] = "Gruppen må ha et navn.";
-    }
-
-    if (empty($feil)) {
-        $stmt = $pdo->prepare("
-            INSERT INTO grupper (navn, beskrivelse)
-            VALUES (:navn, :beskrivelse)
-        ");
-
-        $stmt->execute([
-            'navn' => $innsendt_navn,
-            'beskrivelse' => $innsendt_beskrivelse
-        ]);
-
-        $gruppe_id = $pdo->lastInsertId();
-
-        $opprettet_gruppe = [
-            "id" => $gruppe_id,
-            "navn" => $innsendt_navn,
-            "beskrivelse" => $innsendt_beskrivelse,
-        ];
-    }
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 ?>
 
-<div class="opprett-gruppe-wrapper">
-    <?php if ($opprettet_gruppe !== null): ?>
-        <section class="card opprett-gruppe-resultat" aria-labelledby="opprett-gruppe-resultat-heading">
-            <h1 id="opprett-gruppe-resultat-heading">Gruppen ble opprettet</h1>
+<nav class="navbar">
+    <button
+        id="toggle-sidebar"
+        class="toggle-btn"
+        aria-label="Åpne meny"
+        aria-controls="sidebar"
+    >
+        ☰
+    </button>
 
-            <dl>
-                <dt>Navn</dt>
-                <dd><?php echo htmlspecialchars($opprettet_gruppe["navn"]); ?></dd>
+    <ul>
+        <li>
+            <?php echo url("/"); ?>">
+                <strong>Studenthub</strong>
+            </a>
+        </li>
+    </ul>
 
-                <?php if ($opprettet_gruppe["beskrivelse"] !== ''): ?>
-                    <dt>Beskrivelse</dt>
-                    <dd><?php echo htmlspecialchars($opprettet_gruppe["beskrivelse"]); ?></dd>
-                <?php endif; ?>
-            </dl>
+    <ul>
+        <?php if ($student !== null): ?>
 
-            <div class="opprett-gruppe-resultat-knapper">
-                <a href="<?php echo url('gruppe?id=' . urlencode($opprettet_gruppe['id'])); ?>"
-                >
-                    Gå til gruppen
-                </a>
-
-                <a href="<?php echo url('grupper'); ?>"
-                >
-                    Til alle grupper
-                </a>
-            </div>
-        </section>
-    <?php else: ?>
-        <section class="card" aria-labelledby="opprett-gruppe-heading">
-            <h1 id="opprett-gruppe-heading">Opprett gruppe</h1>
-
-            <?php if (!empty($feil)): ?>
-                <ul class="opprett-gruppe-feil" role="alert">
-                    <?php foreach ($feil as $melding): ?>
-                        <li><?php echo htmlspecialchars($melding); ?></li>
-                    <?php endforeach; ?>
-                </ul>
+            <?php if (!empty($student["avatar_link"])): ?>
+                <li>
+                    <?php echo url("profil.php"); ?>"
+                        class="navbar-avatar-link"
+                    >
+                        <?php echo htmlspecialchars($student["avatar_link"]); ?>"
+                            alt="Brukerprofilbilde"
+                        >
+                    </a>
+                </li>
             <?php endif; ?>
 
-            
-                <div class="form-felt">
-                    <label for="navn">Navn på gruppe</label>
-                    <input
-                        type="text"
-                        id="navn"
-                        name="navn"
-                        value="<?php echo htmlspecialchars($innsendt_navn); ?>"
-                        required
-                    >
-                </div>
+            <li class="navbar-hilsen">
+                <span>
+                    Hei!
+                    <?php echo htmlspecialchars($student["fornavn"]); ?>
+                    <?php echo htmlspecialchars($student["etternavn"]); ?>
+                </span>
+            </li>
 
-                <div class="form-felt">
-                    <label for="beskrivelse">Beskrivelse (valgfritt)</label>
-                    <textarea
-                        id="beskrivelse"
-                        name="beskrivelse"
-                        rows="4"
-                    ><?php echo htmlspecialchars($innsendt_beskrivelse); ?></textarea>
-                </div>
+            <li>
+                <?php echo url("logg-ut.php"); ?>">
+                    Logg ut
+                </a>
+            </li>
 
-                <button type="submit" class="button button-primary button-lg">
-                    Opprett gruppe
-                </button>
-            </form>
-        </section>
-    <?php endif; ?>
-</div>
+        <?php else: ?>
+
+            <li>
+                <?php echo url("logg-inn.php"); ?>">
+                    Logg inn
+                </a>
+            </li>
+
+            <li>
+                <?php echo url("registrer.php"); ?>">
+                    Registrer
+                </a>
+            </li>
+
+        <?php endif; ?>
+    </ul>
+</nav>
