@@ -1,124 +1,275 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/_bootstrap.php";
 
-$gruppe_id = $_GET["gruppe_id"] ?? null;
-$oppgave_id = $_GET["oppgave_id"] ?? null;
-$fil_id = $_GET["fil_id"] ?? null;
-$diskusjon_id = $_GET["diskusjon_id"] ?? "1";
+$get = filter_input_array(INPUT_GET, [
+    "gruppe_id" => FILTER_VALIDATE_INT,
+    "diskusjon_id" => FILTER_VALIDATE_INT
+]);
 
-if ($gruppe_id == null) {
+$gruppe_id = $get["gruppe_id"] ?? null;
+$diskusjon_id = $get["diskusjon_id"] ?? null;
+
+if (!$gruppe_id || !$diskusjon_id) {
     header("Location: " . url("/index.php"));
     exit();
 }
 
-$gruppe = [
-    "id" => $gruppe_id,
-    "navn" => "Gruppe " . $gruppe_id,
-];
+/*
+|--------------------------------------------------------------------------
+| Kontroller medlemskap
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT 1
+    FROM gruppe_medlemmer
+    WHERE gruppe_id = :gruppe_id
+    AND bruker_id = :student_id
+");
+
+$stmt->execute([
+    "gruppe_id" => $gruppe_id,
+    "student_id" => $_SESSION["student_id"]
+]);
+
+if (!$stmt->fetchColumn()) {
+    header("Location: " . url("/index.php"));
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hent gruppe
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT id, navn
+    FROM grupper
+    WHERE id = :gruppe_id
+");
+
+$stmt->execute([
+    "gruppe_id" => $gruppe_id
+]);
+
+$gruppe = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$gruppe) {
+    header("Location: " . url("/index.php"));
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hent diskusjon
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT
+        id,
+        gruppe_id,
+        oppgave_id,
+        fil_id,
+        tittel,
+        opprettet_på
+    FROM diskusjoner
+    WHERE id = :diskusjon_id
+    AND gruppe_id = :gruppe_id
+");
+
+$stmt->execute([
+    "diskusjon_id" => $diskusjon_id,
+    "gruppe_id" => $gruppe_id
+]);
+
+$diskusjon = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$diskusjon) {
+    header(
+        "Location: " .
+        url(
+            "/gruppe.php?gruppe_id=" .
+            $gruppe_id .
+            "&section=diskusjoner"
+        )
+    );
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hent eventuell oppgave
+|--------------------------------------------------------------------------
+*/
 
 $oppgave = null;
-if ($oppgave_id !== null) {
-    $oppgave = [
-        "oppgave_id" => $oppgave_id,
-        "gruppe_id" => $gruppe_id,
-        "tittel" => "Oppgave " . $oppgave_id,
-    ];
+
+if ($diskusjon["oppgave_id"] !== null) {
+    $stmt = $pdo->prepare("
+        SELECT
+            id AS oppgave_id,
+            gruppe_id,
+            tittel
+        FROM oppgaver
+        WHERE id = :oppgave_id
+        AND gruppe_id = :gruppe_id
+    ");
+
+    $stmt->execute([
+        "oppgave_id" => $diskusjon["oppgave_id"],
+        "gruppe_id" => $gruppe_id
+    ]);
+
+    $oppgave = $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Hent eventuell fil
+|--------------------------------------------------------------------------
+*/
 
 $fil = null;
-if ($fil_id !== null) {
-    $fil = [
-        "fil_id" => $fil_id,
-        "gruppe_id" => $gruppe_id,
-        "fil_navn" => "Fil " . $fil_id,
-    ];
+
+if ($diskusjon["fil_id"] !== null) {
+    $stmt = $pdo->prepare("
+        SELECT
+            id AS fil_id,
+            gruppe_id,
+            fil_navn
+        FROM filer
+        WHERE id = :fil_id
+        AND gruppe_id = :gruppe_id
+    ");
+
+    $stmt->execute([
+        "fil_id" => $diskusjon["fil_id"],
+        "gruppe_id" => $gruppe_id
+    ]);
+
+    $fil = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-$diskusjon = [
-    "id" => $diskusjon_id,
-    "tittel" => "Diskusjonstråd " . $diskusjon_id,
-];
+/*
+|--------------------------------------------------------------------------
+| Opprett innlegg
+|--------------------------------------------------------------------------
+*/
 
-$mock_forfattere = [
-    ["navn" => "Kai Eide", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-    ["navn" => "Mia Solberg", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-    ["navn" => "Noah Haugen", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-];
+$feil = [];
 
-$mock_tekster = [
-    "Har begynt på denne nå, legger ut fremgang her etter hvert.",
-    "Bra jobba! Jeg kan ta en titt på det du har lastet opp i morgen.",
-    "Husk å sjekke fristen, den er nærmere enn vi tror.",
-];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $input = filter_input_array(INPUT_POST, [
+        "tekst" => FILTER_DEFAULT
+    ]);
 
-$reaksjon_typer = [
-    1 => ["emoji" => "👍", "reaksjon_navn" => "Liker"],
-    2 => ["emoji" => "❤️", "reaksjon_navn" => "Elsker"],
-    3 => ["emoji" => "😂", "reaksjon_navn" => "Morsomt"],
-    4 => ["emoji" => "🎉", "reaksjon_navn" => "Feirer"],
-    5 => ["emoji" => "😮", "reaksjon_navn" => "Overrasket"],
-];
+    $tekst = trim($input["tekst"] ?? "");
 
-$mock_reaksjoner_per_innlegg = [
-    [1 => 3, 3 => 1],
-    [2 => 2],
-    [],
-];
-
-$innlegg = [];
-foreach ($mock_tekster as $i => $tekst) {
-    $forfatter = $mock_forfattere[$i % count($mock_forfattere)];
-
-    $reaksjoner = [];
-    foreach ($mock_reaksjoner_per_innlegg[$i] as $reaksjon_type_id => $antall) {
-        $reaksjoner[] = [
-            "reaksjon_type_id" => $reaksjon_type_id,
-            "emoji" => $reaksjon_typer[$reaksjon_type_id]["emoji"],
-            "navn" => $reaksjon_typer[$reaksjon_type_id]["reaksjon_navn"],
-            "antall" => $antall,
-        ];
+    if ($tekst === "") {
+        $feil[] = "Innlegget kan ikke være tomt.";
     }
 
-    $innlegg[] = [
-        "innlegg_id" => $i + 1,
-        "forfatter_navn" => $forfatter["navn"],
-        "forfatter_avatar" => $forfatter["avatar_link"],
-        "tekst" => $tekst,
-        "opprettet_på" => date("Y-m-d H:i", strtotime("-" . ((count($mock_tekster) - $i) * 6) . " hours")),
-        "reaksjoner" => $reaksjoner,
-    ];
+    if (empty($feil)) {
+        $stmt = $pdo->prepare("
+            INSERT INTO diskusjon_innlegg (
+                diskusjon_id,
+                opprettet_av,
+                innhold
+            )
+            VALUES (
+                :diskusjon_id,
+                :opprettet_av,
+                :innhold
+            )
+        ");
+
+        $stmt->execute([
+            "diskusjon_id" => $diskusjon_id,
+            "opprettet_av" => $_SESSION["student_id"],
+            "innhold" => $tekst
+        ]);
+
+        header(
+            "Location: " .
+            url(
+                "/diskusjon.php?gruppe_id=" .
+                $gruppe_id .
+                "&diskusjon_id=" .
+                $diskusjon_id
+            )
+        );
+
+        exit();
+    }
 }
 
-$page_title = "Diskusjon";
-$page_content = __DIR__."/../pages/diskusjon.tpl.php";
-$page_styles = [url("/assets/css/diskusjon.css")];
+/*
+|--------------------------------------------------------------------------
+| Hent faktiske innlegg
+|--------------------------------------------------------------------------
+*/
 
-$breadcrumbs = [
-    ["label" => "Grupper", "href" => url("/index.php")],
-    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)],
+$stmt = $pdo->prepare("
+    SELECT
+        i.id AS innlegg_id,
+        i.innhold AS tekst,
+        i.opprettet_på,
+        CONCAT(s.fornavn, ' ', s.etternavn) AS forfatter_navn,
+        s.avatar_link AS forfatter_avatar
+    FROM diskusjon_innlegg i
+    INNER JOIN studenter s
+        ON s.id = i.opprettet_av
+    WHERE i.diskusjon_id = :diskusjon_id
+    ORDER BY i.opprettet_på ASC
+");
+
+$stmt->execute([
+    "diskusjon_id" => $diskusjon_id
+]);
+
+$innlegg = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+/*
+|--------------------------------------------------------------------------
+| Side
+|--------------------------------------------------------------------------
+*/
+
+$page_title = $diskusjon["tittel"];
+
+$page_content = __DIR__ . "/../pages/diskusjon.tpl.php";
+
+$page_styles = [
+    url("/assets/css/diskusjon.css")
 ];
 
-if ($oppgave !== null) {
-    $breadcrumbs[] = [
-        "label" => $oppgave["tittel"],
-        "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
-    ];
-} elseif ($fil !== null) {
-    $breadcrumbs[] = [
-        "label" => $fil["fil_navn"],
-        "href" => url("/ressurs.php?ressurs_id=" . $fil["fil_id"]),
-    ];
-}
-
-$breadcrumbs[] = ["label" => $diskusjon["tittel"]];
+$breadcrumbs = [
+    [
+        "label" => "Grupper",
+        "href" => url("/index.php")
+    ],
+    [
+        "label" => $gruppe["navn"],
+        "href" => url(
+            "/gruppe.php?gruppe_id=" .
+            $gruppe_id .
+            "&section=diskusjoner"
+        )
+    ],
+    [
+        "label" => $diskusjon["tittel"]
+    ]
+];
 
 $state = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
     "fil" => $fil,
     "diskusjon" => $diskusjon,
-    "innlegg" => $innlegg,
+    "innlegg" => $innlegg
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/_layout.php";

@@ -2,24 +2,35 @@
 
 require __DIR__ . "/_bootstrap.php";
 
-$input = filter_input_array(INPUT_GET, [
-    "ressurs_id" => FILTER_VALIDATE_INT
+$get = filter_input_array(INPUT_GET, [
+    "ressurs_id" => FILTER_VALIDATE_INT,
+    "versjon_id" => FILTER_VALIDATE_INT,
+    "last_ned" => FILTER_DEFAULT
 ]);
 
-$ressurs_id = $input["ressurs_id"] ?? null;
+$ressurs_id = $get["ressurs_id"] ?? null;
 
 if (!$ressurs_id) {
     header("Location: " . url("/index.php"));
     exit();
 }
 
+/*
+|--------------------------------------------------------------------------
+| Hent ressurs
+|--------------------------------------------------------------------------
+*/
+
 $stmt = $pdo->prepare("
     SELECT
         f.id AS fil_id,
         f.gruppe_id,
         f.oppgave_id,
+        f.opprettet_av,
         f.fil_navn,
         f.fil_type,
+        f.fil_størrelse,
+        f.fil_lokasjon_hdd,
         f.opprettet_på,
         CONCAT(s.fornavn, ' ', s.etternavn) AS opprettet_av_navn
     FROM filer f
@@ -39,7 +50,100 @@ if (!$ressurs) {
     exit();
 }
 
-$gruppe_id = $ressurs["gruppe_id"];
+$gruppe_id = (int) $ressurs["gruppe_id"];
+
+/*
+|--------------------------------------------------------------------------
+| Kontroller at brukeren er medlem
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT 1
+    FROM gruppe_medlemmer
+    WHERE gruppe_id = :gruppe_id
+    AND bruker_id = :student_id
+");
+
+$stmt->execute([
+    "gruppe_id" => $gruppe_id,
+    "student_id" => $_SESSION["student_id"]
+]);
+
+if (!$stmt->fetchColumn()) {
+    header("Location: " . url("/index.php"));
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Nedlasting
+|--------------------------------------------------------------------------
+*/
+
+$versjon_id = $get["versjon_id"] ?? null;
+$last_ned = $get["last_ned"] ?? null;
+
+if ($versjon_id) {
+    $stmt = $pdo->prepare("
+        SELECT
+            id,
+            fil_lokasjon_hdd
+        FROM filversjoner
+        WHERE id = :versjon_id
+        AND fil_id = :fil_id
+    ");
+
+    $stmt->execute([
+        "versjon_id" => $versjon_id,
+        "fil_id" => $ressurs_id
+    ]);
+
+    $nedlasting = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($nedlasting && is_file($nedlasting["fil_lokasjon_hdd"])) {
+        header("Content-Type: application/octet-stream");
+        header(
+            'Content-Disposition: attachment; filename="' .
+            basename($ressurs["fil_navn"]) .
+            '"'
+        );
+        header(
+            "Content-Length: " .
+            filesize($nedlasting["fil_lokasjon_hdd"])
+        );
+
+        readfile($nedlasting["fil_lokasjon_hdd"]);
+        exit();
+    }
+}
+
+if ($last_ned === "original") {
+    if (
+        !empty($ressurs["fil_lokasjon_hdd"]) &&
+        is_file($ressurs["fil_lokasjon_hdd"])
+    ) {
+        header("Content-Type: application/octet-stream");
+        header(
+            'Content-Disposition: attachment; filename="' .
+            basename($ressurs["fil_navn"]) .
+            '"'
+        );
+        header(
+            "Content-Length: " .
+            filesize($ressurs["fil_lokasjon_hdd"])
+        );
+
+        readfile($ressurs["fil_lokasjon_hdd"]);
+        exit();
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Gruppe
+|--------------------------------------------------------------------------
+*/
 
 $stmt = $pdo->prepare("
     SELECT id, navn
@@ -57,6 +161,12 @@ if (!$gruppe) {
     header("Location: " . url("/index.php"));
     exit();
 }
+
+/*
+|--------------------------------------------------------------------------
+| Oppgave
+|--------------------------------------------------------------------------
+*/
 
 $oppgave = null;
 
@@ -79,6 +189,12 @@ if ($ressurs["oppgave_id"] !== null) {
     $oppgave = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+/*
+|--------------------------------------------------------------------------
+| Last opp ny versjon
+|--------------------------------------------------------------------------
+*/
+
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_FILES["ny_fil"]) &&
@@ -88,7 +204,7 @@ if (
     $fil_storrelse = (int) $_FILES["ny_fil"]["size"];
 
     $stmt = $pdo->prepare("
-        SELECT COALESCE(MAX(versjon_nummer), 0) + 1
+        SELECT COALESCE(MAX(versjon_nummer), 1) + 1
         FROM filversjoner
         WHERE fil_id = :fil_id
     ");
@@ -105,10 +221,21 @@ if (
         mkdir($opplastingsmappe, 0755, true);
     }
 
-    $lagret_navn = uniqid("", true) . "_" . $ny_fil_navn;
-    $fil_lokasjon = $opplastingsmappe . $lagret_navn;
+    $lagret_navn =
+        uniqid("", true) .
+        "_" .
+        $ny_fil_navn;
 
-    if (move_uploaded_file($_FILES["ny_fil"]["tmp_name"], $fil_lokasjon)) {
+    $fil_lokasjon =
+        $opplastingsmappe .
+        $lagret_navn;
+
+    if (
+        move_uploaded_file(
+            $_FILES["ny_fil"]["tmp_name"],
+            $fil_lokasjon
+        )
+    ) {
         $stmt = $pdo->prepare("
             INSERT INTO filversjoner (
                 fil_id,
@@ -121,7 +248,7 @@ if (
                 :fil_id,
                 :opprettet_av,
                 :versjon_nummer,
-                :fil_lokasjon_hdd,
+                :fil_lokasjon,
                 :fil_storrelse
             )
         ");
@@ -130,11 +257,27 @@ if (
             "fil_id" => $ressurs_id,
             "opprettet_av" => $_SESSION["student_id"],
             "versjon_nummer" => $nytt_versjon_nummer,
-            "fil_lokasjon_hdd" => $fil_lokasjon,
+            "fil_lokasjon" => $fil_lokasjon,
             "fil_storrelse" => $fil_storrelse
         ]);
+
+        header(
+            "Location: " .
+            url(
+                "/ressurs.php?ressurs_id=" .
+                $ressurs_id
+            )
+        );
+
+        exit();
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Versjoner
+|--------------------------------------------------------------------------
+*/
 
 $stmt = $pdo->prepare("
     SELECT
@@ -154,18 +297,44 @@ $stmt->execute([
     "fil_id" => $ressurs_id
 ]);
 
-$versjoner = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$database_versjoner = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$ressurs["versjoner"] = $versjoner;
+/*
+|--------------------------------------------------------------------------
+| Originalfil som versjon 1
+|--------------------------------------------------------------------------
+*/
 
-if (!empty($versjoner)) {
-    $ressurs["siste_versjon"] = end($versjoner);
-} else {
-    $ressurs["siste_versjon"] = null;
+$versjoner = [
+    [
+        "versjon_id" => null,
+        "versjon_nummer" => 1,
+        "opprettet_av_navn" => $ressurs["opprettet_av_navn"],
+        "opprettet_på" => $ressurs["opprettet_på"],
+        "fil_størrelse" => (int) $ressurs["fil_størrelse"],
+        "er_original" => true
+    ]
+];
+
+foreach ($database_versjoner as $versjon) {
+    $versjon["er_original"] = false;
+    $versjoner[] = $versjon;
 }
 
-$page_title = "Ressurs";
-$page_content = __DIR__ . "/../pages/ressurs.tpl.php";
+$ressurs["versjoner"] = $versjoner;
+$ressurs["siste_versjon"] = end($versjoner);
+
+/*
+|--------------------------------------------------------------------------
+| Side
+|--------------------------------------------------------------------------
+*/
+
+$page_title = $ressurs["fil_navn"];
+
+$page_content =
+    __DIR__ .
+    "/../pages/ressurs.tpl.php";
 
 $page_styles = [
     url("/assets/css/ressurs-tabell.css"),
@@ -179,29 +348,20 @@ $breadcrumbs = [
     ],
     [
         "label" => $gruppe["navn"],
-        "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)
-    ],
-];
-
-if ($oppgave !== null) {
-    $breadcrumbs[] = [
-        "label" => $oppgave["tittel"],
         "href" => url(
-            "/oppgave.php?gruppe_id=" .
+            "/gruppe.php?gruppe_id=" .
             $gruppe_id .
-            "&oppgave_id=" .
-            $oppgave["oppgave_id"]
-        ),
-    ];
-}
-
-$breadcrumbs[] = [
-    "label" => "Ressurs " . $ressurs_id
+            "&section=ressurser"
+        )
+    ],
+    [
+        "label" => $ressurs["fil_navn"]
+    ]
 ];
 
 $state = [
     "ressurs" => $ressurs,
-    "oppgave" => $oppgave,
+    "oppgave" => $oppgave
 ];
 
 include __DIR__ . "/_layout.php";
