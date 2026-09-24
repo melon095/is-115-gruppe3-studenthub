@@ -62,4 +62,20 @@
 
             <div class="form-felt">
                 <label for="bekreft_passord">Bekreft passord</label>
- 
+ <div class="form-felt">
+    <label for="bekreft_passord">Bekreft passord</label>
+
+    <input
+        type="password"
+        id="bekreft_passord"
+        name="bekreft_passord"
+        autocomplete="new-password"
+        required
+    >
+</div>
+
+<button type="submit" class="button button-primary button-lg">
+    Registrer deg
+</button>
+
+</form>
