@@ -1,11 +1,41 @@
 <?php
 
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // TODO: Database integrasjon.
-    // TODO: Validere bruker input.
-    $_SESSION['student_id'] = 1;
-    header('Location: ' . url('/index.php'));
-    exit();
+$feil = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = filter_input_array(INPUT_POST, [
+        'epost' => FILTER_VALIDATE_EMAIL,
+        'passord' => FILTER_DEFAULT
+    ]);
+
+    if (
+        !$input ||
+        !$input['epost'] ||
+        !$input['passord']
+    ) {
+        $feil[] = "Ugyldig e-post eller passord.";
+    } else {
+        $stmt = $pdo->prepare("
+            SELECT id, passord
+            FROM studenter
+            WHERE epost = :epost
+        ");
+
+        $stmt->execute([
+            'epost' => $input['epost']
+        ]);
+
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($student && password_verify($input['passord'], $student['passord'])) {
+            $_SESSION['student_id'] = $student['id'];
+
+            header('Location: ' . url('/index.php'));
+            exit();
+        } else {
+            $feil[] = "Feil e-post eller passord.";
+        }
+    }
 }
 
 ?>
@@ -14,22 +44,45 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section class="auth-card" aria-labelledby="login-heading">
         <h1 id="login-heading">Logg inn</h1>
 
-        <form method="post" action="" class="form">
+        <?php if (!empty($feil)): ?>
+            <ul class="form-feil" role="alert">
+                <?php foreach ($feil as $melding): ?>
+                    <li><?php echo htmlspecialchars($melding); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        
             <div class="form-felt">
                 <label for="epost">E-post</label>
-                <input type="email" id="epost" name="epost" autocomplete="email" required>
+                <input
+                    type="email"
+                    id="epost"
+                    name="epost"
+                    autocomplete="email"
+                    required
+                >
             </div>
 
             <div class="form-felt">
                 <label for="passord">Passord</label>
-                <input type="password" id="passord" name="passord" autocomplete="current-password" required>
+                <input
+                    type="password"
+                    id="passord"
+                    name="passord"
+                    autocomplete="current-password"
+                    required
+                >
             </div>
 
-            <button type="submit" class="button button-primary button-lg">Logg inn</button>
+            <button type="submit" class="button button-primary button-lg">
+                Logg inn
+            </button>
         </form>
 
         <p class="auth-lenke">
-            Ikke registrert? <a href="<?php echo url("/registrer.php"); ?>">Registrer deg</a>
+            Ikke registrert?
+                <a href="<?php echo url('/register.php'); ?>">Registrer deg</a>
         </p>
     </section>
 </div>

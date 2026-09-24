@@ -6,18 +6,33 @@ $innsendt_navn = "";
 $innsendt_beskrivelse = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // TODO: Ordentlig validering med filter_var osv.
-    $innsendt_navn = trim($_POST['navn'] ?? '');
-    $innsendt_beskrivelse = trim($_POST['beskrivelse'] ?? '');
+    $input = filter_input_array(INPUT_POST, [
+        'navn' => FILTER_DEFAULT,
+        'beskrivelse' => FILTER_DEFAULT
+    ]);
+
+    $innsendt_navn = trim($input['navn'] ?? '');
+    $innsendt_beskrivelse = trim($input['beskrivelse'] ?? '');
 
     if ($innsendt_navn === '') {
         $feil[] = "Gruppen må ha et navn.";
     }
 
     if (empty($feil)) {
-        // TODO: Database integrasjon.
+        $stmt = $pdo->prepare("
+            INSERT INTO grupper (navn, beskrivelse)
+            VALUES (:navn, :beskrivelse)
+        ");
+
+        $stmt->execute([
+            'navn' => $innsendt_navn,
+            'beskrivelse' => $innsendt_beskrivelse
+        ]);
+
+        $gruppe_id = $pdo->lastInsertId();
+
         $opprettet_gruppe = [
-            "id" => random_int(100, 999),
+            "id" => $gruppe_id,
             "navn" => $innsendt_navn,
             "beskrivelse" => $innsendt_beskrivelse,
         ];
@@ -42,8 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </dl>
 
             <div class="opprett-gruppe-resultat-knapper">
-                <a class="button button-primary" href="<?php echo url("/gruppe.php?gruppe_id=" . $opprettet_gruppe["id"] . "&section=oppgaver"); ?>">Gå til gruppen</a>
-                <a class="button button-secondary" href="<?php echo url("/index.php"); ?>">Til alle grupper</a>
+                <a href="<?php echo url('gruppe?id=' . urlencode($opprettet_gruppe['id'])); ?>"
+                >
+                    Gå til gruppen
+                </a>
+
+                <a href="<?php echo url('grupper'); ?>"
+                >
+                    Til alle grupper
+                </a>
             </div>
         </section>
     <?php else: ?>
@@ -58,18 +80,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </ul>
             <?php endif; ?>
 
-            <form method="post" action="" class="form">
+            
                 <div class="form-felt">
                     <label for="navn">Navn på gruppe</label>
-                    <input type="text" id="navn" name="navn" value="<?php echo htmlspecialchars($innsendt_navn); ?>" required>
+                    <input
+                        type="text"
+                        id="navn"
+                        name="navn"
+                        value="<?php echo htmlspecialchars($innsendt_navn); ?>"
+                        required
+                    >
                 </div>
 
                 <div class="form-felt">
                     <label for="beskrivelse">Beskrivelse (valgfritt)</label>
-                    <textarea id="beskrivelse" name="beskrivelse" rows="4"><?php echo htmlspecialchars($innsendt_beskrivelse); ?></textarea>
+                    <textarea
+                        id="beskrivelse"
+                        name="beskrivelse"
+                        rows="4"
+                    ><?php echo htmlspecialchars($innsendt_beskrivelse); ?></textarea>
                 </div>
 
-                <button type="submit" class="button button-primary button-lg">Opprett gruppe</button>
+                <button type="submit" class="button button-primary button-lg">
+                    Opprett gruppe
+                </button>
             </form>
         </section>
     <?php endif; ?>
