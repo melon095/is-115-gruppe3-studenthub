@@ -2,6 +2,10 @@
 
 $feil = [];
 
+$fornavn = "";
+$etternavn = "";
+$epost = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = filter_input_array(INPUT_POST, [
         'fornavn' => FILTER_DEFAULT,
@@ -88,72 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         
-            <div class="form-felt">
-                <label for="fornavn">Fornavn</label>
-                <input
-                    type="text"
-                    id="fornavn"
-                    name="fornavn"
-                    autocomplete="given-name"
-                    value="<?php echo htmlspecialchars($fornavn ?? ''); ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-felt">
-                <label for="etternavn">Etternavn</label>
-                <input
-                    type="text"
-                    id="etternavn"
-                    name="etternavn"
-                    autocomplete="family-name"
-                    value="<?php echo htmlspecialchars($etternavn ?? ''); ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-felt">
-                <label for="epost">E-post</label>
-                <input
-                    type="email"
-                    id="epost"
-                    name="epost"
-                    autocomplete="email"
-                    value="<?php echo htmlspecialchars($epost ?: ''); ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-felt">
-                <label for="passord">Passord</label>
-                <input
-                    type="password"
-                    id="passord"
-                    name="passord"
-                    autocomplete="new-password"
-                    required
-                >
-            </div>
-
-            <div class="form-felt">
-                <label for="bekreft_passord">Bekreft passord</label>
-                <input
-                    type="password"
-                    id="bekreft_passord"
-                    name="bekreft_passord"
-                    autocomplete="new-password"
-                    required
-                >
-            </div>
-
-            <button type="submit" class="button button-primary button-lg">
-                Registrer deg
-            </button>
-        </form>
 
         <p class="auth-lenke">
             Har du allerede en konto?
-                <a href="<?php echo url('/login.php'); ?>">Logg inn</a>
+            <?php echo url('/login.php'); ?>Logg inn</a>
         </p>
     </section>
 </div>
