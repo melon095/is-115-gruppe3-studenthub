@@ -17,12 +17,10 @@ function section_btn(array $state, string $section, string $tekst): string
         urlencode($section)
     );
 
-    return sprintf(
-        '<li>%s%s</a></li>',
-        htmlspecialchars($klasse),
-        htmlspecialchars($href),
-        htmlspecialchars($tekst)
-    );
+    return '<li>' .
+        htmlspecialchars($tekst) .
+        '</a>' .
+        '</li>';
 }
 
 function bytes_til_menneske(int $bytes): string
@@ -58,7 +56,6 @@ function bytes_til_menneske(int $bytes): string
                 </p>
             <?php endif; ?>
         </div>
-
 
         <div class="gruppe-title-knapper">
 
@@ -97,7 +94,6 @@ function bytes_til_menneske(int $bytes): string
 
             </details>
 
-
             <?php
 
             $forlat_url = url(
@@ -114,7 +110,6 @@ function bytes_til_menneske(int $bytes): string
         </div>
 
     </div>
-
 
     <nav class="gruppe-section-nav" aria-label="Gruppemeny">
 
@@ -148,9 +143,7 @@ function bytes_til_menneske(int $bytes): string
 
     </nav>
 
-
     <div class="gruppe-sections">
-
 
         <?php if ($state["section"] === "oppgaver"): ?>
 
@@ -159,12 +152,9 @@ function bytes_til_menneske(int $bytes): string
                 <div class="gruppe-section-heading">
                     <div>
                         <h2>Oppgaver</h2>
-                        <p>
-                            Oppgaver som tilhører denne gruppen.
-                        </p>
+                        <p>Oppgaver som tilhører denne gruppen.</p>
                     </div>
                 </div>
-
 
                 <?php if (empty($state["oppgaver"])): ?>
 
@@ -187,25 +177,18 @@ function bytes_til_menneske(int $bytes): string
                                 <article class="gruppe-oppgaver-oppgave">
 
                                     <div>
-
                                         <h3>
-                                            <?php echo htmlspecialchars(
-                                                $oppgave["tittel"]
-                                            ); ?>
+                                            <?php echo htmlspecialchars($oppgave["tittel"]); ?>
                                         </h3>
 
                                         <?php if (!empty($oppgave["beskrivelse"])): ?>
 
                                             <p>
-                                                <?php echo htmlspecialchars(
-                                                    $oppgave["beskrivelse"]
-                                                ); ?>
+                                                <?php echo htmlspecialchars($oppgave["beskrivelse"]); ?>
                                             </p>
 
                                         <?php endif; ?>
-
                                     </div>
-
 
                                     <?php
 
@@ -232,7 +215,6 @@ function bytes_til_menneske(int $bytes): string
 
                 <?php endif; ?>
 
-
                 <div class="gruppe-opprett-omrade">
 
                     <h3>Opprett ny oppgave</h3>
@@ -242,7 +224,6 @@ function bytes_til_menneske(int $bytes): string
                     ?>
 
                         <div class="form-felt">
-
                             <label for="oppgave_tittel">
                                 Tittel
                             </label>
@@ -253,12 +234,9 @@ function bytes_til_menneske(int $bytes): string
                                 name="oppgave_tittel"
                                 required
                             >
-
                         </div>
 
-
                         <div class="form-felt">
-
                             <label for="oppgave_beskrivelse">
                                 Beskrivelse (valgfritt)
                             </label>
@@ -268,9 +246,7 @@ function bytes_til_menneske(int $bytes): string
                                 name="oppgave_beskrivelse"
                                 rows="3"
                             ></textarea>
-
                         </div>
-
 
                         <button
                             type="submit"
@@ -285,7 +261,6 @@ function bytes_til_menneske(int $bytes): string
 
             </section>
 
-
         <?php elseif ($state["section"] === "medlemmer"): ?>
 
             <section>
@@ -294,12 +269,8 @@ function bytes_til_menneske(int $bytes): string
 
                     <div>
                         <h2>Medlemmer</h2>
-
-                        <p>
-                            Studenter som er medlem av gruppen.
-                        </p>
+                        <p>Studenter som er medlem av gruppen.</p>
                     </div>
-
 
                     <?php
 
@@ -316,13 +287,10 @@ function bytes_til_menneske(int $bytes): string
 
                 </div>
 
-
                 <?php if (empty($state["medlemmer"])): ?>
 
                     <div class="gruppe-empty">
-                        <p>
-                            Gruppen har ingen medlemmer.
-                        </p>
+                        <p>Gruppen har ingen medlemmer.</p>
                     </div>
 
                 <?php else: ?>
@@ -341,38 +309,11 @@ function bytes_til_menneske(int $bytes): string
                                         '" alt="Brukerprofilbilde">';
                                     ?>
 
-                                <?php else: ?>
-
-                                    <div
-                                        class="gruppe-medlem-img gruppe-medlem-placeholder"
-                                        aria-hidden="true"
-                                    >
-                                        <?php
-                                        echo htmlspecialchars(
-                                            mb_strtoupper(
-                                                mb_substr(
-                                                    $medlem["fornavn"],
-                                                    0,
-                                                    1
-                                                )
-                                            )
-                                        );
-                                        ?>
-                                    </div>
-
                                 <?php endif; ?>
 
-
                                 <span class="gruppe-medlem-navn">
-
-                                    <?php echo htmlspecialchars(
-                                        $medlem["fornavn"]
-                                    ); ?>
-
-                                    <?php echo htmlspecialchars(
-                                        $medlem["etternavn"]
-                                    ); ?>
-
+                                    <?php echo htmlspecialchars($medlem["fornavn"]); ?>
+                                    <?php echo htmlspecialchars($medlem["etternavn"]); ?>
                                 </span>
 
                             </li>
@@ -385,34 +326,22 @@ function bytes_til_menneske(int $bytes): string
 
             </section>
 
-
         <?php elseif ($state["section"] === "ressurser"): ?>
 
             <section>
 
                 <div class="gruppe-section-heading">
-
                     <div>
                         <h2>Ressurser</h2>
-
-                        <p>
-                            Filer og ressurser som deles med gruppen.
-                        </p>
+                        <p>Filer og ressurser som deles med gruppen.</p>
                     </div>
-
                 </div>
-
 
                 <?php if (empty($state["ressurser"])): ?>
 
                     <div class="gruppe-empty">
-
                         <h3>Ingen ressurser ennå</h3>
-
-                        <p>
-                            Last opp den første filen nedenfor.
-                        </p>
-
+                        <p>Last opp den første filen nedenfor.</p>
                     </div>
 
                 <?php else: ?>
@@ -421,12 +350,9 @@ function bytes_til_menneske(int $bytes): string
 
                         <table class="ressurs-tabell">
 
-                            <caption>
-                                Ressurser i gruppen
-                            </caption>
+                            <caption>Ressurser i gruppen</caption>
 
                             <thead>
-
                                 <tr>
                                     <th scope="col">Filnavn</th>
                                     <th scope="col">Filtype</th>
@@ -434,7 +360,6 @@ function bytes_til_menneske(int $bytes): string
                                     <th scope="col">Revisjoner</th>
                                     <th scope="col">Handling</th>
                                 </tr>
-
                             </thead>
 
                             <tbody>
@@ -444,21 +369,15 @@ function bytes_til_menneske(int $bytes): string
                                     <tr>
 
                                         <th scope="row">
-                                            <?php echo htmlspecialchars(
-                                                $ressurs["fil_navn"]
-                                            ); ?>
+                                            <?php echo htmlspecialchars($ressurs["fil_navn"]); ?>
                                         </th>
 
                                         <td>
-                                            <?php echo htmlspecialchars(
-                                                $ressurs["fil_type"] ?? ""
-                                            ); ?>
+                                            <?php echo htmlspecialchars($ressurs["fil_type"] ?? ""); ?>
                                         </td>
 
                                         <td>
-                                            <?php echo bytes_til_menneske(
-                                                (int) $ressurs["fil_størrelse"]
-                                            ); ?>
+                                            <?php echo bytes_til_menneske((int) $ressurs["fil_størrelse"]); ?>
                                         </td>
 
                                         <td>
@@ -497,7 +416,6 @@ function bytes_til_menneske(int $bytes): string
 
                 <?php endif; ?>
 
-
                 <div class="gruppe-opprett-omrade">
 
                     <h3>Last opp ressurs</h3>
@@ -534,72 +452,16 @@ function bytes_til_menneske(int $bytes): string
 
             </section>
 
-
         <?php elseif ($state["section"] === "diskusjoner"): ?>
 
             <section>
 
                 <div class="gruppe-section-heading">
-
                     <div>
                         <h2>Diskusjoner</h2>
-
-                        <p>
-                            Diskusjonstråder for gruppen.
-                        </p>
+                        <p>Diskusjonstråder for gruppen.</p>
                     </div>
-
                 </div>
-
-
-                <?php if (
-                    $state["filter_oppgave"] !== null ||
-                    $state["filter_fil"] !== null
-                ): ?>
-
-                    <div class="gruppe-diskusjon-filter">
-
-                        Viser diskusjoner merket med
-
-                        <?php if ($state["filter_oppgave"] !== null): ?>
-
-                            oppgaven
-                            <strong>
-                                <?php echo htmlspecialchars(
-                                    $state["filter_oppgave"]["tittel"]
-                                ); ?>
-                            </strong>
-
-                        <?php else: ?>
-
-                            filen
-                            <strong>
-                                <?php echo htmlspecialchars(
-                                    $state["filter_fil"]["fil_navn"]
-                                ); ?>
-                            </strong>
-
-                        <?php endif; ?>
-
-
-                        <?php
-
-                        $vis_alle_url = url(
-                            "/gruppe.php?gruppe_id=" .
-                            $state["gruppe"]["id"] .
-                            "&section=diskusjoner"
-                        );
-
-                        echo '<a href="' .
-                            htmlspecialchars($vis_alle_url) .
-                            '">Vis alle</a>';
-
-                        ?>
-
-                    </div>
-
-                <?php endif; ?>
-
 
                 <?php if (empty($state["diskusjoner_visning"])): ?>
 
@@ -637,25 +499,13 @@ function bytes_til_menneske(int $bytes): string
                                 ?>
 
                                     <span class="gruppe-diskusjon-tittel">
-
-                                        <?php echo htmlspecialchars(
-                                            $trad["tittel"]
-                                        ); ?>
-
+                                        <?php echo htmlspecialchars($trad["tittel"]); ?>
                                     </span>
 
                                     <span class="gruppe-diskusjon-meta">
 
                                         <?php echo (int) $trad["antall_innlegg"]; ?>
                                         innlegg
-
-                                        <span aria-hidden="true">•</span>
-
-                                        Sist aktiv
-                                        <?php echo htmlspecialchars(
-                                            $trad["siste_aktivitet"]
-                                        ); ?>
-
 
                                         <?php if ($trad["oppgave_id"] !== null): ?>
 
@@ -685,7 +535,6 @@ function bytes_til_menneske(int $bytes): string
 
                 <?php endif; ?>
 
-
                 <div class="gruppe-opprett-omrade">
 
                     <h3>Ny diskusjonstråd</h3>
@@ -704,12 +553,10 @@ function bytes_til_menneske(int $bytes): string
                                 type="text"
                                 id="diskusjon_tittel"
                                 name="diskusjon_tittel"
-                                placeholder="F.eks. Spørsmål om innlevering"
                                 required
                             >
 
                         </div>
-
 
                         <div class="form-felt">
 
@@ -722,18 +569,12 @@ function bytes_til_menneske(int $bytes): string
                                 name="diskusjon_oppgave_id"
                             >
 
-                                <option value="">
-                                    Ingen
-                                </option>
+                                <option value="">Ingen</option>
 
                                 <?php foreach ($state["oppgaver"] as $oppgave): ?>
 
-                                    <option
-                                        value="<?php echo (int) $oppgave["oppgave_id"]; ?>"
-                                    >
-                                        <?php echo htmlspecialchars(
-                                            $oppgave["tittel"]
-                                        ); ?>
+                                    <option value="<?php echo (int) $oppgave["oppgave_id"]; ?>">
+                                        <?php echo htmlspecialchars($oppgave["tittel"]); ?>
                                     </option>
 
                                 <?php endforeach; ?>
@@ -741,7 +582,6 @@ function bytes_til_menneske(int $bytes): string
                             </select>
 
                         </div>
-
 
                         <div class="form-felt">
 
@@ -754,18 +594,12 @@ function bytes_til_menneske(int $bytes): string
                                 name="diskusjon_fil_id"
                             >
 
-                                <option value="">
-                                    Ingen
-                                </option>
+                                <option value="">Ingen</option>
 
                                 <?php foreach ($state["ressurser"] as $ressurs): ?>
 
-                                    <option
-                                        value="<?php echo (int) $ressurs["fil_id"]; ?>"
-                                    >
-                                        <?php echo htmlspecialchars(
-                                            $ressurs["fil_navn"]
-                                        ); ?>
+                                    <option value="<?php echo (int) $ressurs["fil_id"]; ?>">
+                                        <?php echo htmlspecialchars($ressurs["fil_navn"]); ?>
                                     </option>
 
                                 <?php endforeach; ?>
@@ -773,7 +607,6 @@ function bytes_til_menneske(int $bytes): string
                             </select>
 
                         </div>
-
 
                         <button
                             type="submit"
@@ -783,23 +616,6 @@ function bytes_til_menneske(int $bytes): string
                         </button>
 
                     </form>
-
-                </div>
-
-            </section>
-
-
-        <?php else: ?>
-
-            <section>
-
-                <div class="gruppe-empty">
-
-                    <h2>Ugyldig seksjon</h2>
-
-                    <p>
-                        Denne delen av gruppen finnes ikke.
-                    </p>
 
                 </div>
 
