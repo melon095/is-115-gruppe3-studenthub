@@ -91,11 +91,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </ul>
         <?php endif; ?>
 
-        
+        <form method="post" action="" class="form">
+            <div class="form-felt">
+                <label for="fornavn">Fornavn</label>
+                <input
+                    type="text"
+                    id="fornavn"
+                    name="fornavn"
+                    autocomplete="given-name"
+                    value="<?php echo htmlspecialchars($fornavn); ?>"
+                    required
+                >
+            </div>
 
-        <p class="auth-lenke">
-            Har du allerede en konto?
-            <?php echo url('/login.php'); ?>Logg inn</a>
-        </p>
-    </section>
-</div>
+            <div class="form-felt">
+                <label for="etternavn">Etternavn</label>
+                <input
+                    type="text"
+                    id="etternavn"
+                    name="etternavn"
+                    autocomplete="family-name"
+                    value="<?php echo htmlspecialchars($etternavn); ?>"
+                    required
+                >
+      

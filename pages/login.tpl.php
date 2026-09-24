@@ -1,6 +1,7 @@
 <?php
 
 $feil = [];
+$epost = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = filter_input_array(INPUT_POST, [
@@ -8,11 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'passord' => FILTER_DEFAULT
     ]);
 
-    if (
-        !$input ||
-        !$input['epost'] ||
-        !$input['passord']
-    ) {
+    $epost = $input['epost'] ?? false;
+    $passord = $input['passord'] ?? '';
+
+    if (!$epost || $passord === '') {
         $feil[] = "Ugyldig e-post eller passord.";
     } else {
         $stmt = $pdo->prepare("
@@ -22,12 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
 
         $stmt->execute([
-            'epost' => $input['epost']
+            'epost' => $epost
         ]);
 
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($student && password_verify($input['passord'], $student['passord'])) {
+        if ($student && password_verify($passord, $student['passord'])) {
             $_SESSION['student_id'] = $student['id'];
 
             header('Location: ' . url('/index.php'));
@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     id="epost"
                     name="epost"
                     autocomplete="email"
+                    value="<?php echo htmlspecialchars($epost ?: ''); ?>"
                     required
                 >
             </div>
@@ -82,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <p class="auth-lenke">
             Ikke registrert?
-                <a href="<?php echo url('/registrer.php'); ?>">Registrer deg</a>
+             ?>">Registrer deg</a>
         </p>
     </section>
 </div>
