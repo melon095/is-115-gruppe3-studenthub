@@ -33,29 +33,21 @@
 
                 <?php
                 $gruppe_url = url(
-                    "/gruppe.php?gruppe_id="
-                    . $opprettet_gruppe["id"]
-                    . "&section=oppgaver"
+                    "/gruppe.php?gruppe_id=" .
+                    $opprettet_gruppe["id"] .
+                    "&section=oppgaver"
                 );
 
-                echo '<a class="button button-primary" href="'
-                    . htmlspecialchars($gruppe_url)
-                    . '">';
+                echo '<a class="button button-primary" href="' .
+                    htmlspecialchars($gruppe_url) .
+                    '">Gå til gruppen</a>';
                 ?>
-
-                    Gå til gruppen
-
-                </a>
 
                 <?php
-                echo '<a class="button button-secondary" href="'
-                    . htmlspecialchars(url("/index.php"))
-                    . '">';
+                echo '<a class="button button-secondary" href="' .
+                    htmlspecialchars(url("/index.php")) .
+                    '">Til alle grupper</a>';
                 ?>
-
-                    Til alle grupper
-
-                </a>
 
             </div>
 
@@ -88,7 +80,6 @@
 
             <?php endif; ?>
 
-
             <?php
             echo '<form method="post" action="" class="form">';
             ?>
@@ -107,7 +98,6 @@
                     >
                 </div>
 
-
                 <div class="form-felt">
                     <label for="beskrivelse">
                         Beskrivelse (valgfritt)
@@ -120,15 +110,13 @@
                     ><?php echo htmlspecialchars($innsendt_beskrivelse); ?></textarea>
                 </div>
 
+                <?php
+                echo '<button type="submit" class="button button-primary button-lg">';
+                echo 'Opprett gruppe';
+                echo '</button>';
 
-                <button
-                    type="submit"
-                    class="button button-primary button-lg"
-                >
-                    Opprett gruppe
-                </button>
-
-            </form>
+                echo '</form>';
+                ?>
 
         </section>
 
