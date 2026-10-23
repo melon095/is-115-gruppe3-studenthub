@@ -15,20 +15,23 @@ function section_btn(
 
     $href = url(
         "/gruppe.php?gruppe_id=" .
-        (int) $state["gruppe"]["id"] .
-        "&section=" .
-        urlencode($section)
+            (int) $state["gruppe"]["id"] .
+            "&section=" .
+            urlencode($section)
     );
 
-    $html = "<li>";
-        $html .= '<a href="' .
-            htmlspecialchars($href) .
-            '">';
-    $html .= htmlspecialchars($tekst);
-    $html .= "</a>";
-    $html .= "</li>";
+    $tekst = htmlspecialchars($tekst);
 
-    return $html;
+    return <<<EOF
+<li>
+    <a
+        class="{$klasse}"
+        href="{$href}"
+    >
+        {$tekst}
+    </a>
+</li>
+EOF;
 }
 
 
@@ -61,11 +64,11 @@ function bytes_til_menneske(
 
     return round(
         $bytes /
-        pow(1024, $eksponent),
+            pow(1024, $eksponent),
         2
     ) .
-    " " .
-    $enheter[$eksponent];
+        " " .
+        $enheter[$eksponent];
 }
 
 ?>
@@ -83,9 +86,7 @@ function bytes_til_menneske(
             </h1>
 
             <?php if (
-                !empty(
-                    $state["gruppe"]["beskrivelse"]
-                )
+                !empty($state["gruppe"]["beskrivelse"])
             ): ?>
 
                 <p class="gruppe-beskrivelse">
@@ -108,8 +109,7 @@ function bytes_til_menneske(
                 <details class="gruppe-endre-navn">
 
                     <summary
-                        class="button button-secondary"
-                    >
+                        class="button button-secondary">
                         Endre navn
                     </summary>
 
@@ -117,30 +117,28 @@ function bytes_til_menneske(
                     echo '<form method="post" action="" class="form">';
                     ?>
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="gruppe_navn">
-                                Nytt navn
-                            </label>
+                        <label for="gruppe_navn">
+                            Nytt navn
+                        </label>
 
-                            <input
-                                type="text"
-                                id="gruppe_navn"
-                                name="gruppe_navn"
-                                value="<?php echo htmlspecialchars(
-                                    $state["gruppe"]["navn"]
-                                ); ?>"
-                                required
-                            >
+                        <input
+                            type="text"
+                            id="gruppe_navn"
+                            name="gruppe_navn"
+                            value="<?php echo htmlspecialchars(
+                                        $state["gruppe"]["navn"]
+                                    ); ?>"
+                            required>
 
-                        </div>
+                    </div>
 
-                        <button
-                            type="submit"
-                            class="button button-primary"
-                        >
-                            Lagre
-                        </button>
+                    <button
+                        type="submit"
+                        class="button button-primary">
+                        Lagre
+                    </button>
 
                     </form>
 
@@ -153,7 +151,7 @@ function bytes_til_menneske(
                 $forlat_url =
                     url(
                         "/forlat-gruppe.php?gruppe_id=" .
-                        $state["gruppe"]["id"]
+                            $state["gruppe"]["id"]
                     );
 
                 echo '<a class="button button-warning" href="' .
@@ -171,8 +169,7 @@ function bytes_til_menneske(
 
     <nav
         class="gruppe-section-nav"
-        aria-label="Gruppemeny"
-    >
+        aria-label="Gruppemeny">
 
         <ul class="gruppe-section-list">
 
@@ -255,8 +252,7 @@ function bytes_til_menneske(
                             <li>
 
                                 <article
-                                    class="gruppe-oppgaver-oppgave"
-                                >
+                                    class="gruppe-oppgaver-oppgave">
 
                                     <div>
 
@@ -267,9 +263,7 @@ function bytes_til_menneske(
                                         </h3>
 
                                         <?php if (
-                                            !empty(
-                                                $oppgave["beskrivelse"]
-                                            )
+                                            !empty($oppgave["beskrivelse"])
                                         ): ?>
 
                                             <p>
@@ -284,17 +278,16 @@ function bytes_til_menneske(
 
 
                                     <div
-                                        class="gruppe-handlinger"
-                                    >
+                                        class="gruppe-handlinger">
 
                                         <?php
 
                                         $oppgave_url =
                                             url(
                                                 "/oppgave.php?gruppe_id=" .
-                                                $state["gruppe"]["id"] .
-                                                "&oppgave_id=" .
-                                                $oppgave["oppgave_id"]
+                                                    $state["gruppe"]["id"] .
+                                                    "&oppgave_id=" .
+                                                    $oppgave["oppgave_id"]
                                             );
 
                                         echo '<a class="button button-primary" href="' .
@@ -312,26 +305,23 @@ function bytes_til_menneske(
                                             echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne oppgaven?\');">';
                                             ?>
 
-                                                <?php echo csrf_felt(); ?>
+                                            <?php echo csrf_felt(); ?>
 
-                                                <input
-                                                    type="hidden"
-                                                    name="admin_handling"
-                                                    value="slett_oppgave"
-                                                >
+                                            <input
+                                                type="hidden"
+                                                name="admin_handling"
+                                                value="slett_oppgave">
 
-                                                <input
-                                                    type="hidden"
-                                                    name="oppgave_id"
-                                                    value="<?php echo (int) $oppgave["oppgave_id"]; ?>"
-                                                >
+                                            <input
+                                                type="hidden"
+                                                name="oppgave_id"
+                                                value="<?php echo (int) $oppgave["oppgave_id"]; ?>">
 
-                                                <button
-                                                    type="submit"
-                                                    class="button button-warning"
-                                                >
-                                                    Slett
-                                                </button>
+                                            <button
+                                                type="submit"
+                                                class="button button-warning">
+                                                Slett
+                                            </button>
 
                                             </form>
 
@@ -358,41 +348,38 @@ function bytes_til_menneske(
                     echo '<form method="post" action="" class="form gruppe-ny-oppgave">';
                     ?>
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="oppgave_tittel">
-                                Tittel
-                            </label>
+                        <label for="oppgave_tittel">
+                            Tittel
+                        </label>
 
-                            <input
-                                type="text"
-                                id="oppgave_tittel"
-                                name="oppgave_tittel"
-                                required
-                            >
+                        <input
+                            type="text"
+                            id="oppgave_tittel"
+                            name="oppgave_tittel"
+                            required>
 
-                        </div>
+                    </div>
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="oppgave_beskrivelse">
-                                Beskrivelse (valgfritt)
-                            </label>
+                        <label for="oppgave_beskrivelse">
+                            Beskrivelse (valgfritt)
+                        </label>
 
-                            <textarea
-                                id="oppgave_beskrivelse"
-                                name="oppgave_beskrivelse"
-                                rows="3"
-                            ></textarea>
+                        <textarea
+                            id="oppgave_beskrivelse"
+                            name="oppgave_beskrivelse"
+                            rows="3"></textarea>
 
-                        </div>
+                    </div>
 
-                        <button
-                            type="submit"
-                            class="button button-primary"
-                        >
-                            Opprett oppgave
-                        </button>
+                    <button
+                        type="submit"
+                        class="button button-primary">
+                        Opprett oppgave
+                    </button>
 
                     </form>
 
@@ -429,7 +416,7 @@ function bytes_til_menneske(
                         $inviter_url =
                             url(
                                 "/inviter.php?gruppe_id=" .
-                                $state["gruppe"]["id"]
+                                    $state["gruppe"]["id"]
                             );
 
                         echo '<a class="button button-primary" href="' .
@@ -459,9 +446,7 @@ function bytes_til_menneske(
                         <li class="gruppe-medlem">
 
                             <?php if (
-                                !empty(
-                                    $medlem["avatar_link"]
-                                )
+                                !empty($medlem["avatar_link"])
                             ): ?>
 
                                 <?php
@@ -474,8 +459,7 @@ function bytes_til_menneske(
 
                                 <div
                                     class="gruppe-medlem-img gruppe-medlem-placeholder"
-                                    aria-hidden="true"
-                                >
+                                    aria-hidden="true">
                                     <?php echo htmlspecialchars(
                                         mb_strtoupper(
                                             mb_substr(
@@ -522,26 +506,23 @@ function bytes_til_menneske(
                                 echo '<form method="post" action="" onsubmit="return confirm(\'Vil du fjerne dette medlemmet fra gruppen?\');">';
                                 ?>
 
-                                    <?php echo csrf_felt(); ?>
+                                <?php echo csrf_felt(); ?>
 
-                                    <input
-                                        type="hidden"
-                                        name="admin_handling"
-                                        value="fjern_medlem"
-                                    >
+                                <input
+                                    type="hidden"
+                                    name="admin_handling"
+                                    value="fjern_medlem">
 
-                                    <input
-                                        type="hidden"
-                                        name="student_id"
-                                        value="<?php echo (int) $medlem["student_id"]; ?>"
-                                    >
+                                <input
+                                    type="hidden"
+                                    name="student_id"
+                                    value="<?php echo (int) $medlem["student_id"]; ?>">
 
-                                    <button
-                                        type="submit"
-                                        class="button button-warning"
-                                    >
-                                        Fjern medlem
-                                    </button>
+                                <button
+                                    type="submit"
+                                    class="button button-warning">
+                                    Fjern medlem
+                                </button>
 
                                 </form>
 
@@ -646,7 +627,7 @@ function bytes_til_menneske(
                                                 $ressurs_url =
                                                     url(
                                                         "/ressurs.php?ressurs_id=" .
-                                                        $ressurs["fil_id"]
+                                                            $ressurs["fil_id"]
                                                     );
 
                                                 echo '<a class="button button-primary" href="' .
@@ -664,26 +645,23 @@ function bytes_til_menneske(
                                                     echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne ressursen?\');">';
                                                     ?>
 
-                                                        <?php echo csrf_felt(); ?>
+                                                    <?php echo csrf_felt(); ?>
 
-                                                        <input
-                                                            type="hidden"
-                                                            name="admin_handling"
-                                                            value="slett_ressurs"
-                                                        >
+                                                    <input
+                                                        type="hidden"
+                                                        name="admin_handling"
+                                                        value="slett_ressurs">
 
-                                                        <input
-                                                            type="hidden"
-                                                            name="fil_id"
-                                                            value="<?php echo (int) $ressurs["fil_id"]; ?>"
-                                                        >
+                                                    <input
+                                                        type="hidden"
+                                                        name="fil_id"
+                                                        value="<?php echo (int) $ressurs["fil_id"]; ?>">
 
-                                                        <button
-                                                            type="submit"
-                                                            class="button button-warning"
-                                                        >
-                                                            Slett
-                                                        </button>
+                                                    <button
+                                                        type="submit"
+                                                        class="button button-warning">
+                                                        Slett
+                                                    </button>
 
                                                     </form>
 
@@ -716,27 +694,25 @@ function bytes_til_menneske(
                     echo '<form method="post" action="" enctype="multipart/form-data" class="gruppe-last-opp">';
                     ?>
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="ny_fil">
-                                Velg fil
-                            </label>
+                        <label for="ny_fil">
+                            Velg fil
+                        </label>
 
-                            <input
-                                type="file"
-                                id="ny_fil"
-                                name="ny_fil"
-                                required
-                            >
+                        <input
+                            type="file"
+                            id="ny_fil"
+                            name="ny_fil"
+                            required>
 
-                        </div>
+                    </div>
 
-                        <button
-                            type="submit"
-                            class="button button-primary"
-                        >
-                            Last opp
-                        </button>
+                    <button
+                        type="submit"
+                        class="button button-primary">
+                        Last opp
+                    </button>
 
                     </form>
 
@@ -767,9 +743,7 @@ function bytes_til_menneske(
 
 
                 <?php if (
-                    empty(
-                        $state["diskusjoner_visning"]
-                    )
+                    empty($state["diskusjoner_visning"])
                 ): ?>
 
                     <div class="gruppe-empty">
@@ -798,9 +772,9 @@ function bytes_til_menneske(
                                     $diskusjon_url =
                                         url(
                                             "/diskusjon.php?gruppe_id=" .
-                                            $state["gruppe"]["id"] .
-                                            "&diskusjon_id=" .
-                                            $trad["id"]
+                                                $state["gruppe"]["id"] .
+                                                "&diskusjon_id=" .
+                                                $trad["id"]
                                         );
 
                                     echo '<a class="gruppe-diskusjon-kort" href="' .
@@ -809,21 +783,21 @@ function bytes_til_menneske(
 
                                     ?>
 
-                                        <span class="gruppe-diskusjon-tittel">
+                                    <span class="gruppe-diskusjon-tittel">
 
-                                            <?php echo htmlspecialchars(
-                                                $trad["tittel"]
-                                            ); ?>
+                                        <?php echo htmlspecialchars(
+                                            $trad["tittel"]
+                                        ); ?>
 
-                                        </span>
+                                    </span>
 
-                                        <span class="gruppe-diskusjon-meta">
+                                    <span class="gruppe-diskusjon-meta">
 
-                                            <?php echo (int) $trad["antall_innlegg"]; ?>
+                                        <?php echo (int) $trad["antall_innlegg"]; ?>
 
-                                            innlegg
+                                        innlegg
 
-                                        </span>
+                                    </span>
 
                                     </a>
 
@@ -836,26 +810,23 @@ function bytes_til_menneske(
                                         echo '<form method="post" action="" onsubmit="return confirm(\'Vil du slette denne diskusjonen og alle innleggene?\');">';
                                         ?>
 
-                                            <?php echo csrf_felt(); ?>
+                                        <?php echo csrf_felt(); ?>
 
-                                            <input
-                                                type="hidden"
-                                                name="admin_handling"
-                                                value="slett_diskusjon"
-                                            >
+                                        <input
+                                            type="hidden"
+                                            name="admin_handling"
+                                            value="slett_diskusjon">
 
-                                            <input
-                                                type="hidden"
-                                                name="diskusjon_id"
-                                                value="<?php echo (int) $trad["id"]; ?>"
-                                            >
+                                        <input
+                                            type="hidden"
+                                            name="diskusjon_id"
+                                            value="<?php echo (int) $trad["id"]; ?>">
 
-                                            <button
-                                                type="submit"
-                                                class="button button-warning"
-                                            >
-                                                Slett
-                                            </button>
+                                        <button
+                                            type="submit"
+                                            class="button button-warning">
+                                            Slett
+                                        </button>
 
                                         </form>
 
@@ -882,97 +853,91 @@ function bytes_til_menneske(
                     echo '<form method="post" action="" class="form gruppe-ny-diskusjon">';
                     ?>
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="diskusjon_tittel">
-                                Tittel
-                            </label>
+                        <label for="diskusjon_tittel">
+                            Tittel
+                        </label>
 
-                            <input
-                                type="text"
-                                id="diskusjon_tittel"
-                                name="diskusjon_tittel"
-                                required
-                            >
+                        <input
+                            type="text"
+                            id="diskusjon_tittel"
+                            name="diskusjon_tittel"
+                            required>
 
-                        </div>
+                    </div>
 
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="diskusjon_oppgave_id">
-                                Knytt til oppgave
-                            </label>
+                        <label for="diskusjon_oppgave_id">
+                            Knytt til oppgave
+                        </label>
 
-                            <select
-                                id="diskusjon_oppgave_id"
-                                name="diskusjon_oppgave_id"
-                            >
+                        <select
+                            id="diskusjon_oppgave_id"
+                            name="diskusjon_oppgave_id">
 
-                                <option value="">
-                                    Ingen
+                            <option value="">
+                                Ingen
+                            </option>
+
+                            <?php foreach (
+                                $state["oppgaver"]
+                                as $oppgave
+                            ): ?>
+
+                                <option
+                                    value="<?php echo (int) $oppgave["oppgave_id"]; ?>">
+                                    <?php echo htmlspecialchars(
+                                        $oppgave["tittel"]
+                                    ); ?>
                                 </option>
 
-                                <?php foreach (
-                                    $state["oppgaver"]
-                                    as $oppgave
-                                ): ?>
+                            <?php endforeach; ?>
 
-                                    <option
-                                        value="<?php echo (int) $oppgave["oppgave_id"]; ?>"
-                                    >
-                                        <?php echo htmlspecialchars(
-                                            $oppgave["tittel"]
-                                        ); ?>
-                                    </option>
+                        </select>
 
-                                <?php endforeach; ?>
-
-                            </select>
-
-                        </div>
+                    </div>
 
 
-                        <div class="form-felt">
+                    <div class="form-felt">
 
-                            <label for="diskusjon_fil_id">
-                                Knytt til fil
-                            </label>
+                        <label for="diskusjon_fil_id">
+                            Knytt til fil
+                        </label>
 
-                            <select
-                                id="diskusjon_fil_id"
-                                name="diskusjon_fil_id"
-                            >
+                        <select
+                            id="diskusjon_fil_id"
+                            name="diskusjon_fil_id">
 
-                                <option value="">
-                                    Ingen
+                            <option value="">
+                                Ingen
+                            </option>
+
+                            <?php foreach (
+                                $state["ressurser"]
+                                as $ressurs
+                            ): ?>
+
+                                <option
+                                    value="<?php echo (int) $ressurs["fil_id"]; ?>">
+                                    <?php echo htmlspecialchars(
+                                        $ressurs["fil_navn"]
+                                    ); ?>
                                 </option>
 
-                                <?php foreach (
-                                    $state["ressurser"]
-                                    as $ressurs
-                                ): ?>
+                            <?php endforeach; ?>
 
-                                    <option
-                                        value="<?php echo (int) $ressurs["fil_id"]; ?>"
-                                    >
-                                        <?php echo htmlspecialchars(
-                                            $ressurs["fil_navn"]
-                                        ); ?>
-                                    </option>
+                        </select>
 
-                                <?php endforeach; ?>
+                    </div>
 
-                            </select>
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="button button-primary"
-                        >
-                            Opprett diskusjonstråd
-                        </button>
+                    <button
+                        type="submit"
+                        class="button button-primary">
+                        Opprett diskusjonstråd
+                    </button>
 
                     </form>
 
