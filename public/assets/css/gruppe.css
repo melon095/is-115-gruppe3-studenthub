@@ -1,194 +1,151 @@
+.gruppe-side {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 .gruppe-title-row {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
 
-    h1 {
-        margin: 0;
-    }
+.gruppe-title-row h1 {
+    margin: 0;
+}
+
+.gruppe-beskrivelse {
+    margin: 0.5rem 0 0;
+    color: var(--text-muted);
+    max-width: 650px;
 }
 
 .gruppe-title-knapper {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
 .gruppe-endre-navn {
     position: relative;
+}
 
-    summary {
-        list-style: none;
-        cursor: pointer;
-    }
+.gruppe-endre-navn summary {
+    list-style: none;
+    cursor: pointer;
+}
 
-    summary::-webkit-details-marker {
-        display: none;
-    }
+.gruppe-endre-navn summary::-webkit-details-marker {
+    display: none;
+}
 
-    .form {
-        position: absolute;
-        top: calc(100% + 0.5rem);
-        right: 0;
-        z-index: 10;
-        width: 260px;
-        padding: 1rem;
-        background-color: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
-    }
+.gruppe-endre-navn .form {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: 0;
+    z-index: 20;
+    width: 280px;
+    padding: 1rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+}
+
+.gruppe-section-nav {
+    margin-bottom: 1.5rem;
 }
 
 .gruppe-section-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.6rem;
     list-style: none;
-    margin: 0 0 1.5rem;
-    padding: 0 0 0.5rem;
+    margin: 0;
+    padding: 0 0 1rem;
     border-bottom: 1px solid var(--border);
 }
 
-.gruppe-ny-oppgave {
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--border);
+.gruppe-section-list li {
+    margin: 0;
 }
 
-.gruppe-last-opp {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--border);
-
-    .form-felt {
-        flex: 1;
-        margin-bottom: 0;
-    }
-}
-
-.gruppe-medlemmer-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-
-    h2 {
-        margin: 0;
-    }
+.gruppe-section-list .button {
+    text-decoration: none;
 }
 
 .gruppe-sections > section {
+    padding: 1.5rem;
     background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1.25rem;
-
-    h2 {
-        margin-top: 0;
-        font-size: 1.125rem;
-    }
-
-    ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    li article, .gruppe-medlem {
-        padding: 0.75rem;
-        background-color: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        transition: border-color 0.15s ease;
-    }
-
-    li article:hover, .gruppe-medlem:hover {
-        border-color: var(--primary-400);
-    }
-
-    li h3 {
-        margin: 0;
-        font-size: 1rem;
-    }
 }
 
-.gruppe-medlem {
+.gruppe-sections h2 {
+    margin-top: 0;
+}
+
+.gruppe-section-heading,
+.gruppe-medlemmer-title-row {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
 }
 
-.gruppe-medlem-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+.gruppe-section-heading h2,
+.gruppe-medlemmer-title-row h2 {
+    margin: 0;
 }
 
-.gruppe-medlem-navn {
-    font-weight: 500;
-}
-
-.gruppe-diskusjon-filter {
-    margin: 0 0 1rem;
-    padding: 0.625rem 0.75rem;
-    background-color: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 0.9375rem;
+.gruppe-section-heading p,
+.gruppe-medlemmer-title-row p {
+    margin: 0.35rem 0 0;
     color: var(--text-muted);
 }
 
-.gruppe-diskusjon-kort {
+.gruppe-empty {
+    margin: 1rem 0;
+    padding: 1.25rem;
+    background-color: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+}
+
+.gruppe-empty h3 {
+    margin: 0 0 0.4rem;
+}
+
+.gruppe-empty p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.gruppe-opprett-omrade {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.gruppe-opprett-omrade h3 {
+    margin-top: 0;
+}
+
+.gruppe-oppgaver-liste,
+.gruppe-medlemmer-liste,
+.gruppe-diskusjon-liste {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem;
-    background-color: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    text-decoration: none;
-    color: var(--text);
-    transition: border-color 0.15s ease;
-}
-
-.gruppe-diskusjon-kort:hover {
-    border-color: var(--primary-400);
-}
-
-.gruppe-diskusjon-tittel {
-    font-weight: 500;
-}
-
-.gruppe-diskusjon-meta {
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-}
-
-.gruppe-diskusjon-tag {
-    display: inline-block;
-    padding: 0.0625rem 0.4rem;
-    background-color: var(--surface);
-    border-radius: var(--radius);
-}
-
-.gruppe-ny-diskusjon {
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--border);
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .gruppe-oppgaver-oppgave {
@@ -196,10 +153,148 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
 
-    p {
-        margin: 0.35rem 0 0;
-        color: var(--text-muted);
-        font-size: 0.9375rem;
+.gruppe-oppgaver-oppgave h3 {
+    margin: 0;
+}
+
+.gruppe-oppgaver-oppgave p {
+    margin: 0.4rem 0 0;
+    color: var(--text-muted);
+}
+
+.gruppe-ny-oppgave,
+.gruppe-ny-diskusjon {
+    max-width: 700px;
+}
+
+.gruppe-medlem {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.gruppe-medlem-img {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.gruppe-medlem-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    font-weight: 600;
+}
+
+.gruppe-medlem-navn {
+    font-weight: 500;
+}
+
+.gruppe-last-opp {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.gruppe-last-opp .form-felt {
+    flex: 1;
+    min-width: 250px;
+    margin-bottom: 0;
+}
+
+.gruppe-diskusjon-filter {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+}
+
+.gruppe-diskusjon-filter a {
+    margin-left: 0.5rem;
+}
+
+.gruppe-diskusjon-kort {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+}
+
+.gruppe-diskusjon-kort:hover {
+    border-color: var(--primary-400);
+}
+
+.gruppe-diskusjon-tittel {
+    font-weight: 600;
+}
+
+.gruppe-diskusjon-meta {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.gruppe-diskusjon-tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.15rem 0.45rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+@media (max-width: 768px) {
+    .gruppe-title-row {
+        flex-direction: column;
+    }
+
+    .gruppe-title-knapper {
+        width: 100%;
+    }
+
+    .gruppe-section-list {
+        flex-direction: column;
+    }
+
+    .gruppe-section-list li,
+    .gruppe-section-list .button {
+        width: 100%;
+    }
+
+    .gruppe-oppgaver-oppgave {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gruppe-last-opp {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .gruppe-endre-navn .form {
+        right: auto;
+        left: 0;
+        width: min(280px, 80vw);
     }
 }

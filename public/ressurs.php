@@ -1,89 +1,142 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/_bootstrap.php";
 
-$ressurs_id = $_GET["ressurs_id"] ?? null;
-$gruppe_id = "1"; // TODO: Gruppe ID fra database.
+krever_autentikasjon();
 
-if ($ressurs_id === null) {
-    header("Location: " . url("/index.php"));
-    exit();
+$get = filter_input_array(INPUT_GET, [
+    "ressurs_id" => FILTER_VALIDATE_INT,
+    "versjon_id" => FILTER_VALIDATE_INT,
+    "last_ned" => FILTER_DEFAULT
+]);
+
+$ressurs_id = $get["ressurs_id"] ?? null;
+
+if (!$ressurs_id) {
+    omdiriger(url("/index.php"));
 }
 
-$gruppe = [
-    "id" => $gruppe_id,
-    "navn" => "Gruppe " . $gruppe_id,
-];
+$ressurs = database_hent_ressurs($pdo, $ressurs_id);
 
-// TODO: Hent ifra database. En ressurs kan enten være knyttet til en spesifikk oppgave
-// eller kun til gruppen - $oppgave er null i det siste tilfellet.
-$oppgave_id = ($ressurs_id % 2 !== 0) ? "1" : null;
+if (!$ressurs) {
+    omdiriger(url("/index.php"));
+}
+
+$gruppe_id = (int) $ressurs["gruppe_id"];
+
+if (!database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $_SESSION["student_id"])) {
+    omdiriger(url("/index.php"));
+}
+
+$versjon_id = $get["versjon_id"] ?? null;
+$last_ned = $get["last_ned"] ?? null;
+
+if ($versjon_id) {
+    $nedlasting = database_hent_filversjon($pdo, $versjon_id, $ressurs_id);
+
+    if ($nedlasting && is_file($nedlasting["fil_lokasjon_hdd"])) {
+        header("Content-Type: application/octet-stream");
+        header('Content-Disposition: attachment; filename="' . basename($ressurs["fil_navn"]) . '"');
+        header("Content-Length: " . filesize($nedlasting["fil_lokasjon_hdd"]));
+
+        readfile($nedlasting["fil_lokasjon_hdd"]);
+        exit();
+    }
+}
+
+if ($last_ned === "original") {
+    if (!empty($ressurs["fil_lokasjon_hdd"]) && is_file($ressurs["fil_lokasjon_hdd"])) {
+        header("Content-Type: application/octet-stream");
+        header('Content-Disposition: attachment; filename="' . basename($ressurs["fil_navn"]) . '"');
+        header("Content-Length: " . filesize($ressurs["fil_lokasjon_hdd"]));
+
+        readfile($ressurs["fil_lokasjon_hdd"]);
+        exit();
+    }
+}
+
+$gruppe = database_hent_gruppe($pdo, $gruppe_id);
+
+if (!$gruppe) {
+    omdiriger(url("/index.php"));
+}
 
 $oppgave = null;
-if ($oppgave_id !== null) {
-    $oppgave = [
-        "oppgave_id" => $oppgave_id,
-        "gruppe_id" => $gruppe_id,
-        "tittel" => "Oppgave " . $oppgave_id,
-    ];
+
+if ($ressurs["oppgave_id"] !== null) {
+    $oppgave = database_hent_oppgave($pdo, $ressurs["oppgave_id"], $gruppe_id);
 }
 
-$versjoner = [];
-$antall_versjoner = 3;
-for ($v = 1; $v <= $antall_versjoner; $v++) {
-    $versjoner[] = [
-        "versjon_id" => $v,
-        "versjon_nummer" => $v,
-        "opprettet_av_navn" => "Kai Eide",
-        "opprettet_på" => date("Y-m-d H:i", strtotime("-" . (($antall_versjoner - $v) * 3) . " days")),
-        "fil_størrelse" => 245_000 + ($v * 15_000),
-    ];
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_FILES["ny_fil"]) &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $lagret_fil = lagre_opplastet_fil($_FILES["ny_fil"]);
+
+    if ($lagret_fil !== null) {
+        $nytt_versjon_nummer = database_hent_neste_versjonsnummer($pdo, $ressurs_id);
+
+        database_opprett_filversjon(
+            $pdo,
+            $ressurs_id,
+            $_SESSION["student_id"],
+            $nytt_versjon_nummer,
+            $lagret_fil["fil_lokasjon"],
+            $lagret_fil["fil_størrelse"]
+        );
+
+        omdiriger(url("/ressurs.php?ressurs_id=" . $ressurs_id));
+    }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES['ny_fil']['error'] === UPLOAD_ERR_OK) {
-    // TODO: Database integrasjon og faktisk fillagring.
-    $versjoner[] = [
-        "versjon_id" => count($versjoner) + 1,
-        "versjon_nummer" => count($versjoner) + 1,
-        "opprettet_av_navn" => "Deg",
-        "opprettet_på" => date("Y-m-d H:i"),
-        "fil_størrelse" => (int) $_FILES['ny_fil']['size'],
-    ];
-}
+$database_versjoner = database_hent_filversjoner_for_fil($pdo, $ressurs_id);
 
-$ressurs = [
-    "fil_id" => $ressurs_id,
-    "gruppe_id" => $gruppe_id,
-    "oppgave_id" => $oppgave_id,
-    "fil_navn" => "Oppgavebeskrivelse.pdf",
-    "fil_type" => "pdf",
-    "opprettet_av_navn" => "Kai Eide",
-    "opprettet_på" => $versjoner[0]["opprettet_på"],
-    "siste_versjon" => end($versjoner),
-    "versjoner" => $versjoner,
+$versjoner = [
+    [
+        "versjon_id" => null,
+        "versjon_nummer" => 1,
+        "opprettet_av_navn" => $ressurs["opprettet_av_navn"],
+        "opprettet_på" => $ressurs["opprettet_på"],
+        "fil_størrelse" => (int) $ressurs["fil_størrelse"],
+        "er_original" => true
+    ]
 ];
 
-$page_title = "Ressurs";
-$page_content = __DIR__."/../pages/ressurs.tpl.php";
-$page_styles = [url("/assets/css/ressurs-tabell.css"), url("/assets/css/ressurs.css")];
-
-$breadcrumbs = [
-    ["label" => "Grupper", "href" => url("/index.php")],
-    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)],
-];
-
-if ($oppgave !== null) {
-    $breadcrumbs[] = [
-        "label" => $oppgave["tittel"],
-        "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
-    ];
+foreach ($database_versjoner as $versjon) {
+    $versjon["er_original"] = false;
+    $versjoner[] = $versjon;
 }
 
-$breadcrumbs[] = ["label" => "Ressurs " . $ressurs_id];
+$ressurs["versjoner"] = $versjoner;
+$ressurs["siste_versjon"] = end($versjoner);
 
-$state = [
+$side_tittel = $ressurs["fil_navn"];
+
+$side_innhold = __DIR__ . "/../pages/ressurs.tpl.php";
+
+$side_stiler = [
+    url("/assets/css/ressurs-tabell.css"),
+    url("/assets/css/ressurs.css")
+];
+
+$brødsmulesti = [
+    [
+        "tekst" => "Grupper",
+        "lenke" => url("/index.php")
+    ],
+    [
+        "tekst" => $gruppe["navn"],
+        "lenke" => url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=ressurser")
+    ],
+    [
+        "tekst" => $ressurs["fil_navn"]
+    ]
+];
+
+$tilstand = [
     "ressurs" => $ressurs,
-    "oppgave" => $oppgave,
+    "oppgave" => $oppgave
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/_layout.php";

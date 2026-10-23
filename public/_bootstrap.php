@@ -2,16 +2,21 @@
 
 session_start();
 
-$scriptDir = str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"]));
-if (mb_substr($scriptDir, -7) === "/public") {
-    $scriptDir = mb_substr($scriptDir, 0, -7);
-}
-if ($scriptDir === "/") {
-    $scriptDir = "";
-}
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../components/database-funksjoner.php';
+require_once __DIR__ . '/../components/csrf.php';
+require_once __DIR__ . '/../components/hjelpefunksjoner.php';
 
-define("BASE_URL", $scriptDir);
+$database_host = DATABASE_HOST;
+$database_navn = DATABASE_NAVN;
 
-function url(string $path): string {
-    return BASE_URL . $path;
-}
+$pdo = new PDO(
+    "mysql:host={$database_host};dbname={$database_navn};charset=utf8mb4",
+    DATABASE_BRUKER,
+    DATABASE_PASSORD,
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false
+    ]
+);
