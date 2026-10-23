@@ -2,96 +2,76 @@
 
 require __DIR__ . "/_bootstrap.php";
 
+krever_autentikasjon();
+
 $feil = [];
 $opprettet_gruppe = null;
 $innsendt_navn = "";
 $innsendt_beskrivelse = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $input = filter_input_array(INPUT_POST, [
-        "navn" => FILTER_DEFAULT,
-        "beskrivelse" => FILTER_DEFAULT
-    ]);
+    if (!csrf_gyldig($_POST["csrf_token"] ?? null)) {
+        $feil[] = "Skjemaet er utløpt. Prøv igjen.";
+    } else {
+        $input = filter_input_array(INPUT_POST, [
+            "navn" => FILTER_DEFAULT,
+            "beskrivelse" => FILTER_DEFAULT
+        ]);
 
-    $innsendt_navn = trim($input["navn"] ?? "");
-    $innsendt_beskrivelse = trim($input["beskrivelse"] ?? "");
+        $innsendt_navn = trim($input["navn"] ?? "");
+        $innsendt_beskrivelse = trim($input["beskrivelse"] ?? "");
 
-    if ($innsendt_navn === "") {
-        $feil[] = "Gruppen må ha et navn.";
-    }
+        if ($innsendt_navn === "") {
+            $feil[] = "Gruppen må ha et navn.";
+        } elseif (mb_strlen($innsendt_navn) > 255) {
+            $feil[] = "Gruppenavnet kan ikke være lengre enn 255 tegn.";
+        }
 
-    if (empty($feil)) {
-        try {
-            $pdo->beginTransaction();
+        if (empty($feil)) {
+            try {
+                $pdo->beginTransaction();
 
-            $stmt = $pdo->prepare("
-                INSERT INTO grupper (
-                    navn,
-                    beskrivelse,
-                    opprettet_av
-                )
-                VALUES (
-                    :navn,
-                    :beskrivelse,
-                    :opprettet_av
-                )
-            ");
+                $gruppe_id = database_opprett_gruppe(
+                    $pdo,
+                    $innsendt_navn,
+                    $innsendt_beskrivelse,
+                    $_SESSION["student_id"]
+                );
 
-            $stmt->execute([
-                "navn" => $innsendt_navn,
-                "beskrivelse" => $innsendt_beskrivelse,
-                "opprettet_av" => $_SESSION["student_id"]
-            ]);
+                database_legg_til_gruppe_medlem($pdo, $gruppe_id, $_SESSION["student_id"]);
 
-            $gruppe_id = $pdo->lastInsertId();
+                $pdo->commit();
 
-            $stmt = $pdo->prepare("
-                INSERT INTO gruppe_medlemmer (
-                    gruppe_id,
-                    bruker_id
-                )
-                VALUES (
-                    :gruppe_id,
-                    :bruker_id
-                )
-            ");
+                $opprettet_gruppe = [
+                    "id" => $gruppe_id,
+                    "navn" => $innsendt_navn,
+                    "beskrivelse" => $innsendt_beskrivelse
+                ];
+            } catch (PDOException $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
 
-            $stmt->execute([
-                "gruppe_id" => $gruppe_id,
-                "bruker_id" => $_SESSION["student_id"]
-            ]);
-
-            $pdo->commit();
-
-            $opprettet_gruppe = [
-                "id" => $gruppe_id,
-                "navn" => $innsendt_navn,
-                "beskrivelse" => $innsendt_beskrivelse
-            ];
-        } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
+                $feil[] = "Kunne ikke opprette gruppen.";
             }
-
-            $feil[] = "Kunne ikke opprette gruppen.";
         }
     }
 }
 
-$page_title = "Opprett gruppe";
-$page_content = __DIR__ . "/../pages/opprett-gruppe.tpl.php";
+$side_tittel = "Opprett gruppe";
+$side_innhold = __DIR__ . "/../pages/opprett-gruppe.tpl.php";
 
-$page_styles = [
+$side_stiler = [
     url("/assets/css/opprett-gruppe.css")
 ];
 
-$breadcrumbs = [
+$brødsmulesti = [
     [
-        "label" => "Grupper",
-        "href" => url("/index.php")
+        "tekst" => "Grupper",
+        "lenke" => url("/index.php")
     ],
     [
-        "label" => "Opprett gruppe"
+        "tekst" => "Opprett gruppe"
     ]
 ];
 

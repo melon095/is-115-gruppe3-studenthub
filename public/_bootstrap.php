@@ -2,20 +2,10 @@
 
 session_start();
 
-$scriptDir = str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"]));
-
-if ($scriptDir === "/") {
-    $scriptDir = "";
-}
-
-define("BASE_URL", $scriptDir);
-
-require_once '../config.php';
-
-function url(string $path): string
-{
-    return BASE_URL . $path;
-}
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../components/database-funksjoner.php';
+require_once __DIR__ . '/../components/csrf.php';
+require_once __DIR__ . '/../components/hjelpefunksjoner.php';
 
 $database_host = DATABASE_HOST;
 $database_navn = DATABASE_NAVN;

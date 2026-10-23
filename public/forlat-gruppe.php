@@ -1,31 +1,44 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/_bootstrap.php";
 
-$gruppe_id = $_GET["gruppe_id"] ?? $_POST["gruppe_id"] ?? null;
+krever_autentikasjon();
 
-if ($gruppe_id === null) {
-    header("Location: " . url("/index.php"));
-    exit();
+$gruppe_id = filter_input(INPUT_GET, "gruppe_id", FILTER_VALIDATE_INT)
+    ?: filter_input(INPUT_POST, "gruppe_id", FILTER_VALIDATE_INT);
+
+if (!$gruppe_id) {
+    omdiriger(url("/index.php"));
 }
 
-$gruppe = [
-    "id" => $gruppe_id,
-    "navn" => "Gruppe " . $gruppe_id,
+$gruppe = database_hent_gruppe($pdo, $gruppe_id);
+
+if (!$gruppe) {
+    omdiriger(url("/index.php"));
+}
+
+$har_forlatt = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (csrf_gyldig($_POST["csrf_token"] ?? null)) {
+        database_fjern_gruppe_medlem($pdo, $gruppe_id, $_SESSION['student_id']);
+        $har_forlatt = true;
+    }
+}
+
+$side_tittel = "Forlat gruppe";
+$side_innhold = __DIR__ . "/../pages/forlat-gruppe.tpl.php";
+$side_stiler = [url("/assets/css/forlat-gruppe.css")];
+
+$brødsmulesti = [
+    ["tekst" => "Grupper", "lenke" => url("/index.php")],
+    ["tekst" => $gruppe["navn"], "lenke" => url("/gruppe.php?gruppe_id=" . $gruppe["id"])],
+    ["tekst" => "Forlat gruppe"],
 ];
 
-$page_title = "Forlat gruppe";
-$page_content = __DIR__."/../pages/forlat-gruppe.tpl.php";
-$page_styles = [url("/assets/css/forlat-gruppe.css")];
-
-$breadcrumbs = [
-    ["label" => "Grupper", "href" => url("/index.php")],
-    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe["id"])],
-    ["label" => "Forlat gruppe"],
-];
-
-$state = [
+$tilstand = [
+    "har_forlatt" => $har_forlatt,
     "gruppe" => $gruppe,
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/_layout.php";

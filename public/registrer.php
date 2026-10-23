@@ -2,7 +2,7 @@
 
 require __DIR__ . "/_bootstrap.php";
 
-$public_page = true;
+$offentlig_side = true;
 
 $feil = [];
 $fornavn = "";
@@ -14,8 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "fornavn" => FILTER_DEFAULT,
         "etternavn" => FILTER_DEFAULT,
         "epost" => FILTER_VALIDATE_EMAIL,
-        "passord" => FILTER_DEFAULT,
-        "bekreft_passord" => FILTER_DEFAULT
+        "passord" => FILTER_UNSAFE_RAW,
+        "bekreft_passord" => FILTER_UNSAFE_RAW
     ]);
 
     $fornavn = trim($input["fornavn"] ?? "");
@@ -26,18 +26,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($fornavn === "") {
         $feil[] = "Fornavn må fylles ut.";
+    } elseif (mb_strlen($fornavn) > 100) {
+        $feil[] = "Fornavn kan ikke være lengre enn 100 tegn.";
     }
 
     if ($etternavn === "") {
         $feil[] = "Etternavn må fylles ut.";
+    } elseif (mb_strlen($etternavn) > 100) {
+        $feil[] = "Etternavn kan ikke være lengre enn 100 tegn.";
     }
 
     if (!$epost) {
         $feil[] = "Du må skrive inn en gyldig e-postadresse.";
+    } elseif (mb_strlen($epost) > 255) {
+        $feil[] = "E-postadressen er for lang.";
     }
 
     if ($passord === "") {
         $feil[] = "Passord må fylles ut.";
+    } elseif (mb_strlen($passord) < 8) {
+        $feil[] = "Passord må være minst 8 tegn.";
     }
 
     if ($passord !== $bekreft_passord) {
@@ -45,56 +53,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     if (empty($feil)) {
-        $stmt = $pdo->prepare("
-            SELECT id
-            FROM studenter
-            WHERE epost = :epost
-        ");
-
-        $stmt->execute([
-            "epost" => $epost
-        ]);
-
-        if ($stmt->fetch()) {
+        if (database_hent_student_ved_epost($pdo, $epost)) {
             $feil[] = "Det finnes allerede en bruker med denne e-postadressen.";
         } else {
-            $passord_hash = password_hash(
-                $passord,
-                PASSWORD_DEFAULT
-            );
+            $passord_hash = password_hash($passord, PASSWORD_DEFAULT);
 
-            $stmt = $pdo->prepare("
-                INSERT INTO studenter (
-                    fornavn,
-                    etternavn,
-                    epost,
-                    passord
-                )
-                VALUES (
-                    :fornavn,
-                    :etternavn,
-                    :epost,
-                    :passord
-                )
-            ");
+            $student_id = database_opprett_student($pdo, $fornavn, $etternavn, $epost, $passord_hash);
 
-            $stmt->execute([
-                "fornavn" => $fornavn,
-                "etternavn" => $etternavn,
-                "epost" => $epost,
-                "passord" => $passord_hash
-            ]);
+            session_regenerate_id(true);
+            $_SESSION["student_id"] = $student_id;
 
-            $_SESSION["student_id"] = $pdo->lastInsertId();
-
-            header("Location: " . url("/index.php"));
-            exit();
+            omdiriger(url("/index.php"));
         }
     }
 }
 
-$page_title = "Registrer";
-$page_content = __DIR__ . "/../pages/registrer.tpl.php";
-$page_styles = [url("/assets/css/auth.css")];
+$side_tittel = "Registrer";
+$side_innhold = __DIR__ . "/../pages/registrer.tpl.php";
+$side_stiler = [url("/assets/css/auth.css")];
 
 include __DIR__ . "/_layout.php";

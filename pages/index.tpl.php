@@ -1,7 +1,3 @@
-<?php
-
-?>
-
 <section>
     <div class="index-title-row">
         <h1>Hjem</h1>

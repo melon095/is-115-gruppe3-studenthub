@@ -1,6 +1,5 @@
 <div class="auth-wrapper">
     <section class="auth-card" aria-labelledby="registrer-heading">
-
         <h1 id="registrer-heading">Registrer deg</h1>
 
         <?php if (!empty($feil)): ?>
@@ -12,7 +11,6 @@
         <?php endif; ?>
 
         <form method="post" action="" class="form">
-
             <div class="form-felt">
                 <label for="fornavn">Fornavn</label>
                 <input
@@ -21,8 +19,7 @@
                     name="fornavn"
                     value="<?php echo htmlspecialchars($fornavn); ?>"
                     autocomplete="given-name"
-                    required
-                >
+                    required>
             </div>
 
             <div class="form-felt">
@@ -33,8 +30,7 @@
                     name="etternavn"
                     value="<?php echo htmlspecialchars($etternavn); ?>"
                     autocomplete="family-name"
-                    required
-                >
+                    required>
             </div>
 
             <div class="form-felt">
@@ -45,35 +41,22 @@
                     name="epost"
                     value="<?php echo htmlspecialchars($epost ?: ""); ?>"
                     autocomplete="email"
-                    required
-                >
+                    required>
             </div>
 
             <div class="form-felt">
                 <label for="passord">Passord</label>
-                <input
-                    type="password"
-                    id="passord"
-                    name="passord"
-                    autocomplete="new-password"
-                    required
-                >
+                <input type="password" id="passord" name="passord" autocomplete="new-password" required>
             </div>
 
             <div class="form-felt">
                 <label for="bekreft_passord">Bekreft passord</label>
- 
-    <input
-        type="password"
-        id="bekreft_passord"
-        name="bekreft_passord"
-        autocomplete="new-password"
-        required
-    >
+                <input type="password" id="bekreft_passord" name="bekreft_passord" autocomplete="new-password" required>
+            </div>
+
+            <button type="submit" class="button button-primary button-lg">
+                Registrer deg
+            </button>
+        </form>
+    </section>
 </div>
-
-<button type="submit" class="button button-primary button-lg">
-    Registrer deg
-</button>
-
-</form>

@@ -2,28 +2,13 @@
 
 $grupper = [];
 
-$vis_sidebar = !($public_page ?? false) && isset($_SESSION["student_id"]);
+$vis_sidebar = !($offentlig_side ?? false) && isset($_SESSION["student_id"]);
 
 if ($vis_sidebar) {
-    $stmt = $pdo->prepare("
-        SELECT
-            g.id AS gruppe_id,
-            g.navn
-        FROM grupper g
-        INNER JOIN gruppe_medlemmer gm
-            ON gm.gruppe_id = g.id
-        WHERE gm.bruker_id = :student_id
-        ORDER BY g.navn
-    ");
-
-    $stmt->execute([
-        "student_id" => $_SESSION["student_id"]
-    ]);
-
-    $grupper = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $grupper = database_hent_grupper_for_student($pdo, $_SESSION["student_id"]);
 }
 
-$current_gruppe_id = filter_input(
+$nåværende_gruppe_id = filter_input(
     INPUT_GET,
     "gruppe_id",
     FILTER_VALIDATE_INT
@@ -32,66 +17,28 @@ $current_gruppe_id = filter_input(
 ?>
 
 <?php if ($vis_sidebar): ?>
-
     <aside class="sidebar" id="sidebar">
-
         <nav class="grupper-nav">
-
             <section>
-
                 <h2>Grupper du er medlem av</h2>
-
                 <?php if (empty($grupper)): ?>
-
                     <p>
                         Du er ikke medlem av noen grupper ennå.
                     </p>
-
                 <?php else: ?>
-
                     <ul class="grupper-liste">
-
                         <?php foreach ($grupper as $gruppe): ?>
-
                             <li>
-
-                                <?php
-
-                                $gruppe_url = url(
-                                    "/gruppe.php?gruppe_id=" .
-                                    $gruppe["gruppe_id"] .
-                                    "&section=oppgaver"
-                                );
-
-                                $current = (
-                                    (int) $current_gruppe_id ===
-                                    (int) $gruppe["gruppe_id"]
-                                );
-
-                                echo '<a href="' .
-                                    htmlspecialchars($gruppe_url) .
-                                    '"' .
-                                    ($current ? ' aria-current="page"' : '') .
-                                    '>';
-
-                                echo htmlspecialchars($gruppe["navn"]);
-
-                                echo '</a>';
-
-                                ?>
-
+                                <a
+                                    href="<?php echo url('/gruppe.php?gruppe_id=' . $gruppe['gruppe_id'] . '&section=oppgaver'); ?>"
+                                    <?php echo ($nåværende_gruppe_id == $gruppe['gruppe_id'] ? 'aria-current="page"' : ''); ?>>
+                                    <?php echo htmlspecialchars($gruppe['navn']); ?>
+                                </a>
                             </li>
-
                         <?php endforeach; ?>
-
                     </ul>
-
                 <?php endif; ?>
-
             </section>
-
         </nav>
-
     </aside>
-
 <?php endif; ?>
