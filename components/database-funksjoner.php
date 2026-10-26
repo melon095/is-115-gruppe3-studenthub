@@ -471,7 +471,7 @@ function database_opprett_fil(PDO $pdo, int $gruppe_id, ?int $oppgave_id, int $o
             :oppgave_id,
             :opprettet_av,
             :fil_navn,
-            :fil_størrelse,
+            :fil_storrelse,
             :fil_type,
             :fil_lokasjon
         )
@@ -482,7 +482,7 @@ function database_opprett_fil(PDO $pdo, int $gruppe_id, ?int $oppgave_id, int $o
         "oppgave_id" => $oppgave_id,
         "opprettet_av" => $opprettet_av,
         "fil_navn" => $fil_navn,
-        "fil_størrelse" => $fil_størrelse,
+        "fil_storrelse" => $fil_størrelse,
         "fil_type" => $fil_type,
         "fil_lokasjon" => $fil_lokasjon
     ]);
@@ -595,7 +595,7 @@ function database_opprett_filversjon(PDO $pdo, int $fil_id, int $opprettet_av, i
             :opprettet_av,
             :versjon_nummer,
             :fil_lokasjon,
-            :fil_størrelse
+            :fil_storrelse
         )
     ");
 
@@ -604,7 +604,7 @@ function database_opprett_filversjon(PDO $pdo, int $fil_id, int $opprettet_av, i
         "opprettet_av" => $opprettet_av,
         "versjon_nummer" => $versjon_nummer,
         "fil_lokasjon" => $fil_lokasjon,
-        "fil_størrelse" => $fil_størrelse
+        "fil_storrelse" => $fil_størrelse
     ]);
 
     return $pdo->lastInsertId();
