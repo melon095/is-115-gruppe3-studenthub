@@ -96,18 +96,45 @@ function database_opprett_gruppe(PDO $pdo, string $navn, string $beskrivelse, in
     return $pdo->lastInsertId();
 }
 
-function database_oppdater_gruppe_navn(PDO $pdo, int $gruppe_id, string $navn)
+function database_oppdater_gruppe(PDO $pdo, int $gruppe_id, string $navn, string $beskrivelse)
 {
     $stmt = $pdo->prepare("
         UPDATE grupper
-        SET navn = :navn
+        SET navn = :navn,
+            beskrivelse = :beskrivelse
         WHERE id = :gruppe_id
     ");
 
     $stmt->execute([
         "navn" => $navn,
+        "beskrivelse" => $beskrivelse,
         "gruppe_id" => $gruppe_id
     ]);
+}
+
+function database_hent_alle_grupper_med_medlemmer(PDO $pdo): array
+{
+    $stmt = $pdo->prepare("
+        SELECT
+            g.id AS gruppe_id,
+            g.navn,
+            g.beskrivelse,
+            g.opprettet_av,
+            s.id AS student_id,
+            s.fornavn,
+            s.etternavn,
+            s.avatar_link
+        FROM grupper g
+        LEFT JOIN gruppe_medlemmer gm
+            ON gm.gruppe_id = g.id
+        LEFT JOIN studenter s
+            ON s.id = gm.bruker_id
+        ORDER BY g.navn, s.fornavn, s.etternavn
+    ");
+
+    $stmt->execute();
+
+    return $stmt->fetchAll();
 }
 
 function database_hent_grupper_for_student(PDO $pdo, int $student_id): array
@@ -327,6 +354,24 @@ function database_opprett_oppgave(PDO $pdo, int $gruppe_id, string $tittel, stri
     return $pdo->lastInsertId();
 }
 
+function database_oppdater_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id, string $tittel, string $beskrivelse)
+{
+    $stmt = $pdo->prepare("
+        UPDATE oppgaver
+        SET tittel = :tittel,
+            beskrivelse = :beskrivelse
+        WHERE id = :oppgave_id
+        AND gruppe_id = :gruppe_id
+    ");
+
+    $stmt->execute([
+        "tittel" => $tittel,
+        "beskrivelse" => $beskrivelse,
+        "oppgave_id" => $oppgave_id,
+        "gruppe_id" => $gruppe_id
+    ]);
+}
+
 function database_fjern_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -339,23 +384,6 @@ function database_fjern_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
         "oppgave_id" => $oppgave_id,
         "gruppe_id" => $gruppe_id
     ]);
-}
-
-function database_tell_diskusjoner_for_oppgave(PDO $pdo, int $gruppe_id, int $oppgave_id): int
-{
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM diskusjoner
-        WHERE gruppe_id = :gruppe_id
-        AND oppgave_id = :oppgave_id
-    ");
-
-    $stmt->execute([
-        "gruppe_id" => $gruppe_id,
-        "oppgave_id" => $oppgave_id
-    ]);
-
-    return (int) $stmt->fetchColumn();
 }
 
 function database_hent_fil(PDO $pdo, int $fil_id, int $gruppe_id)
@@ -687,6 +715,22 @@ function database_opprett_diskusjon(PDO $pdo, int $gruppe_id, string $tittel, ?i
     return $pdo->lastInsertId();
 }
 
+function database_oppdater_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id, string $tittel)
+{
+    $stmt = $pdo->prepare("
+        UPDATE diskusjoner
+        SET tittel = :tittel
+        WHERE id = :diskusjon_id
+        AND gruppe_id = :gruppe_id
+    ");
+
+    $stmt->execute([
+        "tittel" => $tittel,
+        "diskusjon_id" => $diskusjon_id,
+        "gruppe_id" => $gruppe_id
+    ]);
+}
+
 function database_fjern_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -765,5 +809,128 @@ function database_fjern_diskusjon_innlegg(PDO $pdo, int $diskusjon_id, int $grup
         "innlegg_id" => $innlegg_id,
         "diskusjon_id" => $diskusjon_id,
         "gruppe_id" => $gruppe_id
+    ]);
+}
+
+function database_hent_innlegg(PDO $pdo, int $innlegg_id, int $diskusjon_id)
+{
+    $stmt = $pdo->prepare("
+        SELECT id
+        FROM diskusjon_innlegg
+        WHERE id = :innlegg_id
+        AND diskusjon_id = :diskusjon_id
+    ");
+
+    $stmt->execute([
+        "innlegg_id" => $innlegg_id,
+        "diskusjon_id" => $diskusjon_id
+    ]);
+
+    return $stmt->fetch();
+}
+
+function database_hent_reaksjonstyper(PDO $pdo): array
+{
+    $stmt = $pdo->prepare("
+        SELECT id, emoji, navn
+        FROM reaksjon_typer
+        ORDER BY id
+    ");
+
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function database_er_gyldig_reaksjonstype(PDO $pdo, int $reaksjon_type_id)
+{
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM reaksjon_typer
+        WHERE id = :reaksjon_type_id
+        LIMIT 1
+    ");
+
+    $stmt->execute([
+        "reaksjon_type_id" => $reaksjon_type_id
+    ]);
+
+    return $stmt->fetchColumn();
+}
+
+function database_hent_reaksjoner_for_diskusjon(PDO $pdo, int $diskusjon_id): array
+{
+    $stmt = $pdo->prepare("
+        SELECT
+            r.innlegg_id,
+            r.reaksjon_type_id,
+            r.bruker_id
+        FROM reaksjoner r
+        INNER JOIN diskusjon_innlegg i
+            ON i.id = r.innlegg_id
+        WHERE i.diskusjon_id = :diskusjon_id
+    ");
+
+    $stmt->execute([
+        "diskusjon_id" => $diskusjon_id
+    ]);
+
+    return $stmt->fetchAll();
+}
+
+function database_har_reagert(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
+{
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM reaksjoner
+        WHERE innlegg_id = :innlegg_id
+        AND reaksjon_type_id = :reaksjon_type_id
+        AND bruker_id = :bruker_id
+    ");
+
+    $stmt->execute([
+        "innlegg_id" => $innlegg_id,
+        "reaksjon_type_id" => $reaksjon_type_id,
+        "bruker_id" => $bruker_id
+    ]);
+
+    return $stmt->fetchColumn();
+}
+
+function database_legg_til_reaksjon(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
+{
+    $stmt = $pdo->prepare("
+        INSERT INTO reaksjoner (
+            innlegg_id,
+            reaksjon_type_id,
+            bruker_id
+        )
+        VALUES (
+            :innlegg_id,
+            :reaksjon_type_id,
+            :bruker_id
+        )
+    ");
+
+    $stmt->execute([
+        "innlegg_id" => $innlegg_id,
+        "reaksjon_type_id" => $reaksjon_type_id,
+        "bruker_id" => $bruker_id
+    ]);
+}
+
+function database_fjern_reaksjon(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
+{
+    $stmt = $pdo->prepare("
+        DELETE FROM reaksjoner
+        WHERE innlegg_id = :innlegg_id
+        AND reaksjon_type_id = :reaksjon_type_id
+        AND bruker_id = :bruker_id
+    ");
+
+    $stmt->execute([
+        "innlegg_id" => $innlegg_id,
+        "reaksjon_type_id" => $reaksjon_type_id,
+        "bruker_id" => $bruker_id
     ]);
 }

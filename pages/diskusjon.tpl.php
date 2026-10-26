@@ -1,17 +1,47 @@
 <section class="diskusjon-side">
     <div class="diskusjon-title-row">
-        <h1><?php echo htmlspecialchars($tilstand["diskusjon"]["tittel"]); ?></h1>
-        <p class="diskusjon-meta">
-            Tilhører
-            <?php echo htmlspecialchars($tilstand["gruppe"]["navn"]); ?>
-            <?php if ($tilstand["oppgave"] !== null): ?>
-                , knyttet til oppgaven
-                <strong><?php echo htmlspecialchars($tilstand["oppgave"]["tittel"]); ?></strong>
-            <?php elseif ($tilstand["fil"] !== null): ?>
-                , knyttet til filen
-                <strong><?php echo htmlspecialchars($tilstand["fil"]["fil_navn"]); ?></strong>
-            <?php endif; ?>
-        </p>
+        <div>
+            <h1><?php echo htmlspecialchars($tilstand["diskusjon"]["tittel"]); ?></h1>
+            <p class="diskusjon-meta">
+                Tilhører
+                <?php echo htmlspecialchars($tilstand["gruppe"]["navn"]); ?>
+                <?php if ($tilstand["oppgave"] !== null): ?>
+                    , knyttet til oppgaven
+                    <strong><?php echo htmlspecialchars($tilstand["oppgave"]["tittel"]); ?></strong>
+                <?php elseif ($tilstand["fil"] !== null): ?>
+                    , knyttet til filen
+                    <strong><?php echo htmlspecialchars($tilstand["fil"]["fil_navn"]); ?></strong>
+                <?php endif; ?>
+            </p>
+        </div>
+
+        <?php if ($tilstand["er_eier"]): ?>
+            <details class="diskusjon-rediger">
+                <summary class="button button-secondary">
+                    Rediger tittel
+                </summary>
+
+                <form method="post" action="" class="form">
+                    <?php echo csrf_felt(); ?>
+
+                    <div class="form-felt">
+                        <label for="diskusjon_tittel">
+                            Tittel
+                        </label>
+                        <input
+                            type="text"
+                            id="diskusjon_tittel"
+                            name="diskusjon_tittel"
+                            value="<?php echo htmlspecialchars($tilstand["diskusjon"]["tittel"]); ?>"
+                            required>
+                    </div>
+
+                    <button type="submit" class="button button-primary">
+                        Lagre
+                    </button>
+                </form>
+            </details>
+        <?php endif; ?>
     </div>
 
     <?php if (!empty($feil)): ?>
@@ -51,6 +81,30 @@
                             <p>
                                 <?php echo nl2br(htmlspecialchars($post["tekst"])); ?>
                             </p>
+
+                            <div class="diskusjon-reaksjoner">
+                                <?php foreach ($tilstand["reaksjonstyper"] as $type): ?>
+                                    <?php $type_id = (int) $type["id"]; ?>
+                                    <?php $data = $tilstand["reaksjoner"][(int) $post["innlegg_id"]][$type_id] ?? null; ?>
+                                    <?php $antall = $data["antall"] ?? 0; ?>
+                                    <?php $har_reagert = $data["har_reagert"] ?? false; ?>
+                                    <form method="post" action="" class="diskusjon-reaksjon-form">
+                                        <?php echo csrf_felt(); ?>
+                                        <input type="hidden" name="innlegg_id" value="<?php echo (int) $post["innlegg_id"]; ?>">
+                                        <input type="hidden" name="reaksjon_type_id" value="<?php echo $type_id; ?>">
+                                        <button
+                                            type="submit"
+                                            class="diskusjon-reaksjon-knapp<?php echo $har_reagert ? " er-valgt" : ""; ?>"
+                                            title="<?php echo htmlspecialchars($type["navn"]); ?>">
+                                            <?php echo htmlspecialchars($type["emoji"]); ?>
+                                            <?php if ($antall > 0): ?>
+                                                <span class="diskusjon-reaksjon-antall"><?php echo $antall; ?></span>
+                                            <?php endif; ?>
+                                        </button>
+                                    </form>
+                                <?php endforeach; ?>
+                            </div>
+
                             <?php if ($tilstand["er_eier"]): ?>
                                 <form method="post" action="" onsubmit="return confirm('Vil du slette dette innlegget?');">
                                     <?php echo csrf_felt(); ?>

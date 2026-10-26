@@ -174,3 +174,43 @@ CREATE TABLE diskusjon_innlegg (
         REFERENCES studenter(id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE reaksjon_typer (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    emoji VARCHAR(16) NOT NULL,
+    navn VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+INSERT INTO reaksjon_typer (emoji, navn) VALUES
+    ('👍', 'Liker'),
+    ('❤️', 'Elsker'),
+    ('😂', 'Morsomt'),
+    ('😮', 'Overrasket'),
+    ('😢', 'Trist');
+
+
+CREATE TABLE reaksjoner (
+    innlegg_id INT UNSIGNED NOT NULL,
+    reaksjon_type_id INT UNSIGNED NOT NULL,
+    bruker_id INT UNSIGNED NOT NULL,
+    opprettet_på DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (innlegg_id, reaksjon_type_id, bruker_id),
+
+    CONSTRAINT fk_reaksjoner_innlegg
+        FOREIGN KEY (innlegg_id)
+        REFERENCES diskusjon_innlegg(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reaksjoner_type
+        FOREIGN KEY (reaksjon_type_id)
+        REFERENCES reaksjon_typer(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reaksjoner_bruker
+        FOREIGN KEY (bruker_id)
+        REFERENCES studenter(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

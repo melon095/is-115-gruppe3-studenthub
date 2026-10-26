@@ -38,6 +38,21 @@ if (!$diskusjon) {
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["diskusjon_tittel"]) &&
+    $er_eier &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $ny_tittel = trim(filter_input(INPUT_POST, "diskusjon_tittel", FILTER_DEFAULT) ?? "");
+
+    if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
+        database_oppdater_diskusjon($pdo, $diskusjon_id, $gruppe_id, $ny_tittel);
+
+        omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+    }
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST["slett_innlegg"]) &&
     $er_eier &&
     csrf_gyldig($_POST["csrf_token"] ?? null)
@@ -46,6 +61,31 @@ if (
 
     if ($innlegg_id) {
         database_fjern_diskusjon_innlegg($pdo, $diskusjon_id, $gruppe_id, $innlegg_id);
+    }
+
+    omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["innlegg_id"]) &&
+    isset($_POST["reaksjon_type_id"]) &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $mal_innlegg_id = filter_input(INPUT_POST, "innlegg_id", FILTER_VALIDATE_INT);
+    $reaksjon_type_id = filter_input(INPUT_POST, "reaksjon_type_id", FILTER_VALIDATE_INT);
+
+    if (
+        $mal_innlegg_id &&
+        $reaksjon_type_id &&
+        database_hent_innlegg($pdo, $mal_innlegg_id, $diskusjon_id) &&
+        database_er_gyldig_reaksjonstype($pdo, $reaksjon_type_id)
+    ) {
+        if (database_har_reagert($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"])) {
+            database_fjern_reaksjon($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"]);
+        } else {
+            database_legg_til_reaksjon($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"]);
+        }
     }
 
     omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
@@ -85,6 +125,28 @@ if ($diskusjon["fil_id"] !== null) {
 
 $innlegg = database_hent_innlegger_i_diskusjon($pdo, $diskusjon_id);
 
+$reaksjonstyper = database_hent_reaksjonstyper($pdo);
+
+$reaksjoner = [];
+
+foreach (database_hent_reaksjoner_for_diskusjon($pdo, $diskusjon_id) as $rad) {
+    $rad_innlegg_id = (int) $rad["innlegg_id"];
+    $rad_type_id = (int) $rad["reaksjon_type_id"];
+
+    if (!isset($reaksjoner[$rad_innlegg_id][$rad_type_id])) {
+        $reaksjoner[$rad_innlegg_id][$rad_type_id] = [
+            "antall" => 0,
+            "har_reagert" => false
+        ];
+    }
+
+    $reaksjoner[$rad_innlegg_id][$rad_type_id]["antall"]++;
+
+    if ((int) $rad["bruker_id"] === (int) $_SESSION["student_id"]) {
+        $reaksjoner[$rad_innlegg_id][$rad_type_id]["har_reagert"] = true;
+    }
+}
+
 $side_tittel = $diskusjon["tittel"];
 
 $side_innhold = __DIR__ . "/../pages/diskusjon.tpl.php";
@@ -113,6 +175,8 @@ $tilstand = [
     "fil" => $fil,
     "diskusjon" => $diskusjon,
     "innlegg" => $innlegg,
+    "reaksjonstyper" => $reaksjonstyper,
+    "reaksjoner" => $reaksjoner,
     "er_eier" => $er_eier
 ];
 

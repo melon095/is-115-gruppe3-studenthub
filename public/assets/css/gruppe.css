@@ -217,33 +217,36 @@
     margin-bottom: 0;
 }
 
-.gruppe-diskusjon-filter {
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
+.gruppe-diskusjon-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
     background-color: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    color: var(--text-muted);
 }
 
-.gruppe-diskusjon-filter a {
-    margin-left: 0.5rem;
+.gruppe-diskusjon-admin:hover {
+    border-color: var(--primary-400);
+}
+
+.gruppe-diskusjon-fot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
 }
 
 .gruppe-diskusjon-kort {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    padding: 1rem;
-    background-color: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
     color: var(--text);
     text-decoration: none;
-}
-
-.gruppe-diskusjon-kort:hover {
-    border-color: var(--primary-400);
 }
 
 .gruppe-diskusjon-tittel {

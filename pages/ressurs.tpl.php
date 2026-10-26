@@ -8,18 +8,15 @@
                 <?php echo bytes_til_menneske((int) ($tilstand["ressurs"]["siste_versjon"]["fil_størrelse"] ?? $tilstand["ressurs"]["fil_størrelse"] ?? 0)); ?>
                 -
                 <?php if ($tilstand["oppgave"] !== null): ?>
+                    <?php $oppgave_url = url("/oppgave.php?gruppe_id=" . $tilstand["ressurs"]["gruppe_id"] . "&oppgave_id=" . $tilstand["oppgave"]["oppgave_id"]); ?>
                     Tilhører oppgaven
-                    <strong><?php echo htmlspecialchars($tilstand["oppgave"]["tittel"]); ?></strong>
+                    <a href="<?php echo htmlspecialchars($oppgave_url); ?>">
+                        <strong><?php echo htmlspecialchars($tilstand["oppgave"]["tittel"]); ?></strong>
+                    </a>
                 <?php else: ?>
                     Tilhører hele gruppen
                 <?php endif; ?>
             </p>
-        </div>
-        <div>
-            <?php $diskusjon_url = url("/gruppe.php?gruppe_id=" . $tilstand["ressurs"]["gruppe_id"] . "&section=diskusjoner&fil_id=" . $tilstand["ressurs"]["fil_id"]); ?>
-            <a class="button button-secondary" href="<?php echo htmlspecialchars($diskusjon_url); ?>">
-                Se diskusjoner om denne filen
-            </a>
         </div>
     </div>
 

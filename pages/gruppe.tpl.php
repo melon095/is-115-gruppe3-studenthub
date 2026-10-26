@@ -35,7 +35,7 @@ EOF;
             <?php if ($tilstand["er_eier"]): ?>
                 <details class="gruppe-endre-navn">
                     <summary class="button button-secondary">
-                        Endre navn
+                        Rediger gruppe
                     </summary>
 
                     <form method="post" action="" class="form">
@@ -43,7 +43,7 @@ EOF;
 
                         <div class="form-felt">
                             <label for="gruppe_navn">
-                                Nytt navn
+                                Navn
                             </label>
 
                             <input
@@ -52,6 +52,17 @@ EOF;
                                 name="gruppe_navn"
                                 value="<?php echo htmlspecialchars($tilstand["gruppe"]["navn"]); ?>"
                                 required>
+                        </div>
+
+                        <div class="form-felt">
+                            <label for="gruppe_beskrivelse">
+                                Beskrivelse (valgfritt)
+                            </label>
+
+                            <textarea
+                                id="gruppe_beskrivelse"
+                                name="gruppe_beskrivelse"
+                                rows="3"><?php echo htmlspecialchars($tilstand["gruppe"]["beskrivelse"] ?? ""); ?></textarea>
                         </div>
 
                         <button type="submit" class="button button-primary">
@@ -185,13 +196,14 @@ EOF;
                 <ul class="gruppe-medlemmer-liste">
                     <?php foreach ($tilstand["medlemmer"] as $medlem): ?>
                         <?php $medlem_er_eier = (int) $medlem["student_id"] === (int) $tilstand["gruppe"]["opprettet_av"]; ?>
+                        <?php $medlem_navn = $medlem["fornavn"] . " " . $medlem["etternavn"]; ?>
 
                         <li class="gruppe-medlem">
                             <?php if (!empty($medlem["avatar_link"])): ?>
-                                <img class="gruppe-medlem-img" src="<?php echo htmlspecialchars($medlem["avatar_link"]); ?>" alt="Brukerprofilbilde">
+                                <img class="gruppe-medlem-img" src="<?php echo htmlspecialchars($medlem["avatar_link"]); ?>" alt="<?php echo htmlspecialchars($medlem_navn); ?>">
                             <?php else: ?>
                                 <div class="gruppe-medlem-img gruppe-medlem-placeholder" aria-hidden="true">
-                                    <?php echo htmlspecialchars(mb_strtoupper(mb_substr($medlem["fornavn"], 0, 1))); ?>
+                                    <?php echo htmlspecialchars(forbokstav($medlem["fornavn"])); ?>
                                 </div>
                             <?php endif; ?>
 
@@ -247,6 +259,7 @@ EOF;
                                     <th>Filnavn</th>
                                     <th>Filtype</th>
                                     <th>Filstørrelse</th>
+                                    <th>Tilhørighet</th>
                                     <th>Handling</th>
                                 </tr>
                             </thead>
@@ -256,6 +269,17 @@ EOF;
                                         <td><?php echo htmlspecialchars($ressurs["fil_navn"]); ?></td>
                                         <td><?php echo htmlspecialchars($ressurs["fil_type"] ?? ""); ?></td>
                                         <td><?php echo bytes_til_menneske((int) $ressurs["fil_størrelse"]); ?></td>
+                                        <td>
+                                            <?php $tilhorende_oppgave = $tilstand["oppgave_etter_id"][(int) $ressurs["oppgave_id"]] ?? null; ?>
+                                            <?php if ($tilhorende_oppgave !== null): ?>
+                                                <?php $tilhorighet_url = url("/oppgave.php?gruppe_id=" . $tilstand["gruppe"]["id"] . "&oppgave_id=" . $tilhorende_oppgave["oppgave_id"]); ?>
+                                                <a href="<?php echo htmlspecialchars($tilhorighet_url); ?>">
+                                                    <?php echo htmlspecialchars($tilhorende_oppgave["tittel"]); ?>
+                                                </a>
+                                            <?php else: ?>
+                                                Hele gruppen
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <div class="gruppe-handlinger">
                                                 <?php $ressurs_url = url("/ressurs.php?ressurs_id=" . $ressurs["fil_id"]); ?>
@@ -315,7 +339,7 @@ EOF;
                     </div>
                 </div>
 
-                <?php if (empty($tilstand["diskusjoner_visning"])): ?>
+                <?php if (empty($tilstand["diskusjoner"])): ?>
                     <div class="gruppe-empty">
                         <h3>
                             Ingen diskusjoner ennå
@@ -323,18 +347,37 @@ EOF;
                     </div>
                 <?php else: ?>
                     <ul class="gruppe-diskusjon-liste">
-                        <?php foreach ($tilstand["diskusjoner_visning"] as $trad): ?>
-                            <li>
-                                <div class="gruppe-diskusjon-admin">
-                                    <?php $diskusjon_url = url("/diskusjon.php?gruppe_id=" . $tilstand["gruppe"]["id"] . "&diskusjon_id=" . $trad["id"]); ?>
-                                    <a class="gruppe-diskusjon-kort" href="<?php echo htmlspecialchars($diskusjon_url); ?>">
-                                        <span class="gruppe-diskusjon-tittel">
-                                            <?php echo htmlspecialchars($trad["tittel"]); ?>
+                        <?php foreach ($tilstand["diskusjoner"] as $trad): ?>
+                            <li class="gruppe-diskusjon-admin">
+                                <?php $diskusjon_url = url("/diskusjon.php?gruppe_id=" . $tilstand["gruppe"]["id"] . "&diskusjon_id=" . $trad["id"]); ?>
+                                <a class="gruppe-diskusjon-kort" href="<?php echo htmlspecialchars($diskusjon_url); ?>">
+                                    <span class="gruppe-diskusjon-tittel">
+                                        <?php echo htmlspecialchars($trad["tittel"]); ?>
+                                    </span>
+                                    <span class="gruppe-diskusjon-meta">
+                                        <?php echo (int) $trad["antall_innlegg"]; ?> innlegg
+                                    </span>
+                                </a>
+
+                                <div class="gruppe-diskusjon-fot">
+                                    <?php $tilhorende_oppgave = $trad["oppgave_id"] !== null ? ($tilstand["oppgave_etter_id"][(int) $trad["oppgave_id"]] ?? null) : null; ?>
+                                    <?php $tilhorende_fil = $trad["fil_id"] !== null ? ($tilstand["ressurs_etter_id"][(int) $trad["fil_id"]] ?? null) : null; ?>
+
+                                    <?php if ($tilhorende_oppgave !== null): ?>
+                                        <?php $knytning_url = url("/oppgave.php?gruppe_id=" . $tilstand["gruppe"]["id"] . "&oppgave_id=" . $tilhorende_oppgave["oppgave_id"]); ?>
+                                        <a class="gruppe-diskusjon-tag" href="<?php echo htmlspecialchars($knytning_url); ?>">
+                                            Oppgave: <?php echo htmlspecialchars($tilhorende_oppgave["tittel"]); ?>
+                                        </a>
+                                    <?php elseif ($tilhorende_fil !== null): ?>
+                                        <?php $knytning_url = url("/ressurs.php?ressurs_id=" . $tilhorende_fil["fil_id"]); ?>
+                                        <a class="gruppe-diskusjon-tag" href="<?php echo htmlspecialchars($knytning_url); ?>">
+                                            Fil: <?php echo htmlspecialchars($tilhorende_fil["fil_navn"]); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="gruppe-diskusjon-tag">
+                                            Hele gruppen
                                         </span>
-                                        <span class="gruppe-diskusjon-meta">
-                                            <?php echo (int) $trad["antall_innlegg"]; ?> innlegg
-                                        </span>
-                                    </a>
+                                    <?php endif; ?>
 
                                     <?php if ($tilstand["er_eier"]): ?>
                                         <form method="post" action="" onsubmit="return confirm('Vil du slette denne diskusjonen og alle innleggene?');">

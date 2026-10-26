@@ -26,6 +26,11 @@ function krever_autentikasjon(): void
     }
 }
 
+function forbokstav(string $navn): string
+{
+    return mb_strtoupper(mb_substr($navn, 0, 1));
+}
+
 function bytes_til_menneske(int $bytes): string
 {
     if ($bytes <= 0) {

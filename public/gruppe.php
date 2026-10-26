@@ -6,9 +6,7 @@ krever_autentikasjon();
 
 $get = filter_input_array(INPUT_GET, [
     "gruppe_id" => FILTER_VALIDATE_INT,
-    "section" => FILTER_SANITIZE_SPECIAL_CHARS,
-    "oppgave_id" => FILTER_VALIDATE_INT,
-    "fil_id" => FILTER_VALIDATE_INT
+    "section" => FILTER_SANITIZE_SPECIAL_CHARS
 ]);
 
 $gruppe_id = $get["gruppe_id"] ?? null;
@@ -100,11 +98,13 @@ if (
     csrf_gyldig($_POST["csrf_token"] ?? null)
 ) {
     $nytt_navn = trim(filter_input(INPUT_POST, "gruppe_navn", FILTER_DEFAULT) ?? "");
+    $ny_beskrivelse = trim(filter_input(INPUT_POST, "gruppe_beskrivelse", FILTER_DEFAULT) ?? "");
 
     if ($nytt_navn !== "" && mb_strlen($nytt_navn) <= 255) {
-        database_oppdater_gruppe_navn($pdo, $gruppe_id, $nytt_navn);
+        database_oppdater_gruppe($pdo, $gruppe_id, $nytt_navn, $ny_beskrivelse);
 
         $gruppe["navn"] = $nytt_navn;
+        $gruppe["beskrivelse"] = $ny_beskrivelse;
     }
 }
 
@@ -185,46 +185,19 @@ foreach ($ressurser as &$ressurs) {
 
 unset($ressurs);
 
+$oppgave_etter_id = [];
+
+foreach ($oppgaver as $oppgave) {
+    $oppgave_etter_id[(int) $oppgave["oppgave_id"]] = $oppgave;
+}
+
+$ressurs_etter_id = [];
+
+foreach ($ressurser as $ressurs) {
+    $ressurs_etter_id[(int) $ressurs["fil_id"]] = $ressurs;
+}
+
 $diskusjoner = database_hent_diskusjoner_for_gruppe($pdo, $gruppe_id);
-
-$filter_oppgave_id = $get["oppgave_id"] ?? null;
-$filter_fil_id = $get["fil_id"] ?? null;
-
-$filter_oppgave = null;
-
-if ($filter_oppgave_id) {
-    foreach ($oppgaver as $oppgave) {
-        if ((int) $oppgave["oppgave_id"] === (int) $filter_oppgave_id) {
-            $filter_oppgave = $oppgave;
-            break;
-        }
-    }
-}
-
-$filter_fil = null;
-
-if ($filter_fil_id) {
-    foreach ($ressurser as $ressurs) {
-        if ((int) $ressurs["fil_id"] === (int) $filter_fil_id) {
-            $filter_fil = $ressurs;
-            break;
-        }
-    }
-}
-
-$diskusjoner_visning = $diskusjoner;
-
-if ($filter_oppgave_id) {
-    $diskusjoner_visning = array_filter(
-        $diskusjoner,
-        fn($trad) => (int) $trad["oppgave_id"] === (int) $filter_oppgave_id
-    );
-} elseif ($filter_fil_id) {
-    $diskusjoner_visning = array_filter(
-        $diskusjoner,
-        fn($trad) => (int) $trad["fil_id"] === (int) $filter_fil_id
-    );
-}
 
 $side_tittel = "Gruppe";
 
@@ -250,9 +223,9 @@ $tilstand = [
     "oppgaver" => $oppgaver,
     "medlemmer" => $medlemmer,
     "ressurser" => $ressurser,
-    "diskusjoner_visning" => $diskusjoner_visning,
-    "filter_oppgave" => $filter_oppgave,
-    "filter_fil" => $filter_fil,
+    "diskusjoner" => $diskusjoner,
+    "oppgave_etter_id" => $oppgave_etter_id,
+    "ressurs_etter_id" => $ressurs_etter_id,
     "section" => $section,
     "er_eier" => $er_eier
 ];

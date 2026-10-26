@@ -5,11 +5,44 @@
             <p class="oppgave-meta">Opprettet <?php echo htmlspecialchars($tilstand["oppgave"]["opprettet_på"]); ?></p>
         </div>
 
-        <div>
-            <?php $diskusjoner_url = url("/gruppe.php?gruppe_id=" . $tilstand["gruppe"]["id"] . "&section=diskusjoner&oppgave_id=" . $tilstand["oppgave"]["oppgave_id"]); ?>
-            <a class="button button-secondary" href="<?php echo htmlspecialchars($diskusjoner_url); ?>">
-                <?php echo (int) $tilstand["antall_diskusjoner"]; ?> diskusjoner om denne oppgaven
-            </a>
+        <div class="oppgave-handlinger">
+            <?php if ($tilstand["er_eier"]): ?>
+                <details class="oppgave-rediger">
+                    <summary class="button button-secondary">
+                        Rediger oppgave
+                    </summary>
+
+                    <form method="post" action="" class="form">
+                        <?php echo csrf_felt(); ?>
+
+                        <div class="form-felt">
+                            <label for="oppgave_tittel">
+                                Tittel
+                            </label>
+                            <input
+                                type="text"
+                                id="oppgave_tittel"
+                                name="oppgave_tittel"
+                                value="<?php echo htmlspecialchars($tilstand["oppgave"]["tittel"]); ?>"
+                                required>
+                        </div>
+
+                        <div class="form-felt">
+                            <label for="oppgave_beskrivelse">
+                                Beskrivelse (valgfritt)
+                            </label>
+                            <textarea
+                                id="oppgave_beskrivelse"
+                                name="oppgave_beskrivelse"
+                                rows="3"><?php echo htmlspecialchars($tilstand["oppgave"]["beskrivelse"] ?? ""); ?></textarea>
+                        </div>
+
+                        <button type="submit" class="button button-primary">
+                            Lagre
+                        </button>
+                    </form>
+                </details>
+            <?php endif; ?>
         </div>
     </div>
 

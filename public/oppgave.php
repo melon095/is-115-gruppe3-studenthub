@@ -32,6 +32,24 @@ if (!$oppgave) {
     omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
 }
 
+$er_eier = (int) $gruppe["opprettet_av"] === (int) $_SESSION["student_id"];
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["oppgave_tittel"]) &&
+    $er_eier &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $ny_tittel = trim(filter_input(INPUT_POST, "oppgave_tittel", FILTER_DEFAULT) ?? "");
+    $ny_beskrivelse = trim(filter_input(INPUT_POST, "oppgave_beskrivelse", FILTER_DEFAULT) ?? "");
+
+    if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
+        database_oppdater_oppgave($pdo, $oppgave_id, $gruppe_id, $ny_tittel, $ny_beskrivelse);
+
+        omdiriger(url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id));
+    }
+}
+
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_FILES["ny_fil"]) &&
@@ -63,8 +81,6 @@ foreach ($ressurser as &$ressurs) {
 
 unset($ressurs);
 
-$antall_diskusjoner = database_tell_diskusjoner_for_oppgave($pdo, $gruppe_id, $oppgave_id);
-
 $side_tittel = "Oppgave";
 $side_innhold = __DIR__ . "/../pages/oppgave.tpl.php";
 $side_stiler = [
@@ -90,7 +106,7 @@ $tilstand = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
     "ressurser" => $ressurser,
-    "antall_diskusjoner" => $antall_diskusjoner,
+    "er_eier" => $er_eier,
 ];
 
 include __DIR__ . "/_layout.php";

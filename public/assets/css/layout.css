@@ -66,6 +66,7 @@ aside.sidebar {
         border-radius: var(--radius);
         text-decoration: none;
         color: var(--text);
+        background-color: color-mix(in srgb, var(--bg) 50%, var(--surface) 50%);
         transition: all 0.2s;
 
         &:hover {
