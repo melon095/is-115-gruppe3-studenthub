@@ -5,3 +5,5 @@ const DATABASE_NAVN = "studenthub";
 const DATABASE_BRUKER = "root";
 const DATABASE_PASSORD = "";
 
+const EPOST_AVSENDER = "invitasjon@studenthub.no";
+

@@ -7,27 +7,31 @@ $feil = [];
 $epost = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $input = filter_input_array(INPUT_POST, [
-        "epost" => FILTER_VALIDATE_EMAIL,
-        "passord" => FILTER_UNSAFE_RAW
-    ]);
-
-    $epost = $input["epost"] ?? false;
-    $passord = $input["passord"] ?? "";
-
-    if (!$epost || $passord === "") {
-        $feil[] = "Ugyldig e-post eller passord.";
+    if (!csrf_gyldig($_POST["csrf_token"] ?? null)) {
+        $feil[] = "Skjemaet er utløpt. Prøv igjen.";
     } else {
-        $student = database_hent_student_ved_epost($pdo, $epost);
+        $input = filter_input_array(INPUT_POST, [
+            "epost" => FILTER_VALIDATE_EMAIL,
+            "passord" => FILTER_UNSAFE_RAW
+        ]);
 
-        if ($student && password_verify($passord, $student["passord"])) {
-            session_regenerate_id(true);
-            $_SESSION["student_id"] = $student["id"];
+        $epost = $input["epost"] ?? false;
+        $passord = $input["passord"] ?? "";
 
-            omdiriger(url("/index.php"));
+        if (!$epost || $passord === "") {
+            $feil[] = "Ugyldig e-post eller passord.";
+        } else {
+            $student = database_hent_student_ved_epost($pdo, $epost);
+
+            if ($student && password_verify($passord, $student["passord"])) {
+                session_regenerate_id(true);
+                $_SESSION["student_id"] = $student["id"];
+
+                omdiriger(url("/index.php"));
+            }
+
+            $feil[] = "Feil e-post eller passord.";
         }
-
-        $feil[] = "Feil e-post eller passord.";
     }
 }
 

@@ -9,7 +9,9 @@ $fornavn = "";
 $etternavn = "";
 $epost = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?? null)) {
+    $feil[] = "Skjemaet er utløpt. Prøv igjen.";
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $input = filter_input_array(INPUT_POST, [
         "fornavn" => FILTER_DEFAULT,
         "etternavn" => FILTER_DEFAULT,

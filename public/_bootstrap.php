@@ -6,6 +6,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../components/database-funksjoner.php';
 require_once __DIR__ . '/../components/csrf.php';
 require_once __DIR__ . '/../components/hjelpefunksjoner.php';
+require_once __DIR__ . '/../components/epost.php';
 
 $database_host = DATABASE_HOST;
 $database_navn = DATABASE_NAVN;

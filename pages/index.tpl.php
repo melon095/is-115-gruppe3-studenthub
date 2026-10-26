@@ -33,7 +33,7 @@
                         <details class="gruppe-kort-medlemmer">
                             <summary class="gruppe-avatar-stack">
                                 <?php foreach ($synlige_medlemmer as $medlem): ?>
-                                    <?php $medlem_navn = $medlem["fornavn"] . " " . $medlem["etternavn"]; ?>
+                                    <?php $medlem_navn = fullt_navn($medlem); ?>
                                     <?php if (!empty($medlem["avatar_link"])): ?>
                                         <img
                                             class="gruppe-avatar"
@@ -56,7 +56,7 @@
 
                             <ul class="gruppe-medlemsliste">
                                 <?php foreach ($gruppe["medlemmer"] as $medlem): ?>
-                                    <li><?php echo htmlspecialchars($medlem["fornavn"] . " " . $medlem["etternavn"]); ?></li>
+                                    <li><?php echo htmlspecialchars(fullt_navn($medlem)); ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         </details>

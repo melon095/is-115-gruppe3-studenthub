@@ -117,11 +117,19 @@
     overflow-wrap: anywhere;
 }
 
+.diskusjon-innlegg-fot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
 .diskusjon-reaksjoner {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-top: 0.75rem;
 }
 
 .diskusjon-reaksjon-form {

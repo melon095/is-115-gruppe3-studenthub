@@ -31,6 +31,11 @@ function forbokstav(string $navn): string
     return mb_strtoupper(mb_substr($navn, 0, 1));
 }
 
+function fullt_navn(array $person): string
+{
+    return $person["fornavn"] . " " . $person["etternavn"];
+}
+
 function bytes_til_menneske(int $bytes): string
 {
     if ($bytes <= 0) {

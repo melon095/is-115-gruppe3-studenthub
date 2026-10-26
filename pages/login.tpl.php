@@ -11,6 +11,8 @@
         <?php endif; ?>
 
         <form method="post" action="" class="form">
+            <?php echo csrf_felt(); ?>
+
             <div class="form-felt">
                 <label for="epost">E-post</label>
                 <input

@@ -196,7 +196,7 @@ EOF;
                 <ul class="gruppe-medlemmer-liste">
                     <?php foreach ($tilstand["medlemmer"] as $medlem): ?>
                         <?php $medlem_er_eier = (int) $medlem["student_id"] === (int) $tilstand["gruppe"]["opprettet_av"]; ?>
-                        <?php $medlem_navn = $medlem["fornavn"] . " " . $medlem["etternavn"]; ?>
+                        <?php $medlem_navn = fullt_navn($medlem); ?>
 
                         <li class="gruppe-medlem">
                             <?php if (!empty($medlem["avatar_link"])): ?>

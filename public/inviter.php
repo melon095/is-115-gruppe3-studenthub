@@ -22,20 +22,47 @@ if ((int) $gruppe["opprettet_av"] !== (int) $_SESSION["student_id"]) {
 
 $feil = [];
 $generert_lenke = null;
+$sendt_til = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!csrf_gyldig($_POST["csrf_token"] ?? null)) {
         $feil[] = "Skjemaet er utløpt. Prøv igjen.";
     } else {
-        $kode = bin2hex(random_bytes(16));
-
-        database_opprett_invitasjon($pdo, $gruppe_id, $kode, $_SESSION["student_id"]);
+        $handling = filter_input(INPUT_POST, "handling", FILTER_DEFAULT) ?? "";
 
         $skjema = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
 
-        $generert_lenke = $skjema . "://" . $_SERVER["HTTP_HOST"] . url(
-            "/inviter-til-gruppe.php?gruppe_id=" . $gruppe_id . "&kode=" . urlencode($kode)
-        );
+        if ($handling === "send_epost") {
+            $epost = filter_input(INPUT_POST, "epost", FILTER_VALIDATE_EMAIL);
+
+            if (!$epost) {
+                $feil[] = "Skriv inn en gyldig e-postadresse.";
+            } else {
+                $kode = bin2hex(random_bytes(16));
+
+                database_opprett_invitasjon($pdo, $gruppe_id, $kode, $_SESSION["student_id"]);
+
+                $lenke = $skjema . "://" . $_SERVER["HTTP_HOST"] . url(
+                    "/inviter-til-gruppe.php?gruppe_id=" . $gruppe_id . "&kode=" . urlencode($kode)
+                );
+
+                $inviterer = database_hent_student($pdo, $_SESSION["student_id"]);
+
+                if (send_invitasjon_epost($epost, $gruppe["navn"], $lenke, fullt_navn($inviterer))) {
+                    $sendt_til = $epost;
+                } else {
+                    $feil[] = "Kunne ikke sende e-posten. Del lenken manuelt i stedet.";
+                }
+            }
+        } elseif ($handling === "generer_lenke") {
+            $kode = bin2hex(random_bytes(16));
+
+            database_opprett_invitasjon($pdo, $gruppe_id, $kode, $_SESSION["student_id"]);
+
+            $generert_lenke = $skjema . "://" . $_SERVER["HTTP_HOST"] . url(
+                "/inviter-til-gruppe.php?gruppe_id=" . $gruppe_id . "&kode=" . urlencode($kode)
+            );
+        }
     }
 }
 
@@ -66,7 +93,8 @@ $brødsmulesti = [
 ];
 
 $tilstand = [
-    "gruppe" => $gruppe
+    "gruppe" => $gruppe,
+    "sendt_til" => $sendt_til
 ];
 
 include __DIR__ . "/_layout.php";
