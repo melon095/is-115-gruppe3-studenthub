@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
 krever_autentikasjon();
 
@@ -230,4 +230,4 @@ $tilstand = [
     "er_eier" => $er_eier
 ];
 
-include __DIR__ . "/_layout.php";
+include __DIR__ . "/layout.inc.php";

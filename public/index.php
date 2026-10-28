@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
 krever_autentikasjon();
 
@@ -39,11 +39,11 @@ foreach ($grupper_rader as $rad) {
 $alle_grupper = array_values($alle_grupper);
 
 $side_tittel = "Hovedside";
-$side_innhold = __DIR__."/../pages/index.tpl.php";
+$side_innhold = __DIR__ . "/../pages/index.tpl.php";
 $side_stiler = [url("/assets/css/index.css")];
 
 $tilstand = [
     "alle_grupper" => $alle_grupper
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/layout.inc.php";

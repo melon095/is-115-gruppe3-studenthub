@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
 $_SESSION = [];
 

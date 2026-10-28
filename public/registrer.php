@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
 $offentlig_side = true;
 
@@ -74,4 +74,4 @@ $side_tittel = "Registrer";
 $side_innhold = __DIR__ . "/../pages/registrer.tpl.php";
 $side_stiler = [url("/assets/css/auth.css")];
 
-include __DIR__ . "/_layout.php";
+include __DIR__ . "/layout.inc.php";
