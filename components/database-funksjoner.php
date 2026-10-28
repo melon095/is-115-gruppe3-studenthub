@@ -57,6 +57,20 @@ function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, 
     return $pdo->lastInsertId();
 }
 
+function database_oppdater_avatar(PDO $pdo, int $student_id, string $avatar_link)
+{
+    $stmt = $pdo->prepare("
+        UPDATE studenter
+        SET avatar_link = :avatar_link
+        WHERE id = :student_id
+    ");
+
+    $stmt->execute([
+        "avatar_link" => $avatar_link,
+        "student_id" => $student_id
+    ]);
+}
+
 function database_hent_gruppe(PDO $pdo, int $id)
 {
     $stmt = $pdo->prepare("
@@ -753,8 +767,9 @@ function database_hent_innlegger_i_diskusjon(PDO $pdo, int $diskusjon_id): array
             i.opprettet_av,
             i.innhold AS tekst,
             i.opprettet_på,
-            CONCAT(s.fornavn, ' ', s.etternavn) AS forfatter_navn,
-            s.avatar_link AS forfatter_avatar
+            s.fornavn,
+            s.etternavn,
+            s.avatar_link
         FROM diskusjon_innlegg i
         INNER JOIN studenter s
             ON s.id = i.opprettet_av

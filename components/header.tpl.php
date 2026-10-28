@@ -37,6 +37,12 @@ if (isset($_SESSION["student_id"])) {
             </li>
 
             <li>
+                <a class="navbar-avatar-link" href="<?php echo htmlspecialchars(url('/profil.php')); ?>">
+                    <?php echo profilbilde_html($student, "navbar-avatar", "navbar-avatar-placeholder"); ?>
+                </a>
+            </li>
+
+            <li>
                 <a href="<?php echo htmlspecialchars(url('/logout.php')); ?>">
                     Logg ut
                 </a>

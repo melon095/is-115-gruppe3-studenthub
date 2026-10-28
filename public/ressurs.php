@@ -35,23 +35,13 @@ if ($versjon_id) {
     $nedlasting = database_hent_filversjon($pdo, $versjon_id, $ressurs_id);
 
     if ($nedlasting && is_file($nedlasting["fil_lokasjon_hdd"])) {
-        header("Content-Type: application/octet-stream");
-        header('Content-Disposition: attachment; filename="' . basename($ressurs["fil_navn"]) . '"');
-        header("Content-Length: " . filesize($nedlasting["fil_lokasjon_hdd"]));
-
-        readfile($nedlasting["fil_lokasjon_hdd"]);
-        exit();
+        send_filnedlasting($nedlasting["fil_lokasjon_hdd"], $ressurs["fil_navn"]);
     }
 }
 
 if ($last_ned === "original") {
     if (!empty($ressurs["fil_lokasjon_hdd"]) && is_file($ressurs["fil_lokasjon_hdd"])) {
-        header("Content-Type: application/octet-stream");
-        header('Content-Disposition: attachment; filename="' . basename($ressurs["fil_navn"]) . '"');
-        header("Content-Length: " . filesize($ressurs["fil_lokasjon_hdd"]));
-
-        readfile($ressurs["fil_lokasjon_hdd"]);
-        exit();
+        send_filnedlasting($ressurs["fil_lokasjon_hdd"], $ressurs["fil_navn"]);
     }
 }
 

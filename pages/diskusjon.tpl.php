@@ -66,13 +66,11 @@
             <?php foreach ($tilstand["innlegg"] as $post): ?>
                 <li>
                     <article class="diskusjon-innlegg">
-                        <?php if (!empty($post["forfatter_avatar"])): ?>
-                            <img class="diskusjon-innlegg-avatar" src="<?php echo htmlspecialchars($post['forfatter_avatar']); ?>" alt="Profilbilde" />
-                        <?php endif; ?>
+                        <?php echo profilbilde_html($post, "diskusjon-innlegg-avatar", "diskusjon-innlegg-avatar-plassholder"); ?>
                         <div class="diskusjon-innlegg-innhold">
                             <header class="diskusjon-innlegg-header">
                                 <span class="diskusjon-innlegg-forfatter">
-                                    <?php echo htmlspecialchars($post["forfatter_navn"]); ?>
+                                    <?php echo htmlspecialchars(fullt_navn($post)); ?>
                                 </span>
                                 <time class="diskusjon-innlegg-tid">
                                     <?php echo htmlspecialchars($post["opprettet_på"]); ?>

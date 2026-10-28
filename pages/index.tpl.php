@@ -33,18 +33,7 @@
                         <details class="gruppe-kort-medlemmer">
                             <summary class="gruppe-avatar-stack">
                                 <?php foreach ($synlige_medlemmer as $medlem): ?>
-                                    <?php $medlem_navn = fullt_navn($medlem); ?>
-                                    <?php if (!empty($medlem["avatar_link"])): ?>
-                                        <img
-                                            class="gruppe-avatar"
-                                            src="<?php echo htmlspecialchars($medlem["avatar_link"]); ?>"
-                                            alt="<?php echo htmlspecialchars($medlem_navn); ?>"
-                                            title="<?php echo htmlspecialchars($medlem_navn); ?>">
-                                    <?php else: ?>
-                                        <span class="gruppe-avatar gruppe-avatar-placeholder" title="<?php echo htmlspecialchars($medlem_navn); ?>">
-                                            <?php echo htmlspecialchars(forbokstav($medlem["fornavn"])); ?>
-                                        </span>
-                                    <?php endif; ?>
+                                    <?php echo profilbilde_html($medlem, "gruppe-avatar", "gruppe-avatar-placeholder"); ?>
                                 <?php endforeach; ?>
 
                                 <?php if ($resterende > 0): ?>

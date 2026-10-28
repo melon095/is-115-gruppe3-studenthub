@@ -89,6 +89,15 @@
     object-fit: cover;
 }
 
+.diskusjon-innlegg-avatar-plassholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    font-weight: 600;
+}
+
 .diskusjon-innlegg-innhold {
     flex: 1;
     min-width: 0;

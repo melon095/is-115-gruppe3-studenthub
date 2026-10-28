@@ -196,16 +196,9 @@ EOF;
                 <ul class="gruppe-medlemmer-liste">
                     <?php foreach ($tilstand["medlemmer"] as $medlem): ?>
                         <?php $medlem_er_eier = (int) $medlem["student_id"] === (int) $tilstand["gruppe"]["opprettet_av"]; ?>
-                        <?php $medlem_navn = fullt_navn($medlem); ?>
 
                         <li class="gruppe-medlem">
-                            <?php if (!empty($medlem["avatar_link"])): ?>
-                                <img class="gruppe-medlem-img" src="<?php echo htmlspecialchars($medlem["avatar_link"]); ?>" alt="<?php echo htmlspecialchars($medlem_navn); ?>">
-                            <?php else: ?>
-                                <div class="gruppe-medlem-img gruppe-medlem-placeholder" aria-hidden="true">
-                                    <?php echo htmlspecialchars(forbokstav($medlem["fornavn"])); ?>
-                                </div>
-                            <?php endif; ?>
+                            <?php echo profilbilde_html($medlem, "gruppe-medlem-img", "gruppe-medlem-placeholder"); ?>
 
                             <span class="gruppe-medlem-navn">
                                 <?php echo htmlspecialchars($medlem["fornavn"]); ?>
