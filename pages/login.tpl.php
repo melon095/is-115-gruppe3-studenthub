@@ -1,23 +1,27 @@
-<?php
-
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // TODO: Database integrasjon.
-    // TODO: Validere bruker input.
-    $_SESSION['student_id'] = 1;
-    header('Location: ' . url('/index.php'));
-    exit();
-}
-
-?>
-
 <div class="auth-wrapper">
     <section class="auth-card" aria-labelledby="login-heading">
         <h1 id="login-heading">Logg inn</h1>
 
+        <?php if (!empty($feil)): ?>
+            <ul class="form-feil" role="alert">
+                <?php foreach ($feil as $melding): ?>
+                    <li><?php echo htmlspecialchars($melding); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
         <form method="post" action="" class="form">
+            <?php echo csrf_felt(); ?>
+
             <div class="form-felt">
                 <label for="epost">E-post</label>
-                <input type="email" id="epost" name="epost" autocomplete="email" required>
+                <input
+                    type="email"
+                    id="epost"
+                    name="epost"
+                    autocomplete="email"
+                    value="<?php echo htmlspecialchars($epost ?? ""); ?>"
+                    required>
             </div>
 
             <div class="form-felt">
@@ -25,11 +29,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" id="passord" name="passord" autocomplete="current-password" required>
             </div>
 
-            <button type="submit" class="button button-primary button-lg">Logg inn</button>
+            <button type="submit" class="button button-primary button-lg">
+                Logg inn
+            </button>
         </form>
 
         <p class="auth-lenke">
-            Ikke registrert? <a href="<?php echo url("/registrer.php"); ?>">Registrer deg</a>
+            Ikke registrert?
+            <a href="<?php echo htmlspecialchars(url("/registrer.php")); ?>">
+                Registrer deg
+            </a>
         </p>
     </section>
 </div>

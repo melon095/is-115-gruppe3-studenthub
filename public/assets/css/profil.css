@@ -1,0 +1,41 @@
+.profil-side {
+    max-width: 480px;
+}
+
+.profil-suksess {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+}
+
+.profil-kort {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.profil-bilde,
+.profil-bilde-plassholder {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profil-bilde-plassholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.profil-kort .form {
+    width: 100%;
+}

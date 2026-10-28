@@ -1,124 +1,183 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
-$gruppe_id = $_GET["gruppe_id"] ?? null;
-$oppgave_id = $_GET["oppgave_id"] ?? null;
-$fil_id = $_GET["fil_id"] ?? null;
-$diskusjon_id = $_GET["diskusjon_id"] ?? "1";
+krever_autentikasjon();
 
-if ($gruppe_id == null) {
-    header("Location: " . url("/index.php"));
-    exit();
+$feil = [];
+
+$get = filter_input_array(INPUT_GET, [
+    "gruppe_id" => FILTER_VALIDATE_INT,
+    "diskusjon_id" => FILTER_VALIDATE_INT
+]);
+
+$gruppe_id = $get["gruppe_id"] ?? null;
+$diskusjon_id = $get["diskusjon_id"] ?? null;
+
+if (!$gruppe_id || !$diskusjon_id) {
+    omdiriger(url("/index.php"));
 }
 
-$gruppe = [
-    "id" => $gruppe_id,
-    "navn" => "Gruppe " . $gruppe_id,
-];
+$gruppe = database_hent_gruppe($pdo, $gruppe_id);
+
+if (!$gruppe) {
+    omdiriger(url("/index.php"));
+}
+
+if (!database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $_SESSION['student_id'])) {
+    omdiriger(url("/index.php"));
+}
+
+$er_eier = (int) $gruppe["opprettet_av"] === (int) $_SESSION["student_id"];
+
+$diskusjon = database_hent_diskusjon($pdo, $gruppe_id, $diskusjon_id);
+
+if (!$diskusjon) {
+    omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=diskusjoner"));
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["diskusjon_tittel"]) &&
+    $er_eier &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $ny_tittel = trim(filter_input(INPUT_POST, "diskusjon_tittel", FILTER_DEFAULT) ?? "");
+
+    if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
+        database_oppdater_diskusjon($pdo, $diskusjon_id, $gruppe_id, $ny_tittel);
+
+        omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+    }
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["slett_innlegg"]) &&
+    $er_eier &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $innlegg_id = filter_input(INPUT_POST, "innlegg_id", FILTER_VALIDATE_INT);
+
+    if ($innlegg_id) {
+        database_fjern_diskusjon_innlegg($pdo, $diskusjon_id, $gruppe_id, $innlegg_id);
+    }
+
+    omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["innlegg_id"]) &&
+    isset($_POST["reaksjon_type_id"]) &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $mal_innlegg_id = filter_input(INPUT_POST, "innlegg_id", FILTER_VALIDATE_INT);
+    $reaksjon_type_id = filter_input(INPUT_POST, "reaksjon_type_id", FILTER_VALIDATE_INT);
+
+    if (
+        $mal_innlegg_id &&
+        $reaksjon_type_id &&
+        database_hent_innlegg($pdo, $mal_innlegg_id, $diskusjon_id) &&
+        database_er_gyldig_reaksjonstype($pdo, $reaksjon_type_id)
+    ) {
+        if (database_har_reagert($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"])) {
+            database_fjern_reaksjon($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"]);
+        } else {
+            database_legg_til_reaksjon($pdo, $mal_innlegg_id, $reaksjon_type_id, $_SESSION["student_id"]);
+        }
+    }
+
+    omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["tekst"]) &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $tekst = trim(filter_input(INPUT_POST, "tekst", FILTER_DEFAULT) ?? "");
+
+    if ($tekst === "") {
+        $feil[] = "Innlegget kan ikke være tomt.";
+    } elseif (mb_strlen($tekst) > 5000) {
+        $feil[] = "Innlegget kan ikke være lengre enn 5000 tegn.";
+    }
+
+    if (empty($feil)) {
+        database_opprett_innlegg($pdo, $diskusjon_id, $_SESSION['student_id'], $tekst);
+
+        omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
+    }
+}
 
 $oppgave = null;
-if ($oppgave_id !== null) {
-    $oppgave = [
-        "oppgave_id" => $oppgave_id,
-        "gruppe_id" => $gruppe_id,
-        "tittel" => "Oppgave " . $oppgave_id,
-    ];
+
+if ($diskusjon["oppgave_id"] !== null) {
+    $oppgave = database_hent_oppgave($pdo, $diskusjon['oppgave_id'], $gruppe_id);
 }
 
 $fil = null;
-if ($fil_id !== null) {
-    $fil = [
-        "fil_id" => $fil_id,
-        "gruppe_id" => $gruppe_id,
-        "fil_navn" => "Fil " . $fil_id,
-    ];
+
+if ($diskusjon["fil_id"] !== null) {
+    $fil = database_hent_fil($pdo, $diskusjon['fil_id'], $gruppe_id);
 }
 
-$diskusjon = [
-    "id" => $diskusjon_id,
-    "tittel" => "Diskusjonstråd " . $diskusjon_id,
-];
+$innlegg = database_hent_innlegger_i_diskusjon($pdo, $diskusjon_id);
 
-$mock_forfattere = [
-    ["navn" => "Kai Eide", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-    ["navn" => "Mia Solberg", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-    ["navn" => "Noah Haugen", "avatar_link" => "http://dummyimage.com/64x64.png/dddddd/000000"],
-];
+$reaksjonstyper = database_hent_reaksjonstyper($pdo);
 
-$mock_tekster = [
-    "Har begynt på denne nå, legger ut fremgang her etter hvert.",
-    "Bra jobba! Jeg kan ta en titt på det du har lastet opp i morgen.",
-    "Husk å sjekke fristen, den er nærmere enn vi tror.",
-];
+$reaksjoner = [];
 
-$reaksjon_typer = [
-    1 => ["emoji" => "👍", "reaksjon_navn" => "Liker"],
-    2 => ["emoji" => "❤️", "reaksjon_navn" => "Elsker"],
-    3 => ["emoji" => "😂", "reaksjon_navn" => "Morsomt"],
-    4 => ["emoji" => "🎉", "reaksjon_navn" => "Feirer"],
-    5 => ["emoji" => "😮", "reaksjon_navn" => "Overrasket"],
-];
+foreach (database_hent_reaksjoner_for_diskusjon($pdo, $diskusjon_id) as $rad) {
+    $rad_innlegg_id = (int) $rad["innlegg_id"];
+    $rad_type_id = (int) $rad["reaksjon_type_id"];
 
-$mock_reaksjoner_per_innlegg = [
-    [1 => 3, 3 => 1],
-    [2 => 2],
-    [],
-];
-
-$innlegg = [];
-foreach ($mock_tekster as $i => $tekst) {
-    $forfatter = $mock_forfattere[$i % count($mock_forfattere)];
-
-    $reaksjoner = [];
-    foreach ($mock_reaksjoner_per_innlegg[$i] as $reaksjon_type_id => $antall) {
-        $reaksjoner[] = [
-            "reaksjon_type_id" => $reaksjon_type_id,
-            "emoji" => $reaksjon_typer[$reaksjon_type_id]["emoji"],
-            "navn" => $reaksjon_typer[$reaksjon_type_id]["reaksjon_navn"],
-            "antall" => $antall,
+    if (!isset($reaksjoner[$rad_innlegg_id][$rad_type_id])) {
+        $reaksjoner[$rad_innlegg_id][$rad_type_id] = [
+            "antall" => 0,
+            "har_reagert" => false
         ];
     }
 
-    $innlegg[] = [
-        "innlegg_id" => $i + 1,
-        "forfatter_navn" => $forfatter["navn"],
-        "forfatter_avatar" => $forfatter["avatar_link"],
-        "tekst" => $tekst,
-        "opprettet_på" => date("Y-m-d H:i", strtotime("-" . ((count($mock_tekster) - $i) * 6) . " hours")),
-        "reaksjoner" => $reaksjoner,
-    ];
+    $reaksjoner[$rad_innlegg_id][$rad_type_id]["antall"]++;
+
+    if ((int) $rad["bruker_id"] === (int) $_SESSION["student_id"]) {
+        $reaksjoner[$rad_innlegg_id][$rad_type_id]["har_reagert"] = true;
+    }
 }
 
-$page_title = "Diskusjon";
-$page_content = __DIR__."/../pages/diskusjon.tpl.php";
-$page_styles = [url("/assets/css/diskusjon.css")];
+$side_tittel = $diskusjon["tittel"];
 
-$breadcrumbs = [
-    ["label" => "Grupper", "href" => url("/index.php")],
-    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe_id)],
+$side_innhold = __DIR__ . "/../pages/diskusjon.tpl.php";
+
+$side_stiler = [
+    url("/assets/css/diskusjon.css")
 ];
 
-if ($oppgave !== null) {
-    $breadcrumbs[] = [
-        "label" => $oppgave["tittel"],
-        "href" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave["oppgave_id"]),
-    ];
-} elseif ($fil !== null) {
-    $breadcrumbs[] = [
-        "label" => $fil["fil_navn"],
-        "href" => url("/ressurs.php?ressurs_id=" . $fil["fil_id"]),
-    ];
-}
+$brødsmulesti = [
+    [
+        "tekst" => "Grupper",
+        "lenke" => url("/index.php")
+    ],
+    [
+        "tekst" => $gruppe["navn"],
+        "lenke" => url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=diskusjoner")
+    ],
+    [
+        "tekst" => $diskusjon["tittel"]
+    ]
+];
 
-$breadcrumbs[] = ["label" => $diskusjon["tittel"]];
-
-$state = [
+$tilstand = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
     "fil" => $fil,
     "diskusjon" => $diskusjon,
     "innlegg" => $innlegg,
+    "reaksjonstyper" => $reaksjonstyper,
+    "reaksjoner" => $reaksjoner,
+    "er_eier" => $er_eier
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/layout.inc.php";

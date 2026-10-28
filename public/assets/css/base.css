@@ -184,6 +184,26 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar-avatar-link {
     display: flex;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--border);
+}
+
+.navbar-avatar-link:hover,
+.navbar-avatar-link:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-500);
+}
+
+.navbar-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 @media (max-width: 768px) {
@@ -196,7 +216,8 @@ h1, h2, h3, h4, h5, h6 {
         gap: 0.625rem;
     }
 
-    .navbar img {
+    .navbar img,
+    .navbar-avatar-placeholder {
         width: 28px;
         height: 28px;
     }

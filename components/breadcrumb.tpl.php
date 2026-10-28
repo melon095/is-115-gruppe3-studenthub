@@ -1,19 +1,25 @@
 <?php
 
-$breadcrumbs = $breadcrumbs ?? [];
+/**
+ * Brødsmulestien som vises øverst på siden, med en lenke tilbake til forsiden.
+ *
+ * @uses array $brødsmulesti Liste med steg, hvert med "tekst" og valgfri "lenke". Siste steg vises alltid uten lenke.
+ */
+
+$brødsmulesti = $brødsmulesti ?? [];
 
 ?>
 
 <nav aria-label="brødsmulesti" class="breadcrumb">
     <ul>
         <li><a href="<?php echo url("/index.php"); ?>">Studenthub</a></li>
-        <?php foreach ($breadcrumbs as $i => $crumb): ?>
-            <?php $er_siste = $i === array_key_last($breadcrumbs); ?>
+        <?php foreach ($brødsmulesti as $i => $crumb): ?>
+            <?php $er_siste = $i === array_key_last($brødsmulesti); ?>
             <li>
-                <?php if (!$er_siste && !empty($crumb["href"])): ?>
-                    <a href="<?php echo htmlspecialchars($crumb["href"]); ?>"><?php echo htmlspecialchars($crumb["label"]); ?></a>
+                <?php if (!$er_siste && !empty($crumb["lenke"])): ?>
+                    <a href="<?php echo htmlspecialchars($crumb["lenke"]); ?>"><?php echo htmlspecialchars($crumb["tekst"]); ?></a>
                 <?php else: ?>
-                    <span aria-current="page"><?php echo htmlspecialchars($crumb["label"]); ?></span>
+                    <span aria-current="page"><?php echo htmlspecialchars($crumb["tekst"]); ?></span>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>

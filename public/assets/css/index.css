@@ -4,8 +4,120 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
+    margin-bottom: 1.75rem;
 
     h1 {
         margin: 0;
     }
+}
+
+.alle-grupper-info {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.alle-grupper-liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+}
+
+.gruppe-kort {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
+}
+
+.gruppe-kort-badge {
+    padding: 0.15rem 0.5rem;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+}
+
+.gruppe-kort h3 {
+    margin: 0;
+}
+
+.gruppe-kort-beskrivelse {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.gruppe-kort-medlemmer {
+    position: relative;
+    margin-top: 0.25rem;
+}
+
+.gruppe-avatar-stack {
+    display: flex;
+    cursor: pointer;
+    list-style: none;
+}
+
+.gruppe-avatar-stack::-webkit-details-marker {
+    display: none;
+}
+
+.gruppe-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    object-fit: cover;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.gruppe-avatar:first-child {
+    margin-left: 0;
+}
+
+.gruppe-avatar-placeholder {
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+}
+
+.gruppe-avatar-mer {
+    background-color: var(--border);
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+}
+
+.gruppe-medlemsliste {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 20;
+    min-width: 180px;
+    max-width: 260px;
+    padding: 0.5rem 0;
+    margin: 0;
+    list-style: none;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+}
+
+.gruppe-medlemsliste li {
+    padding: 0.4rem 0.9rem;
 }

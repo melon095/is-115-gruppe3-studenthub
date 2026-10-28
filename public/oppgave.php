@@ -1,78 +1,112 @@
 <?php
 
-require __DIR__."/_bootstrap.php";
+require __DIR__ . "/bootstrap.inc.php";
 
-$gruppe_id = $_GET["gruppe_id"] ?? null;
-$oppgave_id = $_GET["oppgave_id"] ?? null;
+krever_autentikasjon();
 
-if ($gruppe_id == null || $oppgave_id == null) {
-    header("Location: " . url("/index.php"));
-    exit();
+$get = filter_input_array(INPUT_GET, [
+    "gruppe_id" => FILTER_VALIDATE_INT,
+    "oppgave_id" => FILTER_VALIDATE_INT
+]);
+
+$gruppe_id = $get["gruppe_id"] ?? null;
+$oppgave_id = $get["oppgave_id"] ?? null;
+
+if (!$gruppe_id || !$oppgave_id) {
+    omdiriger(url("/index.php"));
 }
 
-$gruppe = [
-    "id" => $gruppe_id,
-    "navn" => "Gruppe " . $gruppe_id,
-    "beskrivelse" => "Dette er beskrivelsen til gruppe '" . $gruppe_id . "'",
-];
+$gruppe = database_hent_gruppe($pdo, $gruppe_id);
 
-$oppgave = [
-    "oppgave_id" => $oppgave_id,
-    "gruppe_id" => $gruppe_id,
-    "tittel" => "Oppgave " . $oppgave_id,
-    "beskrivelse" => "Beskrivelse for oppgave " . $oppgave_id . " i gruppe " . $gruppe_id,
-    "opprettet_på" => date("Y-m-d", strtotime("-" . $oppgave_id . " days")),
-];
-
-$mock_filer = [
-    ["fil_navn" => "Oppgavebeskrivelse.pdf", "fil_type" => "pdf", "fil_størrelse" => 245_000, "revisjoner" => 1],
-    ["fil_navn" => "Kildekode.zip", "fil_type" => "zip", "fil_størrelse" => 1_820_000, "revisjoner" => 3],
-];
-
-$ressurser = [];
-foreach ($mock_filer as $i => $fil) {
-    $ressurser[] = [
-        "fil_id" => $i + 1,
-        "oppgave_id" => $oppgave_id,
-        "fil_navn" => $fil["fil_navn"],
-        "fil_type" => $fil["fil_type"],
-        "fil_størrelse" => $fil["fil_størrelse"],
-        "siste_versjon" => ["versjon_nummer" => $fil["revisjoner"]],
-    ];
+if (!$gruppe) {
+    omdiriger(url("/index.php"));
 }
 
-// TODO: Hent fra database.
-$antall_diskusjoner = (((int) $oppgave_id) % 4) + 1;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ny_fil']) && $_FILES['ny_fil']['error'] === UPLOAD_ERR_OK) {
-    // TODO: Database integrasjon og faktisk fillagring.
-    $ny_fil_navn = basename($_FILES['ny_fil']['name']);
-
-    $ressurser[] = [
-        "fil_id" => count($ressurser) + 1,
-        "oppgave_id" => $oppgave_id,
-        "fil_navn" => $ny_fil_navn,
-        "fil_type" => strtolower(pathinfo($ny_fil_navn, PATHINFO_EXTENSION)),
-        "fil_størrelse" => (int) $_FILES['ny_fil']['size'],
-        "siste_versjon" => ["versjon_nummer" => 1],
-    ];
+if (!database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $_SESSION["student_id"])) {
+    omdiriger(url("/index.php"));
 }
 
-$page_title = "Oppgave";
-$page_content = __DIR__."/../pages/oppgave.tpl.php";
-$page_styles = [url("/assets/css/oppgave.css"), url("/assets/css/ressurs-tabell.css")];
+$oppgave = database_hent_oppgave($pdo, $oppgave_id, $gruppe_id);
 
-$breadcrumbs = [
-    ["label" => "Grupper", "href" => url("/index.php")],
-    ["label" => $gruppe["navn"], "href" => url("/gruppe.php?gruppe_id=" . $gruppe["id"])],
-    ["label" => $oppgave["tittel"]],
+if (!$oppgave) {
+    omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
+}
+
+$er_eier = (int) $gruppe["opprettet_av"] === (int) $_SESSION["student_id"];
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["oppgave_tittel"]) &&
+    $er_eier &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $ny_tittel = trim(filter_input(INPUT_POST, "oppgave_tittel", FILTER_DEFAULT) ?? "");
+    $ny_beskrivelse = trim(filter_input(INPUT_POST, "oppgave_beskrivelse", FILTER_DEFAULT) ?? "");
+
+    if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
+        database_oppdater_oppgave($pdo, $oppgave_id, $gruppe_id, $ny_tittel, $ny_beskrivelse);
+
+        omdiriger(url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id));
+    }
+}
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_FILES["ny_fil"]) &&
+    csrf_gyldig($_POST["csrf_token"] ?? null)
+) {
+    $lagret_fil = lagre_opplastet_fil($_FILES["ny_fil"]);
+
+    if ($lagret_fil !== null) {
+        database_opprett_fil(
+            $pdo,
+            $gruppe_id,
+            $oppgave_id,
+            $_SESSION["student_id"],
+            $lagret_fil["fil_navn"],
+            $lagret_fil["fil_størrelse"],
+            $lagret_fil["fil_type"],
+            $lagret_fil["fil_lokasjon"]
+        );
+
+        omdiriger(url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id));
+    }
+}
+
+$ressurser = database_hent_ressurser_for_oppgave($pdo, $gruppe_id, $oppgave_id);
+
+foreach ($ressurser as &$ressurs) {
+    $ressurs["siste_versjon"] = database_hent_siste_filversjon($pdo, $ressurs["fil_id"]) ?: ["versjon_nummer" => 1];
+}
+
+unset($ressurs);
+
+$side_tittel = "Oppgave";
+$side_innhold = __DIR__ . "/../pages/oppgave.tpl.php";
+$side_stiler = [
+    url("/assets/css/oppgave.css"),
+    url("/assets/css/ressurs-tabell.css")
 ];
 
-$state = [
+$brødsmulesti = [
+    [
+        "tekst" => "Grupper",
+        "lenke" => url("/index.php")
+    ],
+    [
+        "tekst" => $gruppe["navn"],
+        "lenke" => url("/gruppe.php?gruppe_id=" . $gruppe["id"])
+    ],
+    [
+        "tekst" => $oppgave["tittel"]
+    ],
+];
+
+$tilstand = [
     "gruppe" => $gruppe,
     "oppgave" => $oppgave,
     "ressurser" => $ressurser,
-    "antall_diskusjoner" => $antall_diskusjoner,
+    "er_eier" => $er_eier,
 ];
 
-include __DIR__."/_layout.php";
+include __DIR__ . "/layout.inc.php";
