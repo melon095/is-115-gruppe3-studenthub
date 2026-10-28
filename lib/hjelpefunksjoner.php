@@ -8,17 +8,34 @@ if ($scriptDir === "/") {
 
 define("BASE_URL", $scriptDir);
 
+/**
+ * Bygger en fullstendig URL ved å legge applikasjonens grunnsti foran en sti.
+ *
+ * MÅ brukes rundt alle URL-er som vises til brukeren, siden
+ * prosjektet ikke alltid ligger i roten av webserveren (f.eks. i en undermappe i XAMPP sin htdocs).
+ *
+ * @return string Den fullstendige URL-en.
+ */
 function url(string $path): string
 {
     return BASE_URL . $path;
 }
 
+/**
+ * Sender en HTTP-omdirigering til en annen URL og avslutter kjøringen.
+ */
 function omdiriger(string $url): never
 {
     header("Location: " . $url);
     exit();
 }
 
+/**
+ * Sender en fil som nedlasting ved å sette riktige HTTP-headere og avslutte kjøringen.
+ *
+ * @param string $fil_lokasjon Filens plassering på disken.
+ * @param string $fil_navn Filnavnet som skal vises til brukeren som laster ned.
+ */
 function send_filnedlasting(string $fil_lokasjon, string $fil_navn): never
 {
     header("Content-Type: application/octet-stream");
@@ -29,6 +46,9 @@ function send_filnedlasting(string $fil_lokasjon, string $fil_navn): never
     exit();
 }
 
+/**
+ * Sjekker at brukeren er logget inn, og omdirigerer til innloggingssiden hvis ikke.
+ */
 function krever_autentikasjon(): void
 {
     if (!isset($_SESSION['student_id'])) {
@@ -36,16 +56,32 @@ function krever_autentikasjon(): void
     }
 }
 
+/**
+ * Henter den første bokstaven i et navn, i stor bokstav.
+ *
+ * @return string Forbokstaven.
+ */
 function forbokstav(string $navn): string
 {
     return mb_strtoupper(mb_substr($navn, 0, 1));
 }
 
+/**
+ * Slår sammen fornavn og etternavn til et fullt navn.
+ *
+ * @param array $person En databaserad som har med "fornavn" og "etternavn".
+ * @return string Det fulle navnet.
+ */
 function fullt_navn(array $person): string
 {
     return $person["fornavn"] . " " . $person["etternavn"];
 }
 
+/**
+ * Gjør om en filstørrelse i bytes til en lesbar streng, for eksempel "1.50 MB".
+ *
+ * @return string Den formaterte filstørrelsen.
+ */
 function bytes_til_menneske(int $bytes): string
 {
     if ($bytes <= 0) {
@@ -60,6 +96,12 @@ function bytes_til_menneske(int $bytes): string
     return round($bytes / pow(1024, $eksponent), 2) . " " . $enheter[$eksponent];
 }
 
+/**
+ * Validerer og lagrer en opplastet fil i den private opplastingsmappen.
+ *
+ * @param array $fil Et element fra $_FILES.
+ * @return ?array Informasjon om den lagrede filen, eller null hvis opplastingen feilet.
+ */
 function lagre_opplastet_fil(array $fil): ?array
 {
     if (($fil["error"] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
@@ -95,6 +137,12 @@ function lagre_opplastet_fil(array $fil): ?array
     ];
 }
 
+/**
+ * Validerer at en opplastet fil faktisk er et bilde, og lagrer det i den offentlige mappen for profilbilder.
+ *
+ * @param array $fil Et element fra $_FILES.
+ * @return ?string Den offentlige URL-en til det lagrede bildet, eller null hvis opplastingen feilet eller filen ikke var et gyldig bilde.
+ */
 function lagre_profilbilde(array $fil): ?string
 {
     $tillatte_bildetyper = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP];
@@ -136,6 +184,9 @@ function lagre_profilbilde(array $fil): ?string
     return url("/uploads/avatarer/" . $lagret_navn);
 }
 
+/**
+ * Sletter profilbildefilen som hører til en gitt avatar-lenke, hvis den finnes.
+ */
 function slett_profilbilde_fil(?string $avatar_link): void
 {
     if (empty($avatar_link)) {
@@ -155,6 +206,14 @@ function slett_profilbilde_fil(?string $avatar_link): void
     }
 }
 
+/**
+ * Lager HTML-en som viser profilbildet til en person, eller forbokstaven som plassholder hvis personen ikke har noe bilde.
+ *
+ * @param array $person En databaserad som har med "fornavn", "etternavn" og "avatar_link".
+ * @param string $img_klasse CSS-klassen som skal brukes på <img>-taggen.
+ * @param string $plassholder_klasse CSS-klassen som skal legges til på plassholderen når personen ikke har noe bilde.
+ * @return string HTML-koden for profilbildet.
+ */
 function profilbilde_html(array $person, string $img_klasse, string $plassholder_klasse): string
 {
     $navn = htmlspecialchars(fullt_navn($person));

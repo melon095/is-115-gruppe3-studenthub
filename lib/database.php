@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Henter en student basert på id.
+ *
+ * @return array|false Studentraden, eller false hvis studenten ikke finnes.
+ */
 function database_hent_student(PDO $pdo, int $id)
 {
     $stmt = $pdo->prepare("
@@ -15,6 +20,11 @@ function database_hent_student(PDO $pdo, int $id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter en student basert på e-postadresse.
+ *
+ * @return array|false Studentraden, eller false hvis ingen student har denne e-posten.
+ */
 function database_hent_student_ved_epost(PDO $pdo, string $epost)
 {
     $stmt = $pdo->prepare("
@@ -30,6 +40,11 @@ function database_hent_student_ved_epost(PDO $pdo, string $epost)
     return $stmt->fetch();
 }
 
+/**
+ * Oppretter en ny student i databasen.
+ *
+ * @return string Id-en til den nyopprettede studenten.
+ */
 function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, string $epost, string $passord_hash): string
 {
     $stmt = $pdo->prepare("
@@ -57,6 +72,9 @@ function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, 
     return $pdo->lastInsertId();
 }
 
+/**
+ * Oppdaterer profilbildet til en student.
+ */
 function database_oppdater_avatar(PDO $pdo, int $student_id, string $avatar_link)
 {
     $stmt = $pdo->prepare("
@@ -71,6 +89,11 @@ function database_oppdater_avatar(PDO $pdo, int $student_id, string $avatar_link
     ]);
 }
 
+/**
+ * Henter en gruppe basert på id.
+ *
+ * @return array|false Gruppen, eller false hvis den ikke finnes.
+ */
 function database_hent_gruppe(PDO $pdo, int $id)
 {
     $stmt = $pdo->prepare("
@@ -86,6 +109,11 @@ function database_hent_gruppe(PDO $pdo, int $id)
     return $stmt->fetch();
 }
 
+/**
+ * Oppretter en ny gruppe.
+ *
+ * @return string Id-en til den nyopprettede gruppen.
+ */
 function database_opprett_gruppe(PDO $pdo, string $navn, string $beskrivelse, int $opprettet_av): string
 {
     $stmt = $pdo->prepare("
@@ -110,6 +138,9 @@ function database_opprett_gruppe(PDO $pdo, string $navn, string $beskrivelse, in
     return $pdo->lastInsertId();
 }
 
+/**
+ * Oppdaterer navn og beskrivelse for en gruppe.
+ */
 function database_oppdater_gruppe(PDO $pdo, int $gruppe_id, string $navn, string $beskrivelse)
 {
     $stmt = $pdo->prepare("
@@ -126,6 +157,11 @@ function database_oppdater_gruppe(PDO $pdo, int $gruppe_id, string $navn, string
     ]);
 }
 
+/**
+ * Henter alle grupper på plattformen sammen med medlemmene deres.
+ *
+ * @return array En rad per medlem i hver gruppe, slått sammen i kallerkoden.
+ */
 function database_hent_alle_grupper_med_medlemmer(PDO $pdo): array
 {
     $stmt = $pdo->prepare("
@@ -151,6 +187,11 @@ function database_hent_alle_grupper_med_medlemmer(PDO $pdo): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Henter alle gruppene en student er medlem av.
+ *
+ * @return array Liste over grupper.
+ */
 function database_hent_grupper_for_student(PDO $pdo, int $student_id): array
 {
     $stmt = $pdo->prepare("
@@ -171,6 +212,11 @@ function database_hent_grupper_for_student(PDO $pdo, int $student_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Sjekker om en bruker er medlem av en gruppe.
+ *
+ * @return mixed Sann verdi hvis medlem, ellers false.
+ */
 function database_er_bruker_medlem_i_gruppe(PDO $pdo, int $gruppe_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("
@@ -189,6 +235,9 @@ function database_er_bruker_medlem_i_gruppe(PDO $pdo, int $gruppe_id, int $bruke
     return $stmt->fetchColumn();
 }
 
+/**
+ * Legger en bruker til som medlem av en gruppe.
+ */
 function database_legg_til_gruppe_medlem(PDO $pdo, int $gruppe_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("
@@ -208,6 +257,9 @@ function database_legg_til_gruppe_medlem(PDO $pdo, int $gruppe_id, int $bruker_i
     ]);
 }
 
+/**
+ * Fjerner en bruker som medlem av en gruppe.
+ */
 function database_fjern_gruppe_medlem(PDO $pdo, int $gruppe_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("
@@ -222,6 +274,11 @@ function database_fjern_gruppe_medlem(PDO $pdo, int $gruppe_id, int $bruker_id)
     ]);
 }
 
+/**
+ * Henter alle medlemmene i en gruppe.
+ *
+ * @return array Liste over medlemmer.
+ */
 function database_hent_medlemmer_for_gruppe(PDO $pdo, int $gruppe_id): array
 {
     $stmt = $pdo->prepare("
@@ -244,6 +301,9 @@ function database_hent_medlemmer_for_gruppe(PDO $pdo, int $gruppe_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Oppretter en invitasjon til en gruppe med en unik kode.
+ */
 function database_opprett_invitasjon(PDO $pdo, int $gruppe_id, string $kode, int $opprettet_av)
 {
     $stmt = $pdo->prepare("
@@ -266,6 +326,11 @@ function database_opprett_invitasjon(PDO $pdo, int $gruppe_id, string $kode, int
     ]);
 }
 
+/**
+ * Henter en invitasjon basert på gruppe og kode.
+ *
+ * @return array|false Invitasjonen, eller false hvis den ikke finnes.
+ */
 function database_hent_invitasjon(PDO $pdo, int $gruppe_id, string $kode)
 {
     $stmt = $pdo->prepare("
@@ -289,6 +354,9 @@ function database_hent_invitasjon(PDO $pdo, int $gruppe_id, string $kode)
     return $stmt->fetch();
 }
 
+/**
+ * Fjerner en invitasjon, typisk etter at den er tatt i bruk.
+ */
 function database_fjern_invitasjon(PDO $pdo, int $invitasjon_id)
 {
     $stmt = $pdo->prepare("
@@ -301,6 +369,11 @@ function database_fjern_invitasjon(PDO $pdo, int $invitasjon_id)
     ]);
 }
 
+/**
+ * Henter en oppgave, forutsatt at den tilhører riktig gruppe.
+ *
+ * @return array|false Oppgaven, eller false hvis den ikke finnes.
+ */
 function database_hent_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -323,6 +396,11 @@ function database_hent_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter alle oppgavene i en gruppe.
+ *
+ * @return array Liste over oppgaver.
+ */
 function database_hent_oppgaver_for_gruppe(PDO $pdo, int $gruppe_id): array
 {
     $stmt = $pdo->prepare("
@@ -344,6 +422,11 @@ function database_hent_oppgaver_for_gruppe(PDO $pdo, int $gruppe_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Oppretter en ny oppgave i en gruppe.
+ *
+ * @return string Id-en til den nye oppgaven.
+ */
 function database_opprett_oppgave(PDO $pdo, int $gruppe_id, string $tittel, string $beskrivelse): string
 {
     $stmt = $pdo->prepare("
@@ -368,6 +451,9 @@ function database_opprett_oppgave(PDO $pdo, int $gruppe_id, string $tittel, stri
     return $pdo->lastInsertId();
 }
 
+/**
+ * Oppdaterer tittel og beskrivelse for en oppgave.
+ */
 function database_oppdater_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id, string $tittel, string $beskrivelse)
 {
     $stmt = $pdo->prepare("
@@ -386,6 +472,9 @@ function database_oppdater_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id, st
     ]);
 }
 
+/**
+ * Fjerner en oppgave fra en gruppe.
+ */
 function database_fjern_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -400,6 +489,11 @@ function database_fjern_oppgave(PDO $pdo, int $oppgave_id, int $gruppe_id)
     ]);
 }
 
+/**
+ * Henter grunnleggende informasjon om en fil, forutsatt at den tilhører riktig gruppe.
+ *
+ * @return array|false Filen, eller false hvis den ikke finnes.
+ */
 function database_hent_fil(PDO $pdo, int $fil_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -420,6 +514,11 @@ function database_hent_fil(PDO $pdo, int $fil_id, int $gruppe_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter full informasjon om en ressurs, inkludert navnet til personen som lastet den opp.
+ *
+ * @return array|false Ressursen, eller false hvis den ikke finnes.
+ */
 function database_hent_ressurs(PDO $pdo, int $fil_id)
 {
     $stmt = $pdo->prepare("
@@ -447,6 +546,11 @@ function database_hent_ressurs(PDO $pdo, int $fil_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter alle ressursene som tilhører en gruppe.
+ *
+ * @return array Liste over ressurser.
+ */
 function database_hent_ressurser_for_gruppe(PDO $pdo, int $gruppe_id): array
 {
     $stmt = $pdo->prepare("
@@ -473,6 +577,11 @@ function database_hent_ressurser_for_gruppe(PDO $pdo, int $gruppe_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Henter ressursene som er knyttet til en spesifikk oppgave.
+ *
+ * @return array Liste over ressurser.
+ */
 function database_hent_ressurser_for_oppgave(PDO $pdo, int $gruppe_id, int $oppgave_id): array
 {
     $stmt = $pdo->prepare("
@@ -496,6 +605,11 @@ function database_hent_ressurser_for_oppgave(PDO $pdo, int $gruppe_id, int $oppg
     return $stmt->fetchAll();
 }
 
+/**
+ * Registrerer en nylig opplastet fil i databasen.
+ *
+ * @return string Id-en til den nye filen.
+ */
 function database_opprett_fil(PDO $pdo, int $gruppe_id, ?int $oppgave_id, int $opprettet_av, string $fil_navn, int $fil_størrelse, string $fil_type, string $fil_lokasjon): string
 {
     $stmt = $pdo->prepare("
@@ -532,6 +646,9 @@ function database_opprett_fil(PDO $pdo, int $gruppe_id, ?int $oppgave_id, int $o
     return $pdo->lastInsertId();
 }
 
+/**
+ * Fjerner en fil fra en gruppe.
+ */
 function database_fjern_fil(PDO $pdo, int $fil_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -546,6 +663,11 @@ function database_fjern_fil(PDO $pdo, int $fil_id, int $gruppe_id)
     ]);
 }
 
+/**
+ * Henter den nyeste versjonen av en fil.
+ *
+ * @return array|false Den nyeste versjonen, eller false hvis filen ikke har noen versjoner.
+ */
 function database_hent_siste_filversjon(PDO $pdo, int $fil_id)
 {
     $stmt = $pdo->prepare("
@@ -565,6 +687,11 @@ function database_hent_siste_filversjon(PDO $pdo, int $fil_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter alle versjonene som finnes av en fil.
+ *
+ * @return array Liste over filversjoner.
+ */
 function database_hent_filversjoner_for_fil(PDO $pdo, int $fil_id): array
 {
     $stmt = $pdo->prepare("
@@ -588,6 +715,11 @@ function database_hent_filversjoner_for_fil(PDO $pdo, int $fil_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Henter en spesifikk filversjon, forutsatt at den tilhører riktig fil.
+ *
+ * @return array|false Filversjonen, eller false hvis den ikke finnes.
+ */
 function database_hent_filversjon(PDO $pdo, int $versjon_id, int $fil_id)
 {
     $stmt = $pdo->prepare("
@@ -607,6 +739,11 @@ function database_hent_filversjon(PDO $pdo, int $versjon_id, int $fil_id)
     return $stmt->fetch();
 }
 
+/**
+ * Finner neste ledige versjonsnummer for en fil.
+ *
+ * @return int Neste versjonsnummer.
+ */
 function database_hent_neste_versjonsnummer(PDO $pdo, int $fil_id): int
 {
     $stmt = $pdo->prepare("
@@ -622,6 +759,11 @@ function database_hent_neste_versjonsnummer(PDO $pdo, int $fil_id): int
     return (int) $stmt->fetchColumn();
 }
 
+/**
+ * Registrerer en ny versjon av en fil.
+ *
+ * @return string Id-en til den nye filversjonen.
+ */
 function database_opprett_filversjon(PDO $pdo, int $fil_id, int $opprettet_av, int $versjon_nummer, string $fil_lokasjon, int $fil_størrelse): string
 {
     $stmt = $pdo->prepare("
@@ -652,6 +794,11 @@ function database_opprett_filversjon(PDO $pdo, int $fil_id, int $opprettet_av, i
     return $pdo->lastInsertId();
 }
 
+/**
+ * Henter en diskusjon, forutsatt at den tilhører riktig gruppe.
+ *
+ * @return array|false Diskusjonen, eller false hvis den ikke finnes.
+ */
 function database_hent_diskusjon(PDO $pdo, int $gruppe_id, int $diskusjon_id)
 {
     $stmt = $pdo->prepare("
@@ -669,6 +816,11 @@ function database_hent_diskusjon(PDO $pdo, int $gruppe_id, int $diskusjon_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter alle diskusjonene i en gruppe, sammen med antall innlegg i hver.
+ *
+ * @return array Liste over diskusjoner.
+ */
 function database_hent_diskusjoner_for_gruppe(PDO $pdo, int $gruppe_id): array
 {
     $stmt = $pdo->prepare("
@@ -699,6 +851,11 @@ function database_hent_diskusjoner_for_gruppe(PDO $pdo, int $gruppe_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Oppretter en ny diskusjon i en gruppe.
+ *
+ * @return string Id-en til den nye diskusjonen.
+ */
 function database_opprett_diskusjon(PDO $pdo, int $gruppe_id, string $tittel, ?int $oppgave_id, ?int $fil_id, int $opprettet_av): string
 {
     $stmt = $pdo->prepare("
@@ -729,6 +886,9 @@ function database_opprett_diskusjon(PDO $pdo, int $gruppe_id, string $tittel, ?i
     return $pdo->lastInsertId();
 }
 
+/**
+ * Oppdaterer tittelen på en diskusjon.
+ */
 function database_oppdater_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id, string $tittel)
 {
     $stmt = $pdo->prepare("
@@ -745,6 +905,9 @@ function database_oppdater_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id
     ]);
 }
 
+/**
+ * Fjerner en diskusjon fra en gruppe.
+ */
 function database_fjern_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id)
 {
     $stmt = $pdo->prepare("
@@ -759,6 +922,11 @@ function database_fjern_diskusjon(PDO $pdo, int $diskusjon_id, int $gruppe_id)
     ]);
 }
 
+/**
+ * Henter alle innleggene i en diskusjon, sortert etter når de ble opprettet.
+ *
+ * @return array Liste over innlegg.
+ */
 function database_hent_innlegger_i_diskusjon(PDO $pdo, int $diskusjon_id): array
 {
     $stmt = $pdo->prepare("
@@ -784,6 +952,11 @@ function database_hent_innlegger_i_diskusjon(PDO $pdo, int $diskusjon_id): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Oppretter et nytt innlegg i en diskusjon.
+ *
+ * @return string Id-en til det nye innlegget.
+ */
 function database_opprett_innlegg(PDO $pdo, int $diskusjon_id, int $bruker_id, string $innhold): string
 {
     $stmt = $pdo->prepare("
@@ -808,6 +981,9 @@ function database_opprett_innlegg(PDO $pdo, int $diskusjon_id, int $bruker_id, s
     return $pdo->lastInsertId();
 }
 
+/**
+ * Fjerner et innlegg, forutsatt at det tilhører riktig diskusjon og gruppe.
+ */
 function database_fjern_diskusjon_innlegg(PDO $pdo, int $diskusjon_id, int $gruppe_id, int $innlegg_id)
 {
     $stmt = $pdo->prepare("
@@ -827,6 +1003,11 @@ function database_fjern_diskusjon_innlegg(PDO $pdo, int $diskusjon_id, int $grup
     ]);
 }
 
+/**
+ * Sjekker at et innlegg finnes og tilhører riktig diskusjon.
+ *
+ * @return array|false Innlegget, eller false hvis det ikke finnes.
+ */
 function database_hent_innlegg(PDO $pdo, int $innlegg_id, int $diskusjon_id)
 {
     $stmt = $pdo->prepare("
@@ -844,6 +1025,11 @@ function database_hent_innlegg(PDO $pdo, int $innlegg_id, int $diskusjon_id)
     return $stmt->fetch();
 }
 
+/**
+ * Henter alle tilgjengelige reaksjonstyper.
+ *
+ * @return array Liste over reaksjonstyper.
+ */
 function database_hent_reaksjonstyper(PDO $pdo): array
 {
     $stmt = $pdo->prepare("
@@ -857,6 +1043,11 @@ function database_hent_reaksjonstyper(PDO $pdo): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Sjekker om en reaksjonstype faktisk finnes.
+ *
+ * @return mixed Sann verdi hvis gyldig, ellers false.
+ */
 function database_er_gyldig_reaksjonstype(PDO $pdo, int $reaksjon_type_id)
 {
     $stmt = $pdo->prepare("
@@ -873,6 +1064,11 @@ function database_er_gyldig_reaksjonstype(PDO $pdo, int $reaksjon_type_id)
     return $stmt->fetchColumn();
 }
 
+/**
+ * Henter alle reaksjoner på innleggene i en diskusjon.
+ *
+ * @return array Liste over reaksjoner.
+ */
 function database_hent_reaksjoner_for_diskusjon(PDO $pdo, int $diskusjon_id): array
 {
     $stmt = $pdo->prepare("
@@ -893,6 +1089,11 @@ function database_hent_reaksjoner_for_diskusjon(PDO $pdo, int $diskusjon_id): ar
     return $stmt->fetchAll();
 }
 
+/**
+ * Sjekker om en bruker allerede har reagert med en gitt reaksjonstype på et innlegg.
+ *
+ * @return mixed Sann verdi hvis brukeren har reagert, ellers false.
+ */
 function database_har_reagert(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("
@@ -912,6 +1113,9 @@ function database_har_reagert(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, 
     return $stmt->fetchColumn();
 }
 
+/**
+ * Legger til en reaksjon fra en bruker på et innlegg.
+ */
 function database_legg_til_reaksjon(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("
@@ -934,6 +1138,9 @@ function database_legg_til_reaksjon(PDO $pdo, int $innlegg_id, int $reaksjon_typ
     ]);
 }
 
+/**
+ * Fjerner en brukers reaksjon på et innlegg.
+ */
 function database_fjern_reaksjon(PDO $pdo, int $innlegg_id, int $reaksjon_type_id, int $bruker_id)
 {
     $stmt = $pdo->prepare("

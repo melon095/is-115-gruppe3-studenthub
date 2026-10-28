@@ -1,6 +1,12 @@
 <?php
 
 // https://www.php.net/manual/en/function.mail.php
+
+/**
+ * Sender en e-post som inviterer en person til å bli med i en gruppe.
+ *
+ * @return bool Sann hvis e-posten ble sendt.
+ */
 function send_invitasjon_epost(string $til, string $gruppe_navn, string $lenke, string $invitert_av): bool
 {
     $emne = mb_encode_mimeheader("Du er invitert til " . $gruppe_navn . " på Studenthub", "UTF-8");

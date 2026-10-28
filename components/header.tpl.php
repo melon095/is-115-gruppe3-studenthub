@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Toppmenyen som vises øverst på hver side, med lenke til forsiden og innlogget bruker sin profil/utlogging.
+ */
+
 $student = null;
 
 if (isset($_SESSION["student_id"])) {

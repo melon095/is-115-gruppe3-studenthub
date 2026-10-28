@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Brødsmulestien som vises øverst på siden, med en lenke tilbake til forsiden.
+ *
+ * @uses array $brødsmulesti Liste med steg, hvert med "tekst" og valgfri "lenke". Siste steg vises alltid uten lenke.
+ */
+
 $brødsmulesti = $brødsmulesti ?? [];
 
 ?>

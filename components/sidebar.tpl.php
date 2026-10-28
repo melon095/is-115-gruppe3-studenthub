@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Venstremenyen som lister opp gruppene den innloggede brukeren er medlem av.
+ *
+ * @uses bool $offentlig_side Settes av siden som inkluderer komponenten for å skjule sidebaren på offentlige sider (f.eks. innlogging).
+ */
+
 $grupper = [];
 
 $vis_sidebar = !($offentlig_side ?? false) && isset($_SESSION["student_id"]);
