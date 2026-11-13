@@ -9,6 +9,19 @@ CREATE TABLE studenter (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
+CREATE TABLE passord_historikk (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    student_id INT UNSIGNED NOT NULL,
+    passord_hash VARCHAR(255) NOT NULL,
+    opprettet_på DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_passord_historikk_student
+        FOREIGN KEY (student_id)
+        REFERENCES studenter(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 CREATE TABLE grupper (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     navn VARCHAR(255) NOT NULL,

@@ -77,6 +77,36 @@ function fullt_navn(array $person): string
     return $person["fornavn"] . " " . $person["etternavn"];
 }
 
+function valider_passordstyrke(string $passord): array
+{
+    $feil = [];
+
+    if (mb_strlen($passord) < 8) {
+        $feil[] = "Passord må være minst 8 tegn.";
+    }
+
+    if (!preg_match("/\p{Lu}/u", $passord)) {
+        $feil[] = "Passord må inneholde minst én stor bokstav.";
+    }
+
+    if (!preg_match("/[^\p{L}\p{N}\s]/u", $passord)) {
+        $feil[] = "Passord må inneholde minst ett spesialtegn.";
+    }
+
+    return $feil;
+}
+
+function passord_er_brukt_tidligere(PDO $pdo, int $student_id, string $passord): bool
+{
+    foreach (database_hent_passordhistorikk($pdo, $student_id) as $rad) {
+        if (password_verify($passord, $rad["passord_hash"])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
  * Gjør om en filstørrelse i bytes til en lesbar streng, for eksempel "1.50 MB".
  *

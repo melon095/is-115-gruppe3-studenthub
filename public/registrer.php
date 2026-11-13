@@ -46,8 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
 
     if ($passord === "") {
         $feil[] = "Passord må fylles ut.";
-    } elseif (mb_strlen($passord) < 8) {
-        $feil[] = "Passord må være minst 8 tegn.";
+    } else {
+        $feil = array_merge($feil, valider_passordstyrke($passord));
     }
 
     if ($passord !== $bekreft_passord) {

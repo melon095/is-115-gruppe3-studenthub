@@ -36,6 +36,15 @@
     font-weight: 600;
 }
 
+.profil-kort + .profil-kort {
+    margin-top: 1.5rem;
+}
+
+.profil-kort h2 {
+    margin: 0;
+    align-self: flex-start;
+}
+
 .profil-kort .form {
     width: 100%;
 }

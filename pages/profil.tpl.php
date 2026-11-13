@@ -9,8 +9,10 @@
         </ul>
     <?php endif; ?>
 
-    <?php if (!empty($tilstand["suksess"])): ?>
+    <?php if ($tilstand["suksess"] === "avatar"): ?>
         <p class="profil-suksess">Profilbildet ble oppdatert.</p>
+    <?php elseif ($tilstand["suksess"] === "passord"): ?>
+        <p class="profil-suksess">Passordet ble endret.</p>
     <?php endif; ?>
 
     <div class="profil-kort">
@@ -18,6 +20,7 @@
 
         <form method="post" action="" enctype="multipart/form-data" class="form">
             <?php echo csrf_felt(); ?>
+            <input type="hidden" name="handling" value="avatar">
 
             <div class="form-felt">
                 <label for="avatar">Velg nytt profilbilde</label>
@@ -31,6 +34,52 @@
 
             <button type="submit" class="button button-primary">
                 Last opp
+            </button>
+        </form>
+    </div>
+
+    <div class="profil-kort">
+        <h2>Endre passord</h2>
+
+        <form method="post" action="" class="form">
+            <?php echo csrf_felt(); ?>
+            <input type="hidden" name="handling" value="passord">
+
+            <div class="form-felt">
+                <label for="gammelt_passord">Nåværende passord</label>
+                <input
+                    type="password"
+                    id="gammelt_passord"
+                    name="gammelt_passord"
+                    autocomplete="current-password"
+                    required>
+            </div>
+
+            <div class="form-felt">
+                <label for="nytt_passord">Nytt passord</label>
+                <input
+                    type="password"
+                    id="nytt_passord"
+                    name="nytt_passord"
+                    autocomplete="new-password"
+                    minlength="8"
+                    aria-describedby="nytt-passord-krav"
+                    required>
+                <small id="nytt-passord-krav">Minst 8 tegn, én stor bokstav og ett spesialtegn.</small>
+            </div>
+
+            <div class="form-felt">
+                <label for="bekreft_nytt_passord">Bekreft nytt passord</label>
+                <input
+                    type="password"
+                    id="bekreft_nytt_passord"
+                    name="bekreft_nytt_passord"
+                    autocomplete="new-password"
+                    required>
+            </div>
+
+            <button type="submit" class="button button-primary">
+                Endre passord
             </button>
         </form>
     </div>

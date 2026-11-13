@@ -47,29 +47,114 @@ function database_hent_student_ved_epost(PDO $pdo, string $epost)
  */
 function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, string $epost, string $passord_hash): string
 {
+    $pdo->beginTransaction();
+
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO studenter (
+                fornavn,
+                etternavn,
+                epost,
+                passord
+            )
+            VALUES (
+                :fornavn,
+                :etternavn,
+                :epost,
+                :passord
+            )
+        ");
+
+        $stmt->execute([
+            "fornavn" => $fornavn,
+            "etternavn" => $etternavn,
+            "epost" => $epost,
+            "passord" => $passord_hash
+        ]);
+
+        $student_id = $pdo->lastInsertId();
+
+        database_lagre_passordhistorikk($pdo, (int) $student_id, $passord_hash);
+
+        $pdo->commit();
+    } catch (Throwable $feil) {
+        $pdo->rollBack();
+
+        throw $feil;
+    }
+
+    return $student_id;
+}
+
+/**
+ * Oppdaterer passordet til en student og lagrer det nye passordet i passordhistorikken.
+ */
+function database_oppdater_passord(PDO $pdo, int $student_id, string $passord_hash)
+{
+    $pdo->beginTransaction();
+
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE studenter
+            SET passord = :passord
+            WHERE id = :student_id
+        ");
+
+        $stmt->execute([
+            "passord" => $passord_hash,
+            "student_id" => $student_id
+        ]);
+
+        database_lagre_passordhistorikk($pdo, $student_id, $passord_hash);
+
+        $pdo->commit();
+    } catch (Throwable $feil) {
+        $pdo->rollBack();
+
+        throw $feil;
+    }
+}
+
+/**
+ * Lagrer en passord-hash i passordhistorikken til en student.
+ */
+function database_lagre_passordhistorikk(PDO $pdo, int $student_id, string $passord_hash)
+{
     $stmt = $pdo->prepare("
-        INSERT INTO studenter (
-            fornavn,
-            etternavn,
-            epost,
-            passord
+        INSERT INTO passord_historikk (
+            student_id,
+            passord_hash
         )
         VALUES (
-            :fornavn,
-            :etternavn,
-            :epost,
-            :passord
+            :student_id,
+            :passord_hash
         )
     ");
 
     $stmt->execute([
-        "fornavn" => $fornavn,
-        "etternavn" => $etternavn,
-        "epost" => $epost,
-        "passord" => $passord_hash
+        "student_id" => $student_id,
+        "passord_hash" => $passord_hash
+    ]);
+}
+
+/**
+ * Henter alle passord-hasher en student noen gang har brukt.
+ *
+ * @return array Liste over rader med "passord_hash".
+ */
+function database_hent_passordhistorikk(PDO $pdo, int $student_id): array
+{
+    $stmt = $pdo->prepare("
+        SELECT passord_hash
+        FROM passord_historikk
+        WHERE student_id = :student_id
+    ");
+
+    $stmt->execute([
+        "student_id" => $student_id
     ]);
 
-    return $pdo->lastInsertId();
+    return $stmt->fetchAll();
 }
 
 /**
