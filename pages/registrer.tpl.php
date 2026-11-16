@@ -47,6 +47,17 @@
             </div>
 
             <div class="form-felt">
+                <label for="mobilnummer">Mobilnummer</label>
+                <input
+                    type="tel"
+                    id="mobilnummer"
+                    name="mobilnummer"
+                    autocomplete="tel"
+                    minlength="8"
+                    required>
+            </div>
+
+            <div class="form-felt">
                 <label for="passord">Passord</label>
                 <input
                     type="password"

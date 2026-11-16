@@ -45,8 +45,14 @@ function database_hent_student_ved_epost(PDO $pdo, string $epost)
  *
  * @return string Id-en til den nyopprettede studenten.
  */
-function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, string $epost, string $passord_hash): string
-{
+function database_opprett_student(
+    PDO $pdo,
+    string $fornavn,
+    string $etternavn,
+    string $epost,
+    string $passord_hash,
+    string $mobilnummer
+): string {
     $pdo->beginTransaction();
 
     try {
@@ -55,13 +61,15 @@ function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, 
                 fornavn,
                 etternavn,
                 epost,
-                passord
+                passord,
+                mobilnummer
             )
             VALUES (
                 :fornavn,
                 :etternavn,
                 :epost,
-                :passord
+                :passord,
+                :mobilnummer
             )
         ");
 
@@ -69,7 +77,8 @@ function database_opprett_student(PDO $pdo, string $fornavn, string $etternavn, 
             "fornavn" => $fornavn,
             "etternavn" => $etternavn,
             "epost" => $epost,
-            "passord" => $passord_hash
+            "passord" => $passord_hash,
+            "mobilnummer" => $mobilnummer
         ]);
 
         $student_id = $pdo->lastInsertId();

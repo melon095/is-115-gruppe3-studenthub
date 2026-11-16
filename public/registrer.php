@@ -8,6 +8,7 @@ $feil = [];
 $fornavn = "";
 $etternavn = "";
 $epost = "";
+$mobilnummer = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?? null)) {
     $feil[] = "Skjemaet er utløpt. Prøv igjen.";
@@ -17,7 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
         "etternavn" => FILTER_DEFAULT,
         "epost" => FILTER_VALIDATE_EMAIL,
         "passord" => FILTER_UNSAFE_RAW,
-        "bekreft_passord" => FILTER_UNSAFE_RAW
+        "bekreft_passord" => FILTER_UNSAFE_RAW,
+        "mobilnummer" => FILTER_DEFAULT
     ]);
 
     $fornavn = trim($input["fornavn"] ?? "");
@@ -25,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
     $epost = $input["epost"] ?? false;
     $passord = $input["passord"] ?? "";
     $bekreft_passord = $input["bekreft_passord"] ?? "";
+    $mobilnummer = trim($input["mobilnummer"] ?? "");
 
     if ($fornavn === "") {
         $feil[] = "Fornavn må fylles ut.";
@@ -54,13 +57,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
         $feil[] = "Passordene er ikke like.";
     }
 
+    if ($mobilnummer === "") {
+        $feil[] = "Mobilnummer må fylles ut.";
+    }
+
     if (empty($feil)) {
         if (database_hent_student_ved_epost($pdo, $epost)) {
             $feil[] = "Det finnes allerede en bruker med denne e-postadressen.";
         } else {
             $passord_hash = password_hash($passord, PASSWORD_DEFAULT);
 
-            $student_id = database_opprett_student($pdo, $fornavn, $etternavn, $epost, $passord_hash);
+            $student_id = database_opprett_student($pdo, $fornavn, $etternavn, $epost, $passord_hash, $mobilnummer);
 
             session_regenerate_id(true);
             $_SESSION["student_id"] = $student_id;
