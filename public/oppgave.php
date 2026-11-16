@@ -32,6 +32,8 @@ if (!$oppgave) {
     omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
 }
 
+husk_sist_besokt($gruppe_id, $oppgave_id);
+
 $er_eier = (int) $gruppe["opprettet_av"] === (int) $_SESSION["student_id"];
 
 if (

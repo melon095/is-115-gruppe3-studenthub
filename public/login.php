@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 session_regenerate_id(true);
                 $_SESSION["student_id"] = $student["id"];
 
-                omdiriger(url("/index.php"));
+                omdiriger(destinasjon_etter_innlogging($pdo));
             }
 
             $feil[] = "Feil e-post eller passord.";

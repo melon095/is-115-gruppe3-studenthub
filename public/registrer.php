@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
             session_regenerate_id(true);
             $_SESSION["student_id"] = $student_id;
 
-            omdiriger(url("/index.php"));
+            omdiriger(destinasjon_etter_innlogging($pdo));
         }
     }
 }
