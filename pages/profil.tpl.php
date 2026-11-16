@@ -15,6 +15,39 @@
         <p class="profil-suksess">Passordet ble endret.</p>
     <?php endif; ?>
 
+    <section class="profil-kort">
+        <h2>Informasjon i Databasen</h2>
+        <table class="profil-tabell">
+            <tbody>
+                <tr>
+                    <th scope="row">ID</th>
+                    <td><?php echo (int) $tilstand["student"]["id"]; ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Fornavn</th>
+                    <td><?php echo htmlspecialchars($tilstand["student"]["fornavn"]); ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Etternavn</th>
+                    <td><?php echo htmlspecialchars($tilstand["student"]["etternavn"]); ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">E-post</th>
+                    <td><?php echo htmlspecialchars($tilstand["student"]["epost"]); ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Mobilnummer</th>
+                    <td><?php echo htmlspecialchars($tilstand["student"]["mobilnummer"]); ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Opprettet</th>
+                    <td><?php echo htmlspecialchars($tilstand["student"]["opprettet_på"]); ?></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+
     <div class="profil-kort">
         <?php echo profilbilde_html($tilstand["student"], "profil-bilde", "profil-bilde-plassholder"); ?>
 

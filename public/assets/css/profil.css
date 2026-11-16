@@ -4,7 +4,12 @@
 
 .profil-suksess {
     margin: 0 0 1rem;
-    color: var(--text-muted);
+    padding: 0.75rem 1rem;
+    background-color: var(--secondary-200);
+    border: 1px solid var(--secondary-400);
+    border-left: 4px solid var(--secondary-600);
+    border-radius: var(--radius);
+    color: var(--text);
 }
 
 .profil-kort {
@@ -43,6 +48,29 @@
 .profil-kort h2 {
     margin: 0;
     align-self: flex-start;
+}
+
+.profil-tabell {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profil-tabell th,
+.profil-tabell td {
+    padding: 0.5rem 0;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.profil-tabell th {
+    width: 40%;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.profil-tabell tr:last-child th,
+.profil-tabell tr:last-child td {
+    border-bottom: none;
 }
 
 .profil-kort .form {
