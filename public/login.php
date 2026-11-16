@@ -5,6 +5,7 @@ require __DIR__ . "/bootstrap.inc.php";
 $offentlig_side = true;
 $feil = [];
 $epost = "";
+$action = trim($_GET["action"] ?? "");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!csrf_gyldig($_POST["csrf_token"] ?? null)) {
@@ -38,5 +39,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 $side_tittel = "Logg inn";
 $side_innhold = __DIR__ . "/../pages/login.tpl.php";
 $side_stiler = [url("/assets/css/auth.css")];
+
+$tilstand = [
+    "action" => $action,
+];
 
 include __DIR__ . "/layout.inc.php";
