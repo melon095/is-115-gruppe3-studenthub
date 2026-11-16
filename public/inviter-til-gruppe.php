@@ -2,8 +2,6 @@
 
 require __DIR__ . "/bootstrap.inc.php";
 
-krever_autentikasjon();
-
 $get = filter_input_array(INPUT_GET, [
     "gruppe_id" => FILTER_VALIDATE_INT,
     "kode" => FILTER_DEFAULT
@@ -21,6 +19,12 @@ $invitasjon = database_hent_invitasjon($pdo, $gruppe_id, $kode);
 if (!$invitasjon) {
     omdiriger(url("/index.php"));
 }
+
+if (!isset($_SESSION["student_id"])) {
+    husk_ventende_invitasjon($gruppe_id, $kode);
+}
+
+krever_autentikasjon();
 
 $gruppe = [
     "id" => $invitasjon["gruppe_id"],

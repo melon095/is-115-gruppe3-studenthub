@@ -8,6 +8,7 @@ $feil = [];
 $fornavn = "";
 $etternavn = "";
 $epost = "";
+$mobilnummer = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?? null)) {
     $feil[] = "Skjemaet er utløpt. Prøv igjen.";
@@ -17,7 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
         "etternavn" => FILTER_DEFAULT,
         "epost" => FILTER_VALIDATE_EMAIL,
         "passord" => FILTER_UNSAFE_RAW,
-        "bekreft_passord" => FILTER_UNSAFE_RAW
+        "bekreft_passord" => FILTER_UNSAFE_RAW,
+        "mobilnummer" => FILTER_DEFAULT
     ]);
 
     $fornavn = trim($input["fornavn"] ?? "");
@@ -25,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
     $epost = $input["epost"] ?? false;
     $passord = $input["passord"] ?? "";
     $bekreft_passord = $input["bekreft_passord"] ?? "";
+    $mobilnummer = trim($input["mobilnummer"] ?? "");
 
     if ($fornavn === "") {
         $feil[] = "Fornavn må fylles ut.";
@@ -46,12 +49,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
 
     if ($passord === "") {
         $feil[] = "Passord må fylles ut.";
-    } elseif (mb_strlen($passord) < 8) {
-        $feil[] = "Passord må være minst 8 tegn.";
+    } else {
+        $feil = array_merge($feil, valider_passordstyrke($passord));
     }
 
     if ($passord !== $bekreft_passord) {
         $feil[] = "Passordene er ikke like.";
+    }
+
+    if ($mobilnummer === "") {
+        $feil[] = "Mobilnummer må fylles ut.";
     }
 
     if (empty($feil)) {
@@ -60,12 +67,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
         } else {
             $passord_hash = password_hash($passord, PASSWORD_DEFAULT);
 
-            $student_id = database_opprett_student($pdo, $fornavn, $etternavn, $epost, $passord_hash);
+            $student_id = database_opprett_student($pdo, $fornavn, $etternavn, $epost, $passord_hash, $mobilnummer);
 
             session_regenerate_id(true);
             $_SESSION["student_id"] = $student_id;
 
-            omdiriger(url("/index.php"));
+            omdiriger(destinasjon_etter_innlogging($pdo));
         }
     }
 }

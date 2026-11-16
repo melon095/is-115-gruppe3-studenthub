@@ -43,7 +43,8 @@ $side_innhold = __DIR__ . "/../pages/index.tpl.php";
 $side_stiler = [url("/assets/css/index.css")];
 
 $tilstand = [
-    "alle_grupper" => $alle_grupper
+    "alle_grupper" => $alle_grupper,
+    "sist_besokt" => hent_sist_besokt($pdo, (int) $_SESSION["student_id"])
 ];
 
 include __DIR__ . "/layout.inc.php";

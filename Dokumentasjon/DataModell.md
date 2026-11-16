@@ -16,6 +16,15 @@ erDiagram
         TIMESTAMP opprettet_på
     }
     
+    PASSORD_HISTORIKK {
+        BIGINT id PK
+
+        BIGINT student_id FK
+
+        TEXT passord_hash
+        TIMESTAMP opprettet_på
+    }
+
     GRUPPE {
         BIGINT gruppe_id PK
             
@@ -122,6 +131,7 @@ erDiagram
         TIMESTAMP opprettet_på
     }
     
+    STUDENT ||--o{ PASSORD_HISTORIKK : "har brukt"
     STUDENT ||--o{ GRUPPE_MEDLEM : "er medlem av"
     STUDENT ||--o{ INNLEGG : "skriver"
     STUDENT ||--o{ REAKSJON : "lager"

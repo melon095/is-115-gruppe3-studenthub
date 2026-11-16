@@ -46,6 +46,112 @@ function send_filnedlasting(string $fil_lokasjon, string $fil_navn): never
     exit();
 }
 
+function cookie_valg(int $utloper): array
+{
+    return [
+        "expires" => $utloper,
+        "path" => url("/"),
+        "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
+        "httponly" => true,
+        "samesite" => "Lax"
+    ];
+}
+
+function husk_ventende_invitasjon(int $gruppe_id, string $kode): void
+{
+    $verdi = json_encode([
+        "gruppe_id" => $gruppe_id,
+        "kode" => $kode
+    ]);
+
+    setcookie("ventende_invitasjon", $verdi, cookie_valg(time() + 3600));
+}
+
+function destinasjon_etter_innlogging(PDO $pdo): string
+{
+    $verdi = $_COOKIE["ventende_invitasjon"] ?? null;
+
+    if ($verdi === null) {
+        return url("/index.php");
+    }
+
+    setcookie("ventende_invitasjon", "", cookie_valg(time() - 3600));
+
+    $data = json_decode((string) $verdi, true);
+
+    if (!is_array($data)) {
+        return url("/index.php");
+    }
+
+    $gruppe_id = filter_var($data["gruppe_id"] ?? null, FILTER_VALIDATE_INT);
+    $kode = $data["kode"] ?? null;
+
+    if (!$gruppe_id || !is_string($kode) || $kode === "" || mb_strlen($kode) > 64) {
+        return url("/index.php");
+    }
+
+    if (!database_hent_invitasjon($pdo, $gruppe_id, $kode)) {
+        return url("/index.php");
+    }
+
+    return url("/inviter-til-gruppe.php?gruppe_id=" . $gruppe_id . "&kode=" . urlencode($kode));
+}
+
+function husk_sist_besokt(int $gruppe_id, ?int $oppgave_id = null): void
+{
+    $verdi = json_encode([
+        "gruppe_id" => $gruppe_id,
+        "oppgave_id" => $oppgave_id
+    ]);
+
+    setcookie("sist_besokt", $verdi, cookie_valg(time() + 30 * 24 * 3600));
+}
+
+function hent_sist_besokt(PDO $pdo, int $student_id): ?array
+{
+    $verdi = $_COOKIE["sist_besokt"] ?? null;
+
+    if ($verdi === null) {
+        return null;
+    }
+
+    $data = json_decode((string) $verdi, true);
+
+    if (!is_array($data)) {
+        return null;
+    }
+
+    $gruppe_id = filter_var($data["gruppe_id"] ?? null, FILTER_VALIDATE_INT);
+
+    if (!$gruppe_id || !database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $student_id)) {
+        return null;
+    }
+
+    $gruppe = database_hent_gruppe($pdo, $gruppe_id);
+
+    if (!$gruppe) {
+        return null;
+    }
+
+    $oppgave_id = filter_var($data["oppgave_id"] ?? null, FILTER_VALIDATE_INT);
+
+    if ($oppgave_id) {
+        $oppgave = database_hent_oppgave($pdo, $oppgave_id, $gruppe_id);
+
+        if ($oppgave) {
+            return [
+                "tekst" => "Oppgave: " . $oppgave["tittel"] . " (" . $gruppe["navn"] . ")",
+                "lenke" => url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id)
+            ];
+        }
+    }
+
+    return [
+        "tekst" => "Gruppe: " . $gruppe["navn"],
+        "lenke" => url("/gruppe.php?gruppe_id=" . $gruppe_id)
+    ];
+}
+
 /**
  * Sjekker at brukeren er logget inn, og omdirigerer til innloggingssiden hvis ikke.
  */
@@ -75,6 +181,36 @@ function forbokstav(string $navn): string
 function fullt_navn(array $person): string
 {
     return $person["fornavn"] . " " . $person["etternavn"];
+}
+
+function valider_passordstyrke(string $passord): array
+{
+    $feil = [];
+
+    if (mb_strlen($passord) < 8) {
+        $feil[] = "Passord må være minst 8 tegn.";
+    }
+
+    if (!preg_match("/\p{Lu}/u", $passord)) {
+        $feil[] = "Passord må inneholde minst én stor bokstav.";
+    }
+
+    if (!preg_match("/[^\p{L}\p{N}\s]/u", $passord)) {
+        $feil[] = "Passord må inneholde minst ett spesialtegn.";
+    }
+
+    return $feil;
+}
+
+function passord_er_brukt_tidligere(PDO $pdo, int $student_id, string $passord): bool
+{
+    foreach (database_hent_passordhistorikk($pdo, $student_id) as $rad) {
+        if (password_verify($passord, $rad["passord_hash"])) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**

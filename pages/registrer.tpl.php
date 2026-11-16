@@ -47,8 +47,27 @@
             </div>
 
             <div class="form-felt">
+                <label for="mobilnummer">Mobilnummer</label>
+                <input
+                    type="tel"
+                    id="mobilnummer"
+                    name="mobilnummer"
+                    autocomplete="tel"
+                    minlength="8"
+                    required>
+            </div>
+
+            <div class="form-felt">
                 <label for="passord">Passord</label>
-                <input type="password" id="passord" name="passord" autocomplete="new-password" required>
+                <input
+                    type="password"
+                    id="passord"
+                    name="passord"
+                    autocomplete="new-password"
+                    minlength="8"
+                    aria-describedby="passord-krav"
+                    required>
+                <small id="passord-krav">Minst 8 tegn, én stor bokstav og ett spesialtegn.</small>
             </div>
 
             <div class="form-felt">

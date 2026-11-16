@@ -32,6 +32,8 @@ if (!database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $_SESSION['student_id'
     omdiriger(url("/index.php"));
 }
 
+husk_sist_besokt($gruppe_id);
+
 $er_eier = (int) $gruppe["opprettet_av"] === (int) $_SESSION["student_id"];
 
 if (

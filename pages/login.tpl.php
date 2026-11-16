@@ -1,5 +1,11 @@
 <div class="auth-wrapper">
     <section class="auth-card" aria-labelledby="login-heading">
+        <?php if ($tilstand["action"] === "loggut"): ?>
+            <div class="auth-melding" role="status">
+                Du har blitt logget ut.
+            </div>
+        <?php endif; ?>
+
         <h1 id="login-heading">Logg inn</h1>
 
         <?php if (!empty($feil)): ?>

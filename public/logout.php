@@ -19,4 +19,4 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
-omdiriger(url('/login.php'));
+omdiriger(url('/login.php?action=loggut'));

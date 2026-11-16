@@ -4,8 +4,22 @@ CREATE TABLE studenter (
     etternavn VARCHAR(100) NOT NULL,
     epost VARCHAR(255) NOT NULL UNIQUE,
     passord VARCHAR(255) NOT NULL,
+    mobilnummer VARCHAR(64) NOT NULL,
     avatar_link VARCHAR(500) DEFAULT NULL,
     opprettet_på DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE passord_historikk (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    student_id INT UNSIGNED NOT NULL,
+    passord_hash VARCHAR(255) NOT NULL,
+    opprettet_på DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_passord_historikk_student
+        FOREIGN KEY (student_id)
+        REFERENCES studenter(id)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

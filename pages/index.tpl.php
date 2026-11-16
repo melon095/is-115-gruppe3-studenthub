@@ -1,7 +1,15 @@
 <section>
     <div class="index-title-row">
         <h1>Hjem</h1>
-        <a href="<?php echo url("/opprett-gruppe.php"); ?>" class="button button-primary">Opprett gruppe</a>
+        <div class="index-title-handlinger">
+            <?php if ($tilstand["sist_besokt"] !== null): ?>
+                <a href="<?php echo htmlspecialchars($tilstand["sist_besokt"]["lenke"]); ?>" class="button button-secondary">
+                    Fortsett der du slapp? <?php echo htmlspecialchars($tilstand["sist_besokt"]["tekst"]); ?>
+                </a>
+            <?php endif; ?>
+
+            <a href="<?php echo url("/opprett-gruppe.php"); ?>" class="button button-primary">Opprett gruppe</a>
+        </div>
     </div>
 
     <h2>Alle grupper</h2>
