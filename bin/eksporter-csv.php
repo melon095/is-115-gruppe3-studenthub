@@ -11,6 +11,9 @@ $fil = fopen($filbane, 'w');
 
 $studenter = database_hent_studenter($pdo);
 
+// Fikse ÆØÅ https://stackoverflow.com/a/49561209
+fputs($fil, (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+
 // Header
 fputcsv($fil, [
     "Fornavn",
@@ -30,5 +33,6 @@ foreach ($studenter as $student) {
     ]);
 }
 
+fclose($fil);
 
 echo "Studenter tabellen er i filen '$filbane'" . PHP_EOL;
