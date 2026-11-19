@@ -57,6 +57,8 @@ if (
 
         if ($student_id && (int) $student_id !== (int) $gruppe["opprettet_av"]) {
             database_fjern_gruppe_medlem($pdo, $gruppe_id, $student_id);
+
+            hendelser_skriv($_SESSION["student_id"], "Gruppe", "Fjernet student $student_id fra gruppen '{$gruppe["navn"]}'");
         }
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=medlemmer"));
@@ -67,6 +69,8 @@ if (
 
         if ($oppgave_id) {
             database_fjern_oppgave($pdo, $oppgave_id, $gruppe_id);
+
+            hendelser_skriv($_SESSION["student_id"], "Oppgave", "Slettet oppgave $oppgave_id i gruppen '{$gruppe["navn"]}'");
         }
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
@@ -77,6 +81,8 @@ if (
 
         if ($diskusjon_id) {
             database_fjern_diskusjon($pdo, $diskusjon_id, $gruppe_id);
+
+            hendelser_skriv($_SESSION["student_id"], "Diskusjon", "Slettet diskusjon $diskusjon_id i gruppen '{$gruppe["navn"]}'");
         }
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=diskusjoner"));
@@ -87,6 +93,8 @@ if (
 
         if ($fil_id) {
             database_fjern_fil($pdo, $fil_id, $gruppe_id);
+
+            hendelser_skriv($_SESSION["student_id"], "Ressurs", "Slettet ressurs $fil_id i gruppen '{$gruppe["navn"]}'");
         }
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=ressurser"));
@@ -105,6 +113,8 @@ if (
     if ($nytt_navn !== "" && mb_strlen($nytt_navn) <= 255) {
         database_oppdater_gruppe($pdo, $gruppe_id, $nytt_navn, $ny_beskrivelse);
 
+        hendelser_skriv($_SESSION["student_id"], "Gruppe", "Oppdaterte gruppen '{$gruppe["navn"]}' til '$nytt_navn'");
+
         $gruppe["navn"] = $nytt_navn;
         $gruppe["beskrivelse"] = $ny_beskrivelse;
     }
@@ -120,6 +130,8 @@ if (
 
     if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
         database_opprett_oppgave($pdo, $gruppe_id, $ny_tittel, $ny_beskrivelse);
+
+        hendelser_skriv($_SESSION["student_id"], "Oppgave", "Opprettet oppgaven '$ny_tittel' i gruppen '{$gruppe["navn"]}'");
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=oppgaver"));
     }
@@ -143,6 +155,8 @@ if (
             $lagret_fil["fil_type"],
             $lagret_fil["fil_lokasjon"]
         );
+
+        hendelser_skriv($_SESSION["student_id"], "Ressurs", "Lastet opp filen '{$lagret_fil["fil_navn"]}' i gruppen '{$gruppe["navn"]}'");
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=ressurser"));
     }
@@ -172,6 +186,8 @@ if (
             $merket_fil_id ?: null,
             $_SESSION["student_id"]
         );
+
+        hendelser_skriv($_SESSION["student_id"], "Diskusjon", "Opprettet diskusjonen '$ny_tittel' i gruppen '{$gruppe["navn"]}'");
 
         omdiriger(url("/gruppe.php?gruppe_id=" . $gruppe_id . "&section=diskusjoner"));
     }

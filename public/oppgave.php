@@ -48,6 +48,8 @@ if (
     if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
         database_oppdater_oppgave($pdo, $oppgave_id, $gruppe_id, $ny_tittel, $ny_beskrivelse);
 
+        hendelser_skriv($_SESSION["student_id"], "Oppgave", "Oppdaterte oppgave $oppgave_id til '$ny_tittel'");
+
         omdiriger(url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id));
     }
 }
@@ -70,6 +72,8 @@ if (
             $lagret_fil["fil_type"],
             $lagret_fil["fil_lokasjon"]
         );
+
+        hendelser_skriv($_SESSION["student_id"], "Ressurs", "Lastet opp filen '{$lagret_fil["fil_navn"]}' til oppgave $oppgave_id");
 
         omdiriger(url("/oppgave.php?gruppe_id=" . $gruppe_id . "&oppgave_id=" . $oppgave_id));
     }

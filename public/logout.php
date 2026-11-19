@@ -2,6 +2,10 @@
 
 require __DIR__ . "/bootstrap.inc.php";
 
+if (isset($_SESSION["student_id"])) {
+    hendelser_skriv((int) $_SESSION["student_id"], "Logout", "Bruker har logget ut");
+}
+
 $_SESSION = [];
 
 if (ini_get('session.use_cookies')) {

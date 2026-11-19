@@ -40,6 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         if (!database_er_bruker_medlem_i_gruppe($pdo, $gruppe_id, $_SESSION["student_id"])) {
             database_legg_til_gruppe_medlem($pdo, $gruppe_id, $_SESSION["student_id"]);
+
+            hendelser_skriv($_SESSION["student_id"], "Gruppe", "Ble med i gruppen '{$gruppe["navn"]}' via invitasjon");
         }
 
         database_fjern_invitasjon($pdo, $invitasjon["id"]);

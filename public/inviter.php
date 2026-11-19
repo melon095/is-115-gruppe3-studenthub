@@ -50,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 if (send_invitasjon_epost($epost, $gruppe["navn"], $lenke, fullt_navn($inviterer))) {
                     $sendt_til = $epost;
+                    hendelser_skriv($_SESSION["student_id"], "Inviter", "$gruppe[navn] har sendt invitasjon via epost");
                 } else {
                     $feil[] = "Kunne ikke sende e-posten. Del lenken manuelt i stedet.";
                 }
@@ -58,6 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $kode = bin2hex(random_bytes(16));
 
             database_opprett_invitasjon($pdo, $gruppe_id, $kode, $_SESSION["student_id"]);
+
+            hendelser_skriv($_SESSION["student_id"], "Inviter", "$gruppe[navn] har generert invitasjons lenke");
 
             $generert_lenke = $skjema . "://" . $_SERVER["HTTP_HOST"] . url(
                 "/inviter-til-gruppe.php?gruppe_id=" . $gruppe_id . "&kode=" . urlencode($kode)

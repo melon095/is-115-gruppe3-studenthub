@@ -72,6 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !csrf_gyldig($_POST["csrf_token"] ?
             session_regenerate_id(true);
             $_SESSION["student_id"] = $student_id;
 
+            hendelser_skriv($_SESSION["student_id"], "Registrer", "Bruker har registrert");
+
             omdiriger(destinasjon_etter_innlogging($pdo));
         }
     }
