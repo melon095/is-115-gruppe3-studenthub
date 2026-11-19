@@ -21,6 +21,19 @@ function database_hent_student(PDO $pdo, int $id)
 }
 
 /**
+ * Henter alle studentert i databasen
+ *
+ * @return array Studentrader
+ */
+function database_hent_studenter(PDO $pdo)
+{
+    $stmt = $pdo->prepare("SELECT * FROM studenter");
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+/**
  * Henter en student basert på e-postadresse.
  *
  * @return array|false Studentraden, eller false hvis ingen student har denne e-posten.
