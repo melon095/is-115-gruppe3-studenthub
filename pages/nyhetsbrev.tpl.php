@@ -240,8 +240,10 @@ $kort_beskrivelse = function (?string $beskrivelse) use ($e): string {
 
             <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
                 <tr>
-                    <td style="padding: 28px 20px 20px 20px; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 22px; line-height: 26px; font-weight: bold; letter-spacing: 1px; color: #4a5fd0;" class="darkmode-heading">
-                        Studenthub
+                    <td style="padding: 28px 20px 20px 20px; text-align: center;">
+                        <a href="<?= $e($nettsted_url . "/index.php") ?>">
+                            <img src="<?= $e($nettsted_url . "/assets/bilder/StudentHub-logo.png") ?>" alt="Studenthub" width="200" height="72" style="display: block; margin: 0 auto; width: 200px; height: auto; border: 0; font-family: Arial, Helvetica, sans-serif; font-size: 22px; line-height: 26px; font-weight: bold; color: #4a5fd0;">
+                        </a>
                     </td>
                 </tr>
 
