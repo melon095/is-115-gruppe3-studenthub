@@ -28,7 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 session_regenerate_id(true);
                 $_SESSION["student_id"] = $student["id"];
 
+                hendelser_skriv($_SESSION["student_id"], "Login", "Bruker har logget inn");
+
                 omdiriger(destinasjon_etter_innlogging($pdo));
+            }
+
+            if ($student) {
+                hendelser_skriv((int) $student["id"], "Login", "Mislykket innlogging, feil passord");
             }
 
             $feil[] = "Feil e-post eller passord.";

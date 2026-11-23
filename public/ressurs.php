@@ -76,6 +76,8 @@ if (
             $lagret_fil["fil_størrelse"]
         );
 
+        hendelser_skriv($_SESSION["student_id"], "Ressurs", "Lastet opp versjon $nytt_versjon_nummer av '{$ressurs["fil_navn"]}'");
+
         omdiriger(url("/ressurs.php?ressurs_id=" . $ressurs_id));
     }
 }

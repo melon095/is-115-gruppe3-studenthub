@@ -182,6 +182,18 @@ h1, h2, h3, h4, h5, h6 {
     object-fit: cover;
 }
 
+.navbar-logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.navbar img.navbar-logo {
+    width: auto;
+    height: 36px;
+    border-radius: 0;
+    object-fit: contain;
+}
+
 .navbar-avatar-link {
     display: flex;
     border-radius: 50%;
@@ -220,6 +232,10 @@ h1, h2, h3, h4, h5, h6 {
     .navbar-avatar-placeholder {
         width: 28px;
         height: 28px;
+    }
+
+    .navbar img.navbar-logo {
+        height: 32px;
     }
 
     .navbar-hilsen {

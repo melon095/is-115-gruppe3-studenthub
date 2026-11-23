@@ -24,8 +24,13 @@ if (isset($_SESSION["student_id"])) {
 
     <ul>
         <li>
-            <a href="<?php echo htmlspecialchars(url('/index.php')); ?>">
-                <strong>Studenthub</strong>
+            <a class="navbar-logo-link" href="<?php echo htmlspecialchars(url('/index.php')); ?>">
+                <img
+                    class="navbar-logo"
+                    src="<?php echo htmlspecialchars(url('/assets/bilder/StudentHub-logo.png')); ?>"
+                    alt="Studenthub"
+                    width="2120"
+                    height="762">
             </a>
         </li>
     </ul>

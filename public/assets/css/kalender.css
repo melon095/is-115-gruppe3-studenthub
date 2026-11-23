@@ -1,0 +1,86 @@
+.gruppe-kalender {
+    position: sticky;
+    top: calc(60px + 1rem);
+}
+
+.kalender-tittel {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.kalender-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.kalender-element {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s;
+}
+
+.kalender-element:hover {
+    border-color: var(--primary-400);
+}
+
+.kalender-dato {
+    display: flex;
+    flex: 0 0 3.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0;
+    background-color: var(--primary-600);
+    color: var(--text-on-dark);
+    border-radius: var(--radius);
+    line-height: 1.1;
+}
+
+.kalender-dato-dag {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.kalender-dato-maned {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.kalender-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.kalender-navn {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.kalender-ukedag {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.kalender-tom {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+    .gruppe-kalender {
+        position: static;
+    }
+}

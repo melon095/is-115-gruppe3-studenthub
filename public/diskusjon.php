@@ -47,6 +47,8 @@ if (
     if ($ny_tittel !== "" && mb_strlen($ny_tittel) <= 255) {
         database_oppdater_diskusjon($pdo, $diskusjon_id, $gruppe_id, $ny_tittel);
 
+        hendelser_skriv($_SESSION["student_id"], "Diskusjon", "Endret tittel på diskusjon $diskusjon_id til '$ny_tittel'");
+
         omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
     }
 }
@@ -61,6 +63,8 @@ if (
 
     if ($innlegg_id) {
         database_fjern_diskusjon_innlegg($pdo, $diskusjon_id, $gruppe_id, $innlegg_id);
+
+        hendelser_skriv($_SESSION["student_id"], "Diskusjon", "Slettet innlegg $innlegg_id i diskusjon $diskusjon_id");
     }
 
     omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
@@ -106,6 +110,8 @@ if (
 
     if (empty($feil)) {
         database_opprett_innlegg($pdo, $diskusjon_id, $_SESSION['student_id'], $tekst);
+
+        hendelser_skriv($_SESSION["student_id"], "Diskusjon", "Skrev et innlegg i diskusjon $diskusjon_id");
 
         omdiriger(url("/diskusjon.php?gruppe_id=" . $gruppe_id . "&diskusjon_id=" . $diskusjon_id));
     }

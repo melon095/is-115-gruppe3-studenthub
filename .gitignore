@@ -2,3 +2,6 @@
 config.php
 uploads/
 public/uploads/
+log.json
+studenter.csv
+eksport/

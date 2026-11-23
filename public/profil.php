@@ -27,6 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 database_oppdater_avatar($pdo, $_SESSION["student_id"], $nytt_avatar_link);
 
+                hendelser_skriv($_SESSION["student_id"], "Profil", "$student[fornavn] $student[etternavn] har forandret profilbilde");
+
                 $student["avatar_link"] = $nytt_avatar_link;
                 $suksess = "avatar";
             }
@@ -60,6 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             database_oppdater_passord($pdo, $_SESSION["student_id"], $passord_hash);
 
             session_regenerate_id(true);
+
+            hendelser_skriv($_SESSION["student_id"], "Profil", "$student[fornavn] $student[etternavn] forandret passordet");
 
             $student["passord"] = $passord_hash;
             $suksess = "passord";

@@ -438,7 +438,12 @@ EOF;
                 </div>
             </section>
         <?php endif; ?>
-
     </div>
-
 </section>
+
+<aside
+    class="gruppe-kalender"
+    aria-label="Kalender"
+    aria-busy="true"
+    data-kalender-url="<?php echo htmlspecialchars(url("/kalender-get.ajax.php")); ?>">
+</aside>

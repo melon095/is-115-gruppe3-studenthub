@@ -22,6 +22,9 @@ $har_forlatt = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (csrf_gyldig($_POST["csrf_token"] ?? null)) {
         database_fjern_gruppe_medlem($pdo, $gruppe_id, $_SESSION['student_id']);
+
+        hendelser_skriv($_SESSION["student_id"], "Gruppe", "Forlot gruppen '{$gruppe["navn"]}'");
+
         $har_forlatt = true;
     }
 }

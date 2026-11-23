@@ -42,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $pdo->commit();
 
+                hendelser_skriv($_SESSION["student_id"], "OpprettGruppe", "Opprettet gruppen '$innsendt_navn'");
+
                 $opprettet_gruppe = [
                     "id" => $gruppe_id,
                     "navn" => $innsendt_navn,
