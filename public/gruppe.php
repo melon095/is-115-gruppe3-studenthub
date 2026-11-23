@@ -223,7 +223,12 @@ $side_innhold = __DIR__ . "/../pages/gruppe.tpl.php";
 
 $side_stiler = [
     url("/assets/css/gruppe.css"),
-    url("/assets/css/ressurs-tabell.css")
+    url("/assets/css/ressurs-tabell.css"),
+    url("/assets/css/kalender.css")
+];
+
+$side_skript = [
+    url("/assets/js/kalender.js")
 ];
 
 $brødsmulesti = [
